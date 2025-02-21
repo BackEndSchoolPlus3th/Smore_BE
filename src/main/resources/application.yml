@@ -1,0 +1,18 @@
+server:
+  port: 8090
+spring:
+  profiles:
+    active: dev
+    include: secret
+  logging:
+    level:
+      com.meossamos.smore: DEBUG
+      org.hibernate.orm.jdbc.bind: TRACE
+      org.hibernate.orm.jdbc.extract: TRACE
+      org.springframework.transaction.interceptor: TRACE
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    cache: false

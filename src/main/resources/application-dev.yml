@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:mysql://smore-mysql.c7cca4g8ujfq.ap-northeast-2.rds.amazonaws.com:3306/smore?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 'NyDRqX6H5AX3EMZ1eg6m'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  docker:
+    compose:
+      enabled: false
