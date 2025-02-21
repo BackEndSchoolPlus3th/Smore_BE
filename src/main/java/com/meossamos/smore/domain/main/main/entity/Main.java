@@ -1,4 +1,4 @@
-package com.meossamos.smore.domain.home.article.entity;
+package com.meossamos.smore.domain.main.main.entity;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.global.jpa.BaseEntity;
@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Article extends BaseEntity {
+public class Main extends BaseEntity {
     @Column(nullable = false)
     private String title;
 

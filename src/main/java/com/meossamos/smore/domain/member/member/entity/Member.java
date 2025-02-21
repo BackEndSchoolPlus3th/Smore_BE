@@ -1,10 +1,8 @@
 package com.meossamos.smore.domain.member.member.entity;
 
-import co.elastic.clients.util.DateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.meossamos.smore.domain.home.article.entity.Article;
+import com.meossamos.smore.domain.main.main.entity.Main;
 import com.meossamos.smore.global.jpa.BaseEntity;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -45,5 +43,5 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<Article> articleList = new ArrayList<>();
+    private List<Main> mainList = new ArrayList<>();
 }
