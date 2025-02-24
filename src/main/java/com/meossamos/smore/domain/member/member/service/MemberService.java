@@ -24,4 +24,10 @@ public class MemberService {
                 .build();
         return memberRepository.save(member);
     }
+
+    public Long getMaxMemberId() {
+        Long maxId = memberRepository.findMaxMemberId();
+        return maxId != null ? maxId : 0L;
+    }
+
 }

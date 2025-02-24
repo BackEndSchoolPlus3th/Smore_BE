@@ -15,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -28,7 +27,7 @@ import java.util.List;
 @SuperBuilder
 public class Member extends BaseEntity {
 
-//    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -47,43 +46,49 @@ public class Member extends BaseEntity {
     private String hashTags;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "leader", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<Study> studyList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member1", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList = new ArrayList<>();
+    private List<ChatRoom> chatRoomList1 = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "alarm", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member2", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<ChatRoom> chatRoomList2 = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<Alarm> alarmList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studyArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudyArticle> studyArticleList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "recruitmentArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<RecruitmentArticle> recruitmentArticleList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studyMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudyMember> studyMemberList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studySchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudySchedule> studyScheduleList = new ArrayList<>();

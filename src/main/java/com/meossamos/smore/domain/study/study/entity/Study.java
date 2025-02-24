@@ -43,49 +43,36 @@ public class Study extends BaseEntity {
     private Member leader;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studyDocument", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudyDocument> studyDocumentList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "recruitmentArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<RecruitmentArticle> recruitmentArticleList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studyMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudyMember> studyMemberList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studyArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudyArticle> studyArticleList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToMany(mappedBy = "studySchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
     private List<StudySchedule> studyScheduleList = new ArrayList<>();
 
-    @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "group_chat_room_id")
-    @Builder.Default
+    @OneToOne(mappedBy = "study")
     private GroupChatRoom groupChatRoom = null;
 
-    // Study 엔티티가 영속화되기 전에 GroupChatRoom 생성
-    @PrePersist
-    public void prePersist() {
-        if (this.groupChatRoom == null) {
-            GroupChatRoom room = GroupChatRoom.builder()
-                    .study(this)
-                    .build();
-            this.groupChatRoom = room;
-        }
-    }
 }

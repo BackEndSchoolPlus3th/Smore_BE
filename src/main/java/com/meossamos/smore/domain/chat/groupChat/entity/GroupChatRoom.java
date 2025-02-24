@@ -2,10 +2,7 @@ package com.meossamos.smore.domain.chat.groupChat.entity;
 
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.global.jpa.BaseEntity;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -17,6 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class GroupChatRoom extends BaseEntity {
-    @OneToOne(mappedBy = "groupChatRoom", fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "study_id")
     private Study study;
 }

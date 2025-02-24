@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class StudyArticleService {
     private final StudyArticleRepository studyArticleRepository;
 
-    public StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable String attachments, @Nullable String hashTags, Study study, Member member) {
+    public StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable String attachments, @Nullable String hashTags,  Member member, Study study) {
         StudyArticle studyArticle = StudyArticle.builder()
                 .title(title)
                 .content(content)
