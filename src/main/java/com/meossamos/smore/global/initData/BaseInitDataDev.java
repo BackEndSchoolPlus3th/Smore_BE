@@ -1,7 +1,7 @@
 package com.meossamos.smore.global.initData;
 
-import com.meossamos.smore.domain.home.article.entity.Article;
-import com.meossamos.smore.domain.home.article.service.ArticleService;
+import com.meossamos.smore.domain.main.main.entity.Main;
+import com.meossamos.smore.domain.main.main.service.MainService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import jakarta.annotation.Nullable;
@@ -19,15 +19,15 @@ import java.util.stream.IntStream;
 @Profile("dev")
 public class BaseInitDataDev {
     private final MemberService memberService;
-    private final ArticleService articleService;
+    private final MainService mainService;
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
             IntStream.rangeClosed(1, 10).forEach(i -> {
                 Member member = saveMember("test" + i + "@test.com", "test password" + i, "test nickname" + i, new Date(), "서울", "test hashTags" + i);
-                Article article = saveArticle("test title" + i, "test content" + i, "서울", "test hashTags" + i, "test imageUrls" + i, "test attachments" + i, member);
-                System.out.println(article);
+                Main main = saveArticle("test title" + i, "test content" + i, "서울", "test hashTags" + i, "test imageUrls" + i, "test attachments" + i, member);
+                System.out.println(main);
             });
         };
     }
@@ -45,8 +45,8 @@ public class BaseInitDataDev {
        return memberService.saveMember(member);
     }
 
-    private Article saveArticle(String title, String content, String region, String hashTags, String imageUrls, String attachments, Member member) {
-        Article article = Article.builder()
+    private Main saveArticle(String title, String content, String region, String hashTags, String imageUrls, String attachments, Member member) {
+        Main main = Main.builder()
                 .title(title)
                 .content(content)
                 .region(region)
@@ -56,6 +56,6 @@ public class BaseInitDataDev {
                 .member(member)
                 .build();
 
-        return articleService.saveArticle(article);
+        return mainService.saveArticle(main);
     }
 }
