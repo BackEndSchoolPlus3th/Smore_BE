@@ -4,6 +4,8 @@ import com.meossamos.smore.domain.main.main.entity.Main;
 import com.meossamos.smore.domain.main.main.service.MainService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
+import com.meossamos.smore.domain.study.chat.entity.StudyChat;
+import com.meossamos.smore.domain.study.chat.service.StudyChatService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationRunner;
@@ -20,14 +22,18 @@ import java.util.stream.IntStream;
 public class BaseInitDataDev {
     private final MemberService memberService;
     private final MainService mainService;
+//    private final ArticleService articleService;
+    private final StudyChatService studyChatService;
 
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
             IntStream.rangeClosed(1, 10).forEach(i -> {
                 Member member = saveMember("test" + i + "@test.com", "test password" + i, "test nickname" + i, new Date(), "서울", "test hashTags" + i);
-                Main main = saveArticle("test title" + i, "test content" + i, "서울", "test hashTags" + i, "test imageUrls" + i, "test attachments" + i, member);
-                System.out.println(main);
+                Main article = saveArticle("test title" + i, "test content" + i, "서울", "test hashTags" + i, "test imageUrls" + i, "test attachments" + i, member);
+                System.out.println(article);
+                StudyChat studyChat = saveStudyChat("test studyId" + i, "test userId" + i, "test message" + i);
+                System.out.println(studyChat);
             });
         };
     }
@@ -57,5 +63,15 @@ public class BaseInitDataDev {
                 .build();
 
         return mainService.saveArticle(main);
+    }
+
+    private StudyChat saveStudyChat(String studyId, String userId, String message) {
+        StudyChat studyChat = StudyChat.builder()
+                .studyId(studyId)
+                .userId(userId)
+                .message(message)
+                .build();
+
+        return studyChatService.saveStudyChat(studyChat);
     }
 }

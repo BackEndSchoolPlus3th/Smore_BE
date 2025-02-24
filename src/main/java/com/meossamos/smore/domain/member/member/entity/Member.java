@@ -21,7 +21,7 @@ import java.util.List;
 @SuperBuilder
 public class Member extends BaseEntity {
 
-    @Column(unique = true, nullable = false)
+//    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)
