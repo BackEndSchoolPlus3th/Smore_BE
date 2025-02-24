@@ -1,0 +1,9 @@
+package com.meossamos.smore.domain.alarm.alarm.repository;
+
+import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface AlarmRepository extends JpaRepository<Alarm, Long> {
+}

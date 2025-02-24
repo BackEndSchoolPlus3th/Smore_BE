@@ -17,6 +17,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 public class GroupChatRoom extends BaseEntity {
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "groupChatRoom", fetch = FetchType.LAZY)
     private Study study;
 }

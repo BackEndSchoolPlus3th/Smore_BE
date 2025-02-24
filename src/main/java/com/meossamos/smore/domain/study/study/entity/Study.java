@@ -73,8 +73,19 @@ public class Study extends BaseEntity {
     private List<StudySchedule> studyScheduleList = new ArrayList<>();
 
     @JsonIgnore
-    @OneToOne(mappedBy = "groupChatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "group_chat_room_id")
     @Builder.Default
-    @ToString.Exclude
-    private GroupChatRoom groupChatRoom;
+    private GroupChatRoom groupChatRoom = null;
+
+    // Study 엔티티가 영속화되기 전에 GroupChatRoom 생성
+    @PrePersist
+    public void prePersist() {
+        if (this.groupChatRoom == null) {
+            GroupChatRoom room = GroupChatRoom.builder()
+                    .study(this)
+                    .build();
+            this.groupChatRoom = room;
+        }
+    }
 }

@@ -26,9 +26,6 @@ public class Alarm extends BaseEntity {
     @Column(nullable = false)
     private String message;
 
-    @Column(nullable = false)
-    private LocalDateTime createDate;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Member receiver;
 
