@@ -33,8 +33,8 @@ public class StudySchedule extends BaseEntity {
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Study study;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Study study;
 }

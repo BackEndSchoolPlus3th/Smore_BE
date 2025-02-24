@@ -8,10 +8,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @ToString(callSuper = true)
@@ -28,10 +30,6 @@ public class StudyArticle extends BaseEntity {
 
     @Column(nullable = true)
     private String imageUrls;
-
-    @Column(nullable = false)
-    @CreatedDate
-    private LocalDateTime updateDate;
 
     @Column(nullable = true)
     private String attachments;

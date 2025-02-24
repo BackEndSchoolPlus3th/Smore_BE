@@ -13,6 +13,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +38,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(nullable = true)
-    private Date birthdate;
+    private LocalDate birthdate;
 
     @Column(nullable = true)
     private String region;
