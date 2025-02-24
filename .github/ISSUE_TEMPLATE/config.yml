@@ -1,0 +1,62 @@
+name: "✨ Feature"
+description: "새로운 기능 추가"
+labels: ["feature"]
+body:
+  - type: textarea
+    attributes:
+      label: 📄 설명
+      description: 새로운 기능에 대한 설명을 작성해 주세요.
+      placeholder: 자세히 적을수록 좋습니다!
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: ✅ 작업할 내용
+      description: 할 일을 체크박스 형태로 작성해주세요.
+      placeholder: 최대한 세분화 해서 적어주세요!
+    validations:
+      required: true
+
+name: "🐞 Bug"
+description: "버그 수정 요청"
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: 🐛 버그 설명
+      description: 발견한 버그에 대한 설명을 작성해 주세요.
+      placeholder: 예상 동작과 실제 동작의 차이를 설명해 주세요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 🎯 재현 방법
+      description: 버그를 재현하는 방법을 단계별로 설명해 주세요.
+      placeholder: |
+        1. '...' 페이지로 이동
+        2. '...' 버튼 클릭
+        3. '...' 동작 확인
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📝 기대 동작
+      description: 올바르게 동작해야 하는 방식에 대해 설명해 주세요.
+      placeholder: 원래 어떻게 동작해야 하는지 자세히 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📸 스크린샷 (선택)
+      description: 가능하다면 버그와 관련된 스크린샷을 첨부해 주세요.
+  - type: input
+    attributes:
+      label: 🖥 환경 정보
+      description: 사용한 환경을 작성해 주세요. (OS, 브라우저, 기기 등)
+      placeholder: e.g., Windows 11, Chrome 120.0, iPhone 13
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 📄 추가 내용
+      description: 기타 추가로 공유할 사항이 있다면 작성해 주세요.
