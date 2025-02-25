@@ -45,6 +45,9 @@ public class Member extends BaseEntity {
     @Column(nullable = true)
     private String hashTags;
 
+    @Column(nullable = true)
+    private String profileImageUrl;
+
     @JsonIgnore
     @OneToMany(mappedBy = "leader", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
