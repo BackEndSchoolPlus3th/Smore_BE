@@ -13,14 +13,13 @@ import java.time.LocalDate;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String hashTags) {
+    public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region) {
         Member member = Member.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
                 .birthdate(birthdate)
                 .region(region)
-                .hashTags(hashTags)
                 .build();
         return memberRepository.save(member);
     }

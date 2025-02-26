@@ -6,6 +6,7 @@ import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.chat.groupChat.entity.GroupChatRoom;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.document.entity.StudyDocument;
+import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.global.jpa.BaseEntity;
@@ -35,9 +36,6 @@ public class Study extends BaseEntity {
 
     @Column(nullable = true)
     private String introduction;
-
-    @Column(nullable = true)
-    private String hashTags;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member leader;
@@ -71,6 +69,12 @@ public class Study extends BaseEntity {
     @Builder.Default
     @ToString.Exclude
     private List<StudySchedule> studyScheduleList = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<StudyHashTag> studyHashTagList = new ArrayList<>();
 
     @OneToOne(mappedBy = "study")
     private GroupChatRoom groupChatRoom = null;
