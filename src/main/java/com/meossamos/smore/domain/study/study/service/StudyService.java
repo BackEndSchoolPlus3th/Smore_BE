@@ -1,16 +1,26 @@
 package com.meossamos.smore.domain.study.study.service;
 
+import com.meossamos.smore.domain.article.studyArticle.dto.StudyArticleDto;
+import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
+import com.meossamos.smore.domain.article.studyArticle.repository.StudyArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
+import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
+import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StudyService {
     private final StudyRepository studyRepository;
+    private final StudyMemberRepository studyMemberRepository;
 
     public Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, @Nullable String hashTags, Member leader) {
         Study study = Study.builder()
@@ -23,5 +33,29 @@ public class StudyService {
                 .build();
 
         return studyRepository.save(study);
+    }
+
+    private StudyDto convertToStudyDto(Study study) {
+        return StudyDto.builder()
+                .id(study.getId())
+                .title(study.getTitle())
+                .introduction(study.getIntroduction())
+                .hashTags(study.getHashTags())
+                .build();
+    }
+
+    public List<StudyDto> getStudiesForMember(Member member) {
+        List<StudyMember> studyMembers = studyMemberRepository.findByMember(member);
+
+        return studyMembers.stream()
+                .map(studyMember -> convertToStudyDto(studyMember.getStudy()))
+                .collect(Collectors.toList());
+    }
+
+    public StudyDto getStudyById(Long studyId) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
+
+        return convertToStudyDto(study);
     }
 }

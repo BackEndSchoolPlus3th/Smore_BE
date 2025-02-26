@@ -48,7 +48,6 @@ public class BaseInitDataDev {
     private final StudyMemberService studyMemberService;
     private final ChatMessageService chatMessageService;
 
-
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
