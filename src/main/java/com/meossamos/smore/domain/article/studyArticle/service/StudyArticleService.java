@@ -35,25 +35,11 @@ public class StudyArticleService {
         return studyArticleRepository.save(studyArticle);
     }
 
-    private StudyArticleDto convertToStudyArticleDto(StudyArticle studyArticle, boolean isDetail) {
-        StudyArticleDto.StudyArticleDtoBuilder dtoBuilder = StudyArticleDto.builder()
-                .id(studyArticle.getId())
-                .title(studyArticle.getTitle())
-                .content(studyArticle.getContent());
-
-        if (isDetail) {
-            dtoBuilder.member(studyArticle.getMember())
-                    .attachments(studyArticle.getAttachments());
-        }
-
-        return dtoBuilder.build();
-    }
-
     // 게시글 조회
     public List<StudyArticleDto> getArticlesByStudyId(Long studyId) {
         List<StudyArticle> articles = studyArticleRepository.findByStudyId(studyId);
         return articles.stream()
-                .map(article -> convertToStudyArticleDto(article, false))
+                .map(this::convertToStudyArticleDto)
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +47,7 @@ public class StudyArticleService {
     public StudyArticleDto getStudyArticleById(Long articleId) {
         StudyArticle studyArticle = studyArticleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        return convertToStudyArticleDto(studyArticle, true);
+        return convertToStudyArticleDto(studyArticle);
     }
 
     // 게시글 작성

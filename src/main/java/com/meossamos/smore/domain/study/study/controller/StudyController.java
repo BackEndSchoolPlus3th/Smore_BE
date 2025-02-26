@@ -9,9 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +29,15 @@ public class StudyController {
     @GetMapping("/api/study/{study_Id}")
     public StudyDto getStudyById(@PathVariable("study_Id") Long studyId) {
         return studyService.getStudyById(studyId);
+    }
+
+    // 스터디 정보 수정
+    @PutMapping("/api/study/{study_Id}/introduction")
+    public ResponseEntity<StudyDto> updateStudyIntroductions(
+            @PathVariable("study_Id") Long studyId,
+            @RequestBody StudyDto studyDto) {
+
+        StudyDto updatedStudyDto = studyService.updateStudyIntroductions(studyId, studyDto);
+        return new ResponseEntity<>(updatedStudyDto, HttpStatus.OK);
     }
 }

@@ -61,4 +61,18 @@ public class StudyService {
 
         return convertToStudyDto(study);
     }
+
+    // 스터디 정보 업데이트
+    public StudyDto updateStudyIntroductions(Long studyId, StudyDto studyDto) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
+
+        study.setTitle(studyDto.getTitle());
+        study.setIntroduction(studyDto.getIntroduction());
+        study.setHashTags(studyDto.getHashTags());
+
+        Study updatedStudy = studyRepository.save(study);
+
+        return convertToStudyDto(updatedStudy);
+    }
 }
