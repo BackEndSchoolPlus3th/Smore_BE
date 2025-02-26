@@ -29,17 +29,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String hashTags) {
+
         Member member = Member.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
                 .birthdate(birthdate)
                 .region(region)
-                .hashTags(hashTags)
                 .build();
         return memberRepository.save(member);
     }
