@@ -5,8 +5,11 @@ import com.meossamos.smore.domain.member.member.dto.MemberRequestDto;
 import com.meossamos.smore.domain.member.member.dto.MemberResponseDto;
 import com.meossamos.smore.domain.member.member.dto.TokenDto;
 import com.meossamos.smore.domain.member.member.service.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.antlr.v4.runtime.Token;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +20,18 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/login")
-    public TokenDto login(@RequestBody LoginDto loginDto){
+    public TokenDto login(@RequestBody LoginDto loginDto, HttpServletResponse response){
         TokenDto tokenDto = memberService.login(loginDto);
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",tokenDto.getRefreshToken())
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)  // 7일 유지
+                .sameSite("Strict")
+                .build();
+        response.setHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        response.setHeader(HttpHeaders.AUTHORIZATION,"Bearer "+ tokenDto.getAccessToken());
+
         return tokenDto;
     }
 

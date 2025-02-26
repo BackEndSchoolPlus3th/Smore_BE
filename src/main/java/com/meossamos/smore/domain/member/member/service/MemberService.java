@@ -10,8 +10,12 @@ import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.rsData.RsData;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -58,7 +63,9 @@ public class MemberService {
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
+
         return tokenDto;
+
     }
 
     public Long getMaxMemberId() {
