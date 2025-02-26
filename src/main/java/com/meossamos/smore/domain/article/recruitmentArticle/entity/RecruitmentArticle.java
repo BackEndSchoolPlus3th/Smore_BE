@@ -1,17 +1,18 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.global.jpa.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -50,4 +51,10 @@ public class RecruitmentArticle extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "recruitmentArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<RecruitmentArticleHashTag> recruitmentArticleHashTagList = new ArrayList<>();
 }
