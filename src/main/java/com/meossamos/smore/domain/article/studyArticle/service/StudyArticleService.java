@@ -104,6 +104,19 @@ public class StudyArticleService {
         studyArticleRepository.delete(studyArticle);
     }
 
+    // 게시글 검색
+    public List<StudyArticleDto> searchArticles(Long studyId, String title, String content, String author, String hashtags) {
+        Study study = studyRepository.findById(studyId)
+                .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 ID입니다."));
+
+        List<StudyArticle> articles = studyArticleRepository.findByStudyAndSearchConditions(
+                study, title, content);
+
+        return articles.stream()
+                .map(this::convertToStudyArticleDto)
+                .collect(Collectors.toList());
+    }
+
     // DTO로 변환
     private StudyArticleDto convertToStudyArticleDto(StudyArticle studyArticle) {
         return StudyArticleDto.builder()
