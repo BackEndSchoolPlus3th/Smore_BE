@@ -12,13 +12,12 @@ import org.springframework.stereotype.Service;
 public class StudyService {
     private final StudyRepository studyRepository;
 
-    public Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, @Nullable String hashTags, Member leader) {
+    public Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, Member leader) {
         Study study = Study.builder()
                 .title(title)
                 .memberCnt(memberCnt)
                 .imageUrls(imageUrls)
                 .introduction(introduction)
-                .hashTags(hashTags)
                 .leader(leader)
                 .build();
 
