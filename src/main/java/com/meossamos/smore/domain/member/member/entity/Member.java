@@ -47,6 +47,8 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
+    @Column(nullable = true)
+    private String profileImageUrl;
 
     @JsonIgnore
     @OneToMany(mappedBy = "leader", cascade = CascadeType.ALL, orphanRemoval = true)
