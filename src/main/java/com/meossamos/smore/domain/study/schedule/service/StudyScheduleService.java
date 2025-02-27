@@ -25,12 +25,13 @@ public class StudyScheduleService {
 
 
     // 테스트용 일정 저장
-    public StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, Member member, Study study) {
+    public StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, Boolean allDay, Member member, Study study) {
         StudySchedule studySchedule = StudySchedule.builder()
                 .title(title)
                 .content(content)
                 .startDate(startDate)
                 .endDate(endDate)
+                .allDay(allDay)
                 .member(member)
                 .study(study)
                 .build();
@@ -57,6 +58,7 @@ public class StudyScheduleService {
                 .content(addstudyScheduleDto.getContent())
                 .startDate(addstudyScheduleDto.getStartDate())
                 .endDate(addstudyScheduleDto.getEndDate())
+                .allDay(addstudyScheduleDto.isAllDay())
                 .member(member)
                 .study(study)
                 .build();

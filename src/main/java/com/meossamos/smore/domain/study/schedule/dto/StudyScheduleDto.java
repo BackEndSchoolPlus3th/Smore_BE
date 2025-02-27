@@ -20,6 +20,8 @@ public class StudyScheduleDto {
     private final LocalDateTime startDate;
     private final LocalDateTime endDate;
 
+    private final boolean allDay;
+
     @JsonCreator
     public StudyScheduleDto(StudySchedule studySchedule
                             ){
@@ -28,6 +30,7 @@ public class StudyScheduleDto {
         this.content = studySchedule.getContent();
         this.startDate = studySchedule.getStartDate();
         this.endDate = studySchedule.getEndDate();
+        this.allDay = studySchedule.isAllDay();
 
     }
 

@@ -33,6 +33,9 @@ public class StudySchedule extends BaseEntity {
     @Column(nullable = true)
     private String content;
 
+    @Column(nullable = false)
+    private boolean allDay;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 

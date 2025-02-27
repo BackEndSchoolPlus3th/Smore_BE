@@ -21,16 +21,20 @@ public class AddStudyScheduleDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endDate;
 
+    private boolean allDay;
+
     @JsonCreator
     public AddStudyScheduleDto(
             @JsonProperty("title") String title,
             @JsonProperty("content") String content,
             @JsonProperty("startDate") String startDate,
-            @JsonProperty("endDate") String endDate){
+            @JsonProperty("endDate") String endDate,
+            @JsonProperty("allDay") Boolean allDay){
             this.title = title;
             this.content = content;
             this.startDate = parseDateTime(startDate);
             this.endDate = parseDateTime(endDate);
+            this.allDay = allDay;
     }
     @Override
     public String toString() {
