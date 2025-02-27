@@ -339,37 +339,6 @@ class SmoreBeApplicationTests {
         System.out.println("\n\n\n\n");
     }
 
-    @Test
-    @Order(5)
-    public void findRecruitmentArticleByContentTest() {
-        List<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByContent("content");
-
-        System.out.print("find RecruitmentArticle by Content: ");
-        System.out.print("content");
-
-        System.out.println("\nfounded RecruitmentArticles: ");
-        recruitmentArticles.forEach(recruitmentArticle ->
-                System.out.println("id: " + recruitmentArticle.getId() + ", title: " + recruitmentArticle.getTitle() + ", content: " + recruitmentArticle.getContent() + ", creeatedDate: " + recruitmentArticle.getCreatedDate())
-
-        );
-
-        System.out.println("\n");
-    }
-
-
-    @Test
-    @Order(5)
-    public void RecruitmentArticleDocSearchTest2() throws IOException {
-        List<RecruitmentArticleDoc> recruitmentArticles = RecruitmentArticleDocSearchTest();
-
-        System.out.println("RecruitmentArticleDocSearchTest2: ");
-        recruitmentArticles.forEach(recruitmentArticle ->
-                System.out.println("id: " + recruitmentArticle.getId() + ", title: " + recruitmentArticle.getTitle() + ", content: " + recruitmentArticle.getContent() + ", creeatedDate: " + recruitmentArticle.getCreatedDate())
-
-        );
-
-        System.out.println("\n");
-    }
 
     private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
         return memberService.saveMember(email, password, nickname, birthdate, region, profileImageUrl);
@@ -429,13 +398,5 @@ class SmoreBeApplicationTests {
 
     private Page<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTag, int page, int size) {
         return recruitmentArticleDocService.findByHashTags(hashTag, page, size);
-    }
-
-    private List<RecruitmentArticleDoc> findRecruitmentArticleByContent(String content) {
-        return recruitmentArticleDocService.findAllByContent(content);
-    }
-
-    private List<RecruitmentArticleDoc> RecruitmentArticleDocSearchTest() throws IOException {
-        return recruitmentArticleDocService.searchTest();
     }
 }
