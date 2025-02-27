@@ -9,6 +9,7 @@ import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.global.exception.MemberNotFoundException;
 import com.meossamos.smore.global.exception.StudyNotFoundException;
+import com.meossamos.smore.global.exception.StudyScheduleNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,8 +38,9 @@ public class StudyScheduleService {
         return studyScheduleRepository.save(studySchedule);
     }
 
-    // 작성자 가져와서 member에 집어넣기
+
     // 일정 생성
+    // TODO : 작성자 가져와서 member에 집어넣기
     public StudySchedule addStudySchedule(Long study_id, AddStudyScheduleDto addstudyScheduleDto) {
 
         Study study = studyRepository.findById(study_id).orElseThrow(() ->
@@ -65,4 +67,14 @@ public class StudyScheduleService {
                                 
         return studyScheduleRepository.save(studySchedule);
     }
+
+    // 삭제
+    public void deleteSchedule(Long eventId) {
+
+        StudySchedule studySchedule = studyScheduleRepository.findById(eventId).orElseThrow(() ->
+                new StudyScheduleNotFoundException("StudySchedule not found with ID " + eventId));
+        studyScheduleRepository.delete(studySchedule);
+
+    }
+
 }

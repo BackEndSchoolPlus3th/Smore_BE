@@ -7,9 +7,12 @@ import com.meossamos.smore.domain.study.schedule.repository.StudyScheduleReposit
 import com.meossamos.smore.domain.study.schedule.service.StudyScheduleService;
 import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/study")
@@ -48,7 +51,17 @@ public class ApiV1StudyScheduleController {
     }
 
     // 삭제
-
+    @DeleteMapping("/{study_id}/schedules")
+    public ResponseEntity<RsData> deleteSchedule(@RequestBody Map<String, Long> request){
+        Long eventId = request.get("id");
+        try {
+            studyScheduleService.deleteSchedule(eventId);
+            return ResponseEntity.ok(new RsData<>("200", "스케쥴 삭제 성공", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new RsData<>("400"," 스케쥴 삭제 실패 " + e.getMessage(), null));
+        }
+    }
 
     // 수정
 
