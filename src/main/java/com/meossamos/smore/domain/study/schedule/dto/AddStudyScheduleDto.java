@@ -32,6 +32,15 @@ public class AddStudyScheduleDto {
             this.startDate = parseDateTime(startDate);
             this.endDate = parseDateTime(endDate);
     }
+    @Override
+    public String toString() {
+        return "AddStudyScheduleDto{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                '}';
+    }
 
     private LocalDateTime parseDateTime(String dateTimeStr){
         if(dateTimeStr.length() == 10){ // 날짜만 들어온 경우

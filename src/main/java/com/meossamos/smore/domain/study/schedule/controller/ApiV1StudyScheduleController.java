@@ -37,15 +37,20 @@ public class ApiV1StudyScheduleController {
 
     // 생성
     @PostMapping("/{study_id}/schedules")
-    public RsData<AddStudyScheduleDto> addScedule(@PathVariable Long study_id,
+    public RsData<AddStudyScheduleDto> addSchedule(@PathVariable Long study_id,
                                                   @RequestBody AddStudyScheduleDto addstudyScheduleDto){
-
-        System.out.println(addstudyScheduleDto);
-        return new RsData<>("200","스케쥴 저장 성공", addstudyScheduleDto);
+        try {
+            StudySchedule studySchedule = studyScheduleService.addStudySchedule(study_id, addstudyScheduleDto);
+            return new RsData<>("200","스케쥴 저장 성공", addstudyScheduleDto);
+        } catch (RuntimeException e) {
+            return new RsData<>("500", "스케쥴 저장 실패" + e.getMessage(), null);
+        }
     }
+
+    // 삭제
 
 
     // 수정
 
-    // 삭제
+
 }
