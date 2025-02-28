@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 public class RecruitmentArticleResponseData {
     private Long id;
     private String title;
-    private String content;
+    private String introduction;
     private String region;
     private String imageUrl;
     private Boolean isRecruiting;

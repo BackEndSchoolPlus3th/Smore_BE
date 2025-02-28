@@ -50,7 +50,7 @@ public class ApiV1RecruitmentArticleController {
             RecruitmentArticleResponseData recruitmentArticleResponseData = RecruitmentArticleResponseData.builder()
                     .id(Long.valueOf(recruitmentArticleDoc.getId()))
                     .title(recruitmentArticleDoc.getTitle())
-                    .content(recruitmentArticleDoc.getContent())
+                    .introduction(recruitmentArticleDoc.getIntroduction())
                     .hashTags(recruitmentArticleDoc.getHash_tags())
                     .region(recruitmentArticleDoc.getRegion())
                     .imageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
