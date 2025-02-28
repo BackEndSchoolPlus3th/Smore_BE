@@ -328,7 +328,16 @@ class SmoreBeApplicationTests {
     @Order(5)
     public void findRecruitmentArticleByHashTagTest() {
         List<String> hashTags = HashTagUtil.getRandomHashTags();
-        Page<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByHashTag(hashTags, 0, 20);
+        List<String> hashTags2 = new ArrayList<>();
+        hashTags2.add("백엔드");
+        hashTags2.add("postgresql");
+        hashTags2.add("프론트");
+        List<String> hashTags3 = new ArrayList<>();
+        List<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByHashTag(hashTags2, 2, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles2 = findRecruitmentArticleByHashTag(hashTags2, 3, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles3 = findRecruitmentArticleByHashTag(hashTags2, 12, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles4 = findRecruitmentArticleByHashTag(hashTags3, 1, 12);
+
 
         System.out.print("find RecruitmentArticle by HashTag: ");
         hashTags.forEach(hashTag -> System.out.print(hashTag + ", "));
@@ -396,7 +405,7 @@ class SmoreBeApplicationTests {
         return groupChatRoomService.saveGroupChatRoom(study);
     }
 
-    private Page<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTag, int page, int size) {
-        return recruitmentArticleDocService.findByHashTags(hashTag, page, size);
+    private List<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTags, int page, int size) {
+        return recruitmentArticleDocService.findByHashTags(hashTags, page, size);
     }
 }

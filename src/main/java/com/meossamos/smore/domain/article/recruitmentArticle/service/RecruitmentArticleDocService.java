@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +28,9 @@ public class RecruitmentArticleDocService {
 
     private final ElasticSearchUtil elasticSearchUtil;
     private static final int BLOCK_SIZE = 10;
+    private static final String ES_INDEX_NAME = "es_recruitment_article";
+    private final Map<String, ElasticSearchUtil.SearchResult<RecruitmentArticleDoc>> blockCache = new HashMap<>();
+
 
     /**
      * 해시태그를 이용한 모집글 검색(페이징)
@@ -35,17 +40,46 @@ public class RecruitmentArticleDocService {
      * @param pageSize    페이지당 도큐먼트 수
      * @return 페이징 처리된 RecruitmentArticleDoc 페이지
      */
-    public Page<RecruitmentArticleDoc> findByHashTags(List<String> hashTagList, int pageNum, int pageSize) {
-        pageNum -= 1;
-        Pageable pageable = PageRequest.of(pageNum, pageSize);
-        // BLOCK_SIZE에 따른 검색 시작 번호 계산
-        int pageStart = ((pageNum) - (pageNum % BLOCK_SIZE)) * pageSize;
-        // 한 블록 내에 조회할 도큐먼트 개수
+    public List<RecruitmentArticleDoc> findByHashTags(List<String> hashTagList, int pageNum, int pageSize) {
+        // 1. 1-indexed 페이지 번호를 0-indexed로 변환
+        int adjustedPageNum = pageNum - 1;
+        List<RecruitmentArticleDoc> result = new ArrayList<>();
+
+        // 2. 블록 번호 계산 (예: BLOCK_SIZE = 10)
+        int blockNumber = adjustedPageNum / BLOCK_SIZE;
+        // 블록의 시작 페이지 (0-indexed)
+        int blockStartPage = blockNumber * BLOCK_SIZE;
+        // 블록의 시작 도큐먼트 인덱스
+        int pageStart = blockStartPage * pageSize;
+        // 블록 내 총 도큐먼트 개수
         int searchSize = pageSize * BLOCK_SIZE;
 
-        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult = searchByHashTagList(hashTagList, pageStart, searchSize);
+        System.out.println("blockNumber: " + blockNumber);
+        System.out.println("blockStartPage: " + blockStartPage);
+        System.out.println("pageStart: " + pageStart);
+        System.out.println("searchSize: " + searchSize);
 
-        return new PageImpl<>(searchResult.getDocs(), pageable, searchResult.getTotalHits());
+        // 캐시 키 구성 (간단하게 해시태그 리스트와 blockNumber 결합)
+        String cacheKey = hashTagList.toString() + "_block_" + blockNumber;
+        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult;
+
+        if (blockCache.containsKey(cacheKey)) {
+            // 캐시된 결과 사용
+            searchResult = blockCache.get(cacheKey);
+        } else {
+            // Elasticsearch에서 해당 블록 검색 후 캐시 저장
+            searchResult = searchByHashTagList(hashTagList, pageStart, searchSize);
+            blockCache.put(cacheKey, searchResult);
+        }
+
+        // 페이징 처리
+        if (searchResult != null) {
+            result = paging(searchResult.getDocs(), adjustedPageNum - blockStartPage, pageSize);
+        } else {
+            System.out.println("searchResult is null");
+        }
+
+        return result;
     }
 
     /**
@@ -86,7 +120,7 @@ public class RecruitmentArticleDocService {
 
         try {
             return elasticSearchUtil.searchByQuery(
-                    "es_recruitment_article",  // 검색할 인덱스 이름
+                    ES_INDEX_NAME,
                     boolQuery,
                     RecruitmentArticleDoc.class,
                     startNum,
@@ -98,5 +132,11 @@ public class RecruitmentArticleDocService {
             // 예외 발생 시 빈 결과 반환
             return new ElasticSearchUtil.SearchResult<>(new ArrayList<>(), 0);
         }
+    }
+
+    private List<RecruitmentArticleDoc> paging(List<RecruitmentArticleDoc> docs, int pageNum, int pageSize) {
+        int start = (pageNum - 1) * pageSize;
+        int end = Math.min(start + pageSize, docs.size());
+        return docs.subList(start, end);
     }
 }

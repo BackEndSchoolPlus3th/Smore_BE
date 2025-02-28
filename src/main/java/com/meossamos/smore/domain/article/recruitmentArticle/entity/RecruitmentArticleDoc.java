@@ -1,10 +1,12 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Entity;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -19,47 +21,42 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecruitmentArticleDoc {
-
     @Id
     private String id;
-
-    // JSON 필드명이 "@timestamp"인 경우 @Field의 name 속성 사용
-    @Field(type = FieldType.Date, name = "@timestamp")
-    private String timestamp;
 
     @Field(type = FieldType.Text)
     private String content;
 
     @Field(type = FieldType.Date, name = "created_date")
-    private String  createdDate;
+    private Date created_date;
 
     @Field(type = FieldType.Date, name = "end_date")
-    private String  endDate;
+    private Date end_date;
 
     // 해시태그가 콤마로 구분된 문자열로 저장되는 경우 String으로 사용
     @Field(type = FieldType.Text, name = "hash_tags")
-    private String hashTags;
+    private String hash_tags;
 
     @Field(type = FieldType.Text, name = "image_urls")
-    private String imageUrls;
+    private String image_urls;
 
     @Field(type = FieldType.Boolean, name = "is_recruiting")
-    private Boolean isRecruiting;
+    private Boolean is_recruiting;
 
     @Field(type = FieldType.Long, name = "max_member")
-    private Long maxMember;
+    private Long max_member;
 
     @Field(type = FieldType.Long, name = "member_id")
-    private Long memberId;
+    private Long member_id;
 
     @Field(type = FieldType.Text)
     private String region;
 
     @Field(type = FieldType.Date, name = "start_date")
-    private String  startDate;
+    private Date start_date;
 
     @Field(type = FieldType.Long, name = "study_id")
-    private Long studyId;
+    private Long study_id;
 
     @Field(type = FieldType.Text)
     private String title;
@@ -68,5 +65,5 @@ public class RecruitmentArticleDoc {
     private String type;
 
     @Field(type = FieldType.Date, name = "updated_date")
-    private String  updatedDate;
+    private Date updated_date;
 }
