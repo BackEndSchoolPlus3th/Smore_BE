@@ -46,6 +46,9 @@ public class RecruitmentArticle extends BaseEntity {
     @Column(nullable = false)
     private Integer maxMember;
 
+    @Column(nullable = true)
+    private String hashTags;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 

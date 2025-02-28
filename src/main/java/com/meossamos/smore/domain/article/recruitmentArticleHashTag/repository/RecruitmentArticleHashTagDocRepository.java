@@ -11,18 +11,5 @@ import java.util.List;
 
 @Repository
 public interface RecruitmentArticleHashTagDocRepository extends ElasticsearchRepository<RecruitmentArticleHashTagDoc, String> {
-    @Query("""
-    {
-      "bool": {
-        "must": [
-          { "terms": { "hash_tag.keyword": ?0 } }
-        ],
-        "filter": [
-          { "exists": { "field": "recruitment_article_id" } }
-        ]
-      }
-    }
-    """)
-    List<RecruitmentArticleHashTagDoc> searchByHashTagsAndPage(List<String> hashTags, Pageable pageable);
 
 }
