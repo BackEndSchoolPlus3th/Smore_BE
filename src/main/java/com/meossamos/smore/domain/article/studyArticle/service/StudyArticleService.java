@@ -26,7 +26,6 @@ public class StudyArticleService {
                 .content(content)
                 .imageUrls(imageUrls)
                 .attachments(attachments)
-                .hashTags(hashTags)
                 .study(study)
                 .member(member)
                 .build();
@@ -108,7 +107,6 @@ public class StudyArticleService {
                 .id(studyArticle.getId())
                 .title(studyArticle.getTitle())
                 .content(studyArticle.getContent())
-                .attachments(studyArticle.getAttachments())
                 .member(studyArticle.getMember())
                 .build();
     }

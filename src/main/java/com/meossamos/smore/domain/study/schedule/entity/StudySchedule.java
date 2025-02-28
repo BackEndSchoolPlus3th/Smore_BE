@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.study.schedule.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.global.jpa.BaseEntity;
@@ -32,9 +33,13 @@ public class StudySchedule extends BaseEntity {
     @Column(nullable = true)
     private String content;
 
+    @Column(nullable = false)
+    private boolean allDay;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Study study;
 }

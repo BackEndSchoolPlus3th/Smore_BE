@@ -34,9 +34,6 @@ public class StudyArticle extends BaseEntity {
     @Column(nullable = true)
     private List<String> attachments = new ArrayList<>();
 
-    @Column(nullable = true)
-    private String hashTags;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
 

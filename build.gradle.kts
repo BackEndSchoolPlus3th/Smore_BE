@@ -41,6 +41,10 @@ dependencies {
     // s3 의존성
     implementation(platform("software.amazon.awssdk:bom:2.24.0"))
     implementation("software.amazon.awssdk:s3")
+
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
 }
 
 tasks.withType<Test> {

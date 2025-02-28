@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.chat.chat.entity.ChatRoom;
+import com.meossamos.smore.domain.member.hashTag.entity.MemberHashTag;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
@@ -45,6 +46,8 @@ public class Member extends BaseEntity {
     @Column(nullable = true)
     private String hashTags;
 
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
     @Column(nullable = true)
     private String profileImageUrl;
 
@@ -95,4 +98,10 @@ public class Member extends BaseEntity {
     @Builder.Default
     @ToString.Exclude
     private List<StudySchedule> studyScheduleList = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<MemberHashTag> memberHashTagList = new ArrayList<>();
 }
