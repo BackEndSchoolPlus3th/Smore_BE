@@ -34,6 +34,7 @@ public class StudyService {
         return studyRepository.save(study);
     }
 
+    // Dto 변환
     private StudyDto convertToStudyDto(Study study) {
         return StudyDto.builder()
                 .id(study.getId())
@@ -43,6 +44,7 @@ public class StudyService {
                 .build();
     }
 
+    // 유저 스터디 목록 조회
     public List<StudyDto> getStudiesForMember(Member member) {
         List<StudyMember> studyMembers = studyMemberRepository.findByMember(member);
 
@@ -51,6 +53,7 @@ public class StudyService {
                 .collect(Collectors.toList());
     }
 
+    // 스터디 정보 조회
     public StudyDto getStudyById(Long studyId) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));

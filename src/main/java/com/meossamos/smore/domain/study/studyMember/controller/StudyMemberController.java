@@ -17,6 +17,7 @@ public class StudyMemberController {
     private final StudyMemberService studyMemberService;
     private final StudyService studyService;
 
+    // 유저 탈퇴
     @DeleteMapping("/api/study/{study_Id}/delete")
     public ResponseEntity<String> leaveStudy(@AuthenticationPrincipal Member member, @PathVariable("study_Id") Long studyId) {
             studyMemberService.leaveStudy(member, studyId);

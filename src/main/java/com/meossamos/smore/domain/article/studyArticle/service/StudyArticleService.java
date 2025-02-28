@@ -48,6 +48,7 @@ public class StudyArticleService {
         return dtoBuilder.build();
     }
 
+    // 게시글 조회
     public List<StudyArticleDto> getArticlesByStudyId(Long studyId) {
         List<StudyArticle> articles = studyArticleRepository.findByStudyId(studyId);
         return articles.stream()
@@ -55,12 +56,14 @@ public class StudyArticleService {
                 .collect(Collectors.toList());
     }
 
+    // 게시글 상세 조회
     public StudyArticleDto getStudyArticleById(Long articleId) {
         StudyArticle studyArticle = studyArticleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         return convertToStudyArticleDto(studyArticle, true);
     }
 
+    // 게시글 작성
     public StudyArticleDto createStudyArticle(Long studyId, StudyArticleCreateRequest createRequest, Member member) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 ID입니다."));
@@ -68,6 +71,7 @@ public class StudyArticleService {
         StudyArticle studyArticle = StudyArticle.builder()
                 .title(createRequest.getTitle())
                 .content(createRequest.getContent())
+                .attachments(createRequest.getAttachments())
                 .imageUrls(createRequest.getImageUrls())
                 .attachments(createRequest.getAttachments())
                 .hashTags(createRequest.getHashTags())
@@ -80,6 +84,29 @@ public class StudyArticleService {
         return convertToStudyArticleDto(savedArticle);
     }
 
+    // 게시글 수정
+    public StudyArticleDto updateStudyArticle(Long articleId, StudyArticleDto updateRequest) {
+        StudyArticle studyArticle = studyArticleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        studyArticle.setTitle(updateRequest.getTitle());
+        studyArticle.setContent(updateRequest.getContent());
+        studyArticle.setAttachments(updateRequest.getAttachments());
+
+        StudyArticle updatedArticle = studyArticleRepository.save(studyArticle);
+
+        return convertToStudyArticleDto(updatedArticle);
+    }
+
+    // 게시글 삭제
+    public void deleteStudyArticle(Long articleId) {
+        StudyArticle studyArticle = studyArticleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        studyArticleRepository.delete(studyArticle);
+    }
+
+    // DTO로 변환
     private StudyArticleDto convertToStudyArticleDto(StudyArticle studyArticle) {
         return StudyArticleDto.builder()
                 .id(studyArticle.getId())

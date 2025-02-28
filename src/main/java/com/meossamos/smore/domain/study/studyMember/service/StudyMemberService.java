@@ -27,6 +27,7 @@ public class StudyMemberService {
         return studyMemberRepository.save(studyMember);
     }
 
+    // 유저 탈퇴
     public void leaveStudy(Member member, Long studyId) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));

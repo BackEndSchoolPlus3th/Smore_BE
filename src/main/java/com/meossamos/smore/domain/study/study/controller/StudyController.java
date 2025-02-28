@@ -20,12 +20,14 @@ import java.util.List;
 public class StudyController {
     private final StudyService studyService;
 
+    // 유저 스터디 목록 조회
     @GetMapping("/api/study/my-studies")
     public ResponseEntity<List<StudyDto>> getStudiesForMember(@AuthenticationPrincipal Member member) {
         List<StudyDto> studyDtos = studyService.getStudiesForMember(member);
         return new ResponseEntity<>(studyDtos, HttpStatus.OK); // 200 OK
     }
 
+    // 스터디 정보 조회
     @GetMapping("/api/study/{study_Id}")
     public StudyDto getStudyById(@PathVariable("study_Id") Long studyId) {
         return studyService.getStudyById(studyId);

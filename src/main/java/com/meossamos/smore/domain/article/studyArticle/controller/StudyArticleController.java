@@ -19,17 +19,20 @@ import java.util.List;
 public class StudyArticleController {
     private final StudyArticleService studyArticleService;
 
+    // 게시글 조회
     @GetMapping("/api/study/{study_Id}/articles")
     public List<StudyArticleDto> getArticlesByStudyId(@PathVariable("study_Id") Long studyId) {
         return studyArticleService.getArticlesByStudyId(studyId);
     }
 
+    // 게시글 상세 조회
     @GetMapping("/api/study/{study_Id}/articles/{article_Id}")
     public ResponseEntity<StudyArticleDto> getStudyDetail(@PathVariable("article_Id") Long articleId) {
         StudyArticleDto articleDto = studyArticleService.getStudyArticleById(articleId);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
+    // 게시글 작성
     @PostMapping("/api/study/{study_Id}/articles")
     public ResponseEntity<StudyArticleDto> createStudyArticle(
             @PathVariable("study_Id") Long studyId,
@@ -39,5 +42,26 @@ public class StudyArticleController {
         StudyArticleDto createdArticle = studyArticleService.createStudyArticle(studyId, createRequest, member);
 
         return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
+    }
+
+    // 게시글 수정
+    @PutMapping("/api/study/{study_Id}/articles/{article_Id}")
+    public ResponseEntity<StudyArticleDto> updateStudyArticle(
+            @PathVariable("study_Id") Long studyId,
+            @PathVariable("article_Id") Long articleId,
+            @RequestBody StudyArticleDto updateRequest) {
+
+        StudyArticleDto updatedArticle = studyArticleService.updateStudyArticle(articleId, updateRequest);
+        return new ResponseEntity<>(updatedArticle, HttpStatus.OK);
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/api/study/{study_Id}/articles/{article_Id}")
+    public ResponseEntity<Void> deleteStudyArticle(
+            @PathVariable("study_Id") Long studyId,
+            @PathVariable("article_Id") Long articleId) {
+
+        studyArticleService.deleteStudyArticle(articleId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
     }
 }
