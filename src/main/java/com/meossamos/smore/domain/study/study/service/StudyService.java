@@ -1,14 +1,12 @@
 package com.meossamos.smore.domain.study.study.service;
 
-import com.meossamos.smore.domain.article.studyArticle.dto.StudyArticleDto;
-import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
-import com.meossamos.smore.domain.article.studyArticle.repository.StudyArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
+import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,11 +34,16 @@ public class StudyService {
 
     // Dto 변환
     private StudyDto convertToStudyDto(Study study) {
+
+        List<String> hashTags = study.getStudyHashTagList().stream()
+                .map(StudyHashTag::getHashTag)
+                .collect(Collectors.toList());
+
         return StudyDto.builder()
                 .id(study.getId())
                 .title(study.getTitle())
                 .introduction(study.getIntroduction())
-                .hashTags(study.getHashTags())
+                .hashTags(hashTags)
                 .build();
     }
 
@@ -66,9 +69,13 @@ public class StudyService {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
 
+        List<StudyHashTag> updatedHashTags = studyDto.getHashTags().stream()
+                .map(tag -> new StudyHashTag(tag, study)) // StudyHashTag 생성
+                .collect(Collectors.toList());
+
         study.setTitle(studyDto.getTitle());
         study.setIntroduction(studyDto.getIntroduction());
-        study.setHashTags(studyDto.getHashTags());
+        study.setStudyHashTagList(updatedHashTags);
 
         Study updatedStudy = studyRepository.save(study);
 

@@ -4,6 +4,8 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,7 +17,7 @@ public class StudyArticleDto {
     private String title;
     private String content;
     private String imageUrls;
-    private String attachments;
+    private List<String> attachments;
     private String hashTags;
     private Study study;
     private Member member;
