@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
+import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagDocService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagService;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
@@ -33,7 +34,9 @@ import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -70,6 +73,9 @@ class SmoreBeApplicationTests {
     private RecruitmentArticleHashTagService recruitmentArticleHashTagService;
     @Autowired
     private StudyScheduleService studyScheduleService;
+    @Autowired
+    private RecruitmentArticleHashTagDocService recruitmentArticleHashTagDocService;
+
 
     private Long nextId = 0L;
     private List<Member> memberList = new ArrayList<>();
@@ -302,6 +308,19 @@ class SmoreBeApplicationTests {
         System.out.println(studySchedule);
     }
 
+//    @Test
+//    @Order(5)
+//    public void searchByHashTag() throws IOException {
+//        List<String> hashTagList = new ArrayList<>();
+//        hashTagList.add("java");
+//        hashTagList.add("spring boot");
+//        hashTagList.add("개발자");
+//        hashTagList.add("백엔드");
+//        hashTagList.add("프론트엔드");
+//        Page<Long> resultIds = recruitmentArticleHashTagDocService.searchByHashTag(hashTagList, 0, 12);
+//
+//        System.out.println(resultIds);
+//    }
 
 
     private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region) {
