@@ -90,4 +90,7 @@ public class MemberService {
         return maxId != null ? maxId : 0L;
     }
 
+    public Member findById(Long id) {
+        return memberRepository.findById(id).orElseThrow(() -> new RuntimeException("해당하는 회원이 없습니다."));
+    }
 }

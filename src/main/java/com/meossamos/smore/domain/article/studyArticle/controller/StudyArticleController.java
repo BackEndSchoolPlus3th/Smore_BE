@@ -39,7 +39,7 @@ public class StudyArticleController {
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content) {
 
-        List<StudyArticleDto> searchResults = studyArticleService.searchArticles(studyId, title, content, "", "");
+        List<StudyArticleDto> searchResults = studyArticleService.searchArticles(studyId, title, content);
         return new ResponseEntity<>(searchResults, HttpStatus.OK);
     }
 

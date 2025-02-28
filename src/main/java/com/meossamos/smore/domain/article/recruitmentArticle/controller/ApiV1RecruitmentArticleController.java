@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -39,9 +41,24 @@ public class ApiV1RecruitmentArticleController {
 
         // RecruitmentArticleService 내부에서 RecruitmentArticleDocService의 findByHashTags 메서드를 호출하여 페이지 결과를 얻음
         List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByHashTags(hashTagList, page, size);
+        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = new ArrayList<>();
+        for (RecruitmentArticleDoc recruitmentArticleDoc : resultPage) {
+            Random random = new Random();
+            RecruitmentArticleResponseData recruitmentArticleResponseData = RecruitmentArticleResponseData.builder()
+                    .id(Long.valueOf(recruitmentArticleDoc.getId()))
+                    .title(recruitmentArticleDoc.getTitle())
+                    .content(recruitmentArticleDoc.getContent())
+                    .region(recruitmentArticleDoc.getRegion())
+                    .imageUrl(recruitmentArticleDoc.getImage_urls())
+                    .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
+                    .ClipCount((long) random.nextInt(10))
+                    .writerName("테스트")
+                    .writerProfileImageUrl(recruitmentArticleDoc.getImage_urls())
+                    .build();
+            recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
+        }
 
-
-        return new RsData<>("200", "모집글 목록 조회 성공", resultPage);
+        return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
     }
 
     @GetMapping("/recruitmentArticle/test")
