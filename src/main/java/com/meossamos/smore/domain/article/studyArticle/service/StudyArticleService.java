@@ -72,6 +72,9 @@ public class StudyArticleService {
                 .title(createRequest.getTitle())
                 .content(createRequest.getContent())
                 .attachments(createRequest.getAttachments())
+                .imageUrls(createRequest.getImageUrls())
+                .attachments(createRequest.getAttachments())
+                .hashTags(createRequest.getHashTags())
                 .study(study)
                 .member(member)
                 .build();
