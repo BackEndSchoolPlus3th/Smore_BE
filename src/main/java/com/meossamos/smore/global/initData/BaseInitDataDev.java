@@ -44,6 +44,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Profile("dev")
 public class BaseInitDataDev {
+
     private final StudyScheduleService studyScheduleService;
     private final MemberService memberService;
     private final StudyService studyService;
