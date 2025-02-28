@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
-import com.meossamos.smore.domain.chat.chat.entity.ChatRoom;
+import com.meossamos.smore.domain.chat.dm.entity.DmRoom;
 import com.meossamos.smore.domain.member.hashTag.entity.MemberHashTag;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.study.entity.Study;
@@ -56,13 +56,13 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member1", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList1 = new ArrayList<>();
+    private List<DmRoom> dmRoomList1 = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "member2", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList2 = new ArrayList<>();
+    private List<DmRoom> dmRoomList2 = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)

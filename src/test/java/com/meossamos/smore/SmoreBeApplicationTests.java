@@ -5,12 +5,11 @@ import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
-import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagDocService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagService;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
-import com.meossamos.smore.domain.chat.chat.entity.ChatRoom;
-import com.meossamos.smore.domain.chat.chat.service.ChatRoomService;
+import com.meossamos.smore.domain.chat.dm.entity.DmRoom;
+import com.meossamos.smore.domain.chat.dm.service.DmRoomService;
 import com.meossamos.smore.domain.chat.groupChat.entity.GroupChatRoom;
 import com.meossamos.smore.domain.chat.groupChat.service.GroupChatRoomService;
 import com.meossamos.smore.domain.chat.message.entity.ChatMessage;
@@ -34,9 +33,7 @@ import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -52,7 +49,7 @@ class SmoreBeApplicationTests {
     @Autowired
     private GroupChatRoomService groupChatRoomService;
     @Autowired
-    private ChatRoomService chatRoomService;
+    private DmRoomService dmRoomService;
     @Autowired
     private RecruitmentArticleService recruitmentArticleService;
     @Autowired
@@ -80,7 +77,7 @@ class SmoreBeApplicationTests {
     private Long nextId = 0L;
     private List<Member> memberList = new ArrayList<>();
     private Study study;
-    private ChatRoom chatRoom;
+    private DmRoom dmRoom;
     private RecruitmentArticle recruitmentArticle;
     private StudyArticle studyArticle;
     private StudyDocument studyDocument;
@@ -141,11 +138,11 @@ class SmoreBeApplicationTests {
         } while (first == second);
 
 
-        ChatRoom chatRoom = saveChatRoom(memberList.get(first), memberList.get(second));
+        DmRoom dmRoom = saveChatRoom(memberList.get(first), memberList.get(second));
 
-        this.chatRoom = chatRoom;
+        this.dmRoom = dmRoom;
 
-        System.out.println(chatRoom);
+        System.out.println(dmRoom);
     }
 
     @Test
@@ -237,7 +234,7 @@ class SmoreBeApplicationTests {
     public void saveChatMessageTest() {
         ChatMessage[] chatMessages = new ChatMessage[30];
         for (int i = 0; i < 30; i++) {
-            chatMessages[i] = saveChatMessage(chatRoom.getId().toString(), memberList.get((i + 2) % 5).getId().toString(), "message" + (nextId + (i % 10)), "attachment" + (nextId + ((i + 1) % 10)));
+            chatMessages[i] = saveChatMessage(dmRoom.getId().toString(), memberList.get((i + 2) % 5).getId().toString(), "message" + (nextId + (i % 10)), "attachment" + (nextId + ((i + 1) % 10)));
         }
 
         this.chatMessages = chatMessages;
@@ -331,8 +328,8 @@ class SmoreBeApplicationTests {
         return studyService.saveStudy(title, memberCnt, imageUrls, introduction, leader);
     }
 
-    private ChatRoom saveChatRoom(Member member1, Member member2) {
-        return chatRoomService.saveChatRoom(member1, member2);
+    private DmRoom saveChatRoom(Member member1, Member member2) {
+        return dmRoomService.saveChatRoom(member1, member2);
     }
 
     private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, Member member, Study study) {

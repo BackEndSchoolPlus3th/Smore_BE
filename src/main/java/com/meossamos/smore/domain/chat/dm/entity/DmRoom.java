@@ -1,7 +1,6 @@
-package com.meossamos.smore.domain.chat.chat.entity;
+package com.meossamos.smore.domain.chat.dm.entity;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
-import com.meossamos.smore.global.jpa.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -19,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @SuperBuilder
 @EntityListeners(AuditingEntityListener.class)
-public class ChatRoom {
+public class DmRoom {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
     @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 50)
