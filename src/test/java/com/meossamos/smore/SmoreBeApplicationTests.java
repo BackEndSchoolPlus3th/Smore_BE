@@ -317,7 +317,7 @@ class SmoreBeApplicationTests {
     @Test
     @Order(4)
     public void saveStudyScheduleTest() {
-        StudySchedule studySchedule = saveStudySchedule("title" + nextId, "content" + nextId, LocalDateTime.now(), LocalDateTime.now(), memberList.get(leaderNum), study);
+        StudySchedule studySchedule = saveStudySchedule("title" + nextId, "content" + nextId, LocalDateTime.now(), LocalDateTime.now(), false, memberList.get(leaderNum), study);
 
         this.studySchedule = studySchedule;
 
@@ -381,8 +381,8 @@ class SmoreBeApplicationTests {
         return studyArticleService.saveStudyArticle(title, content, imageUrls, attachments, member, study);
     }
 
-    private StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, Member member, Study study) {
-        return studyScheduleService.saveStudySchedule(title, content, startDate, endDate, member, study);
+    private StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, boolean allDay, Member member, Study study) {
+        return studyScheduleService.saveStudySchedule(title, content, startDate, endDate, allDay, member, study);
     }
 
     private StudyDocument saveStudyDocument(String name, String url, String type, Study study, StudyArticle studyArticle) {

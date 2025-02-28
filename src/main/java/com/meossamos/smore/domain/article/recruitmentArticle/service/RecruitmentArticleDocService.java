@@ -72,12 +72,13 @@ public class RecruitmentArticleDocService {
             blockCache.put(cacheKey, searchResult);
         }
 
-        // 페이징 처리
-        if (searchResult != null) {
-            result = paging(searchResult.getDocs(), adjustedPageNum - blockStartPage, pageSize);
-        } else {
-            System.out.println("searchResult is null");
-        }
+//        // 페이징 처리
+//        if (searchResult != null) {
+//            result = paging(searchResult.getDocs(), adjustedPageNum - blockStartPage, pageSize);
+//        } else {
+//            System.out.println("searchResult is null");
+//        }
+        result = searchResult.getDocs();
 
         return result;
     }
