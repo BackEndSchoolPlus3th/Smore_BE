@@ -15,6 +15,7 @@ services:
       - "9200:9200"
     networks:
       - elastic
+
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.3
     container_name: smore_kibana
@@ -22,16 +23,22 @@ services:
       SERVER_NAME: kibana
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
-      - 5601:5601
+      - "5601:5601"
     depends_on:
       - elasticsearch
     networks:
       - elastic
+
   logstash:
     image: docker.elastic.co/logstash/logstash:8.3.3
     container_name: smore_logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
+      - MYSQL_HOST=smore-dev-mysql.c7cca4g8ujfq.ap-northeast-2.rds.amazonaws.com
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=00001234
+      - MYSQL_DRIVER_LIBRARY=/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar
+      - MYSQL_DRIVER_CLASS=com.mysql.cj.jdbc.Driver
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
       - ./logstash/lib/mysql-connector-j-9.2.0.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar:ro
@@ -42,6 +49,26 @@ services:
       - elasticsearch
     networks:
       - elastic
+
+  mongodb:
+    image: mongo:latest
+    container_name: smore_mongodb
+    restart: always
+    command:
+      - --auth
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: smore_chat_db
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "00001234"
+    volumes:
+      - mongo-data:/data/db
+
 networks:
   elastic:
     driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

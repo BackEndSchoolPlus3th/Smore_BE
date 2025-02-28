@@ -11,8 +11,6 @@ spring:
       org.hibernate.orm.jdbc.extract: TRACE
       org.springframework.transaction.interceptor: TRACE
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
   thymeleaf:
     cache: false
