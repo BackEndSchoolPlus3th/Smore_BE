@@ -37,6 +37,10 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     runtimeOnly("org.springframework.boot:spring-boot-docker-compose")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // s3 의존성
+    implementation(platform("software.amazon.awssdk:bom:2.24.0"))
+    implementation("software.amazon.awssdk:s3")
 }
 
 tasks.withType<Test> {

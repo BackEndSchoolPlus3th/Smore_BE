@@ -5,7 +5,6 @@ import com.meossamos.smore.domain.article.studyArticle.dto.request.StudyArticleC
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.repository.StudyArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
-import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import jakarta.annotation.Nullable;
@@ -21,7 +20,7 @@ public class StudyArticleService {
     private final StudyArticleRepository studyArticleRepository;
     private final StudyRepository studyRepository;
 
-    public StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable String attachments, @Nullable String hashTags,  Member member, Study study) {
+    public StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable List<String> attachments, @Nullable String hashTags,  Member member, Study study) {
         StudyArticle studyArticle = StudyArticle.builder()
                 .title(title)
                 .content(content)
@@ -91,7 +90,7 @@ public class StudyArticleService {
     }
 
     // 게시글 검색
-    public List<StudyArticleDto> searchArticles(Long studyId, String title, String content, String author, String hashtags) {
+    public List<StudyArticleDto> searchArticles(Long studyId, String title, String content) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("유효하지 않은 스터디 ID입니다."));
 
@@ -109,6 +108,7 @@ public class StudyArticleService {
                 .id(studyArticle.getId())
                 .title(studyArticle.getTitle())
                 .content(studyArticle.getContent())
+                .attachments(studyArticle.getAttachments())
                 .member(studyArticle.getMember())
                 .build();
     }
