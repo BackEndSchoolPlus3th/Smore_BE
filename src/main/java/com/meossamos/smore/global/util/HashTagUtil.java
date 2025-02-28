@@ -5,10 +5,11 @@ import java.util.*;
 public class HashTagUtil {
     // 전체 해시태그 목록 (필요에 따라 수정)
     private static final List<String> ALL_TAGS = Arrays.asList(
-            "java", "python", "백엔드", "프론트", "spring",
+            "java", "python", "백엔드", "프론트", "개발자",
             "docker", "kubernetes", "javascript", "react", "nodejs",
             "angular", "mysql", "postgresql", "git", "aws",
-            "azure", "c++", "c#", "html", "css"
+            "azure", "c++", "c#", "html", "css",
+            "spring boot", "vue", "typescript", "mongodb", "redis"
     );
 
     public static String getRandomHashTag() {
