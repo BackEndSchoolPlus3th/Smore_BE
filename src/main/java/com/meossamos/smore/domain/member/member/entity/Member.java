@@ -44,6 +44,12 @@ public class Member extends BaseEntity {
     private String region;
 
     @Column(nullable = true)
+
+    private String hashTags;
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+    @Column(nullable = true)
     private String profileImageUrl;
 
     @JsonIgnore
