@@ -66,4 +66,7 @@ public class RecruitmentArticleDoc {
 
     @Field(type = FieldType.Date, name = "updated_date")
     private Date updated_date;
+
+    @Field(type = FieldType.Long, name = "clip_count")
+    private Long clip_count;
 }

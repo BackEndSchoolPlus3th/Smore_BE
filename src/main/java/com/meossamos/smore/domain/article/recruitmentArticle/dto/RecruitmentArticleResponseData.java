@@ -21,5 +21,5 @@ public class RecruitmentArticleResponseData {
     private String writerName;
     private String writerProfileImageUrl;
     private Long ClipCount;
-
+    private String hashTags;
 }

@@ -48,12 +48,13 @@ public class ApiV1RecruitmentArticleController {
                     .id(Long.valueOf(recruitmentArticleDoc.getId()))
                     .title(recruitmentArticleDoc.getTitle())
                     .content(recruitmentArticleDoc.getContent())
+                    .hashTags(recruitmentArticleDoc.getHash_tags())
                     .region(recruitmentArticleDoc.getRegion())
-                    .imageUrl(recruitmentArticleDoc.getImage_urls())
+                    .imageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
                     .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
-                    .ClipCount((long) random.nextInt(10))
+                    .ClipCount(recruitmentArticleDoc.getClip_count())
                     .writerName("테스트")
-                    .writerProfileImageUrl(recruitmentArticleDoc.getImage_urls())
+                    .writerProfileImageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
                     .build();
             recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
         }

@@ -7,7 +7,6 @@ import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentA
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
-import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagDocService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagService;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
@@ -154,6 +153,7 @@ class SmoreBeApplicationTests {
     @Order(4)
     public void saveRecruitmentArticleTest() {
         int randomNum = random.nextInt(100 - 5 + 1) + 5; // 5부터 100까지의 랜덤 정수
+        int randomClipCount = random.nextInt(100);
 
         List<String> hashTags = HashTagUtil.getRandomHashTags();
         String hashTag = HashTagUtil.mergeHashTagList(hashTags);
@@ -169,7 +169,7 @@ class SmoreBeApplicationTests {
             }
         }
 
-        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "region" + ((nextId + 1) % 3), imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study);
+        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "region" + ((nextId + 1) % 3), imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study, randomClipCount);
 
         this.recruitmentArticle = recruitmentArticle;
 
@@ -179,7 +179,12 @@ class SmoreBeApplicationTests {
     @Test
     @Order(4)
     public void saveStudyArticleTest() {
-        StudyArticle studyArticle = saveStudyArticle("title" + nextId, "content" + nextId, "https://picsum.photos/200/200?random=1", "attachments" + nextId, memberList.get(leaderNum), study);
+        List<String> attachments = new ArrayList<>();
+        attachments.add("attachment" + nextId);
+
+        List<String> hashTags = HashTagUtil.getRandomHashTags();
+        String hashTag = HashTagUtil.mergeHashTagList(hashTags);
+        StudyArticle studyArticle = saveStudyArticle("title" + nextId, "content" + nextId, "https://picsum.photos/200/200?random=1", attachments, hashTag, memberList.get(leaderNum), study);
 
         this.studyArticle = studyArticle;
 
@@ -361,8 +366,8 @@ class SmoreBeApplicationTests {
         return chatRoomService.saveChatRoom(member1, member2);
     }
 
-    private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study) {
-        return recruitmentArticleService.saveRecruitmentArticle(title, content, region, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study);
+    private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
+        return recruitmentArticleService.saveRecruitmentArticle(title, content, region, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
     }
 
     private MemberHashTag saveMemberHashTag(String hashTag, Member member) {
@@ -377,8 +382,8 @@ class SmoreBeApplicationTests {
         return recruitmentArticleHashTagService.saveRecruitmentArticleHashTag(hashTag, recruitmentArticle);
     }
 
-    private StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable String attachments, Member member, Study study) {
-        return studyArticleService.saveStudyArticle(title, content, imageUrls, attachments, member, study);
+    private StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable List<String> attachments, String hashTags, Member member, Study study) {
+        return studyArticleService.saveStudyArticle(title, content, imageUrls,  attachments, hashTags,  member, study);
     }
 
     private StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, boolean allDay, Member member, Study study) {

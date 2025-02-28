@@ -19,12 +19,6 @@ import java.time.LocalDateTime;
 @ToString           // toString 메서드 자동 생성
 public class BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
-    @SequenceGenerator(
-            name = "global_seq",
-            sequenceName = "global_seq",
-            allocationSize = 50
-    )
     private Long id;
 
     @CreatedDate

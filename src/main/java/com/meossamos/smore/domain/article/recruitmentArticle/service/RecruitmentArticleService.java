@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class RecruitmentArticleService {
     private final RecruitmentArticleRepository recruitmentArticleRepository;
 
-    public RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study) {
+    public RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
         RecruitmentArticle recruitmentArticle = RecruitmentArticle.builder()
                 .title(title)
                 .content(content)
@@ -30,6 +30,7 @@ public class RecruitmentArticleService {
                 .hashTags(hashTags)
                 .member(member)
                 .study(study)
+                .clipCount(clipCount)
                 .build();
 
         return recruitmentArticleRepository.save(recruitmentArticle);
@@ -44,5 +45,22 @@ public class RecruitmentArticleService {
         article.setHashTags(mergedHashTags);
 
         return recruitmentArticleRepository.save(article);
+    }
+
+    public RecruitmentArticle findById(Long id) {
+        return recruitmentArticleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("RecruitmentArticle not found"));
+    }
+
+    public Integer UpdateClipCounter(RecruitmentArticle recruitmentArticle, String upOrDown) {
+        Integer clipCount = recruitmentArticle.getClipCount();
+        if (upOrDown.equals("up")) {
+            clipCount++;
+        } else if (upOrDown.equals("down")) {
+            clipCount--;
+        }
+        recruitmentArticle.setClipCount(clipCount);
+        recruitmentArticleRepository.save(recruitmentArticle);
+        return clipCount;
     }
 }
