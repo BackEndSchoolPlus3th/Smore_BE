@@ -32,6 +32,17 @@ public class StudyArticleController {
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
+    // 게시물 검색
+    @GetMapping("/api/study/{study_Id}/articles/search")
+    public ResponseEntity<List<StudyArticleDto>> searchArticles(
+            @PathVariable("study_Id") Long studyId,
+            @RequestParam(value = "title", required = false) String title,
+            @RequestParam(value = "content", required = false) String content) {
+
+        List<StudyArticleDto> searchResults = studyArticleService.searchArticles(studyId, title, content);
+        return new ResponseEntity<>(searchResults, HttpStatus.OK);
+    }
+
     // 게시글 작성
     @PostMapping("/api/study/{study_Id}/articles")
     public ResponseEntity<StudyArticleDto> createStudyArticle(
