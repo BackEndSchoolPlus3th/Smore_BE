@@ -5,6 +5,8 @@ import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentA
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
+import com.meossamos.smore.domain.member.member.entity.Member;
+import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import java.util.Random;
 public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleService recruitmentArticleService;
     private final RecruitmentArticleDocService recruitmentArticleDocService;
+    private final MemberService memberService;
 
     @GetMapping("/recruitmentArticles")
     public RsData<?> getRecruitmentArticles(
@@ -43,7 +46,7 @@ public class ApiV1RecruitmentArticleController {
         List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByHashTags(hashTagList, page, size);
         List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = new ArrayList<>();
         for (RecruitmentArticleDoc recruitmentArticleDoc : resultPage) {
-            Random random = new Random();
+            Member member = memberService.findById(recruitmentArticleDoc.getMember_id());
             RecruitmentArticleResponseData recruitmentArticleResponseData = RecruitmentArticleResponseData.builder()
                     .id(Long.valueOf(recruitmentArticleDoc.getId()))
                     .title(recruitmentArticleDoc.getTitle())
@@ -53,8 +56,8 @@ public class ApiV1RecruitmentArticleController {
                     .imageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
                     .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
                     .ClipCount(recruitmentArticleDoc.getClip_count())
-                    .writerName("테스트")
-                    .writerProfileImageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
+                    .writerName(member.getNickname())
+                    .writerProfileImageUrl(member.getProfileImageUrl())
                     .build();
             recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
         }

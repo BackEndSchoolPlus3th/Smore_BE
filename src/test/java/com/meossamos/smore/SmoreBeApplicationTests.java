@@ -169,7 +169,7 @@ class SmoreBeApplicationTests {
             }
         }
 
-        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "region" + ((nextId + 1) % 3), imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study, randomClipCount);
+        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "introduction", "region" + ((nextId + 1) % 3), imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study, randomClipCount);
 
         this.recruitmentArticle = recruitmentArticle;
 
@@ -366,8 +366,8 @@ class SmoreBeApplicationTests {
         return chatRoomService.saveChatRoom(member1, member2);
     }
 
-    private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
-        return recruitmentArticleService.saveRecruitmentArticle(title, content, region, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
+    private RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
+        return recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
     }
 
     private MemberHashTag saveMemberHashTag(String hashTag, Member member) {

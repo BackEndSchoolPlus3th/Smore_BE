@@ -17,10 +17,11 @@ import java.time.LocalDateTime;
 public class RecruitmentArticleService {
     private final RecruitmentArticleRepository recruitmentArticleRepository;
 
-    public RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
+    public RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
         RecruitmentArticle recruitmentArticle = RecruitmentArticle.builder()
                 .title(title)
                 .content(content)
+                .introduction(introduction)
                 .region(region)
                 .imageUrls(imageUrls)
                 .startDate(startDate)

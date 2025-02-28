@@ -72,13 +72,13 @@ public class RecruitmentArticleDocService {
             blockCache.put(cacheKey, searchResult);
         }
 
-//        // 페이징 처리
-//        if (searchResult != null) {
-//            result = paging(searchResult.getDocs(), adjustedPageNum - blockStartPage, pageSize);
-//        } else {
-//            System.out.println("searchResult is null");
-//        }
-        result = searchResult.getDocs();
+        // 페이징 처리
+        int startIdx = adjustedPageNum % BLOCK_SIZE * pageSize;
+        int endIdx = Math.min(startIdx + pageSize, searchResult.getDocs().size());
+        for (int i = startIdx; i < endIdx; i++) {
+            RecruitmentArticleDoc doc = searchResult.getDocs().get(i);
+            result.add(doc);
+        }
 
         return result;
     }
@@ -133,11 +133,5 @@ public class RecruitmentArticleDocService {
             // 예외 발생 시 빈 결과 반환
             return new ElasticSearchUtil.SearchResult<>(new ArrayList<>(), 0);
         }
-    }
-
-    private List<RecruitmentArticleDoc> paging(List<RecruitmentArticleDoc> docs, int pageNum, int pageSize) {
-        int start = (pageNum - 1) * pageSize;
-        int end = Math.min(start + pageSize, docs.size());
-        return docs.subList(start, end);
     }
 }

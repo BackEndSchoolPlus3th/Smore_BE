@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @ToString           // toString 메서드 자동 생성
 public class BaseEntity {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @CreatedDate

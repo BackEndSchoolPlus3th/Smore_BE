@@ -69,4 +69,7 @@ public class RecruitmentArticleDoc {
 
     @Field(type = FieldType.Long, name = "clip_count")
     private Long clip_count;
+
+    @Field(type = FieldType.Text, name = "introduction")
+    private String introduction;
 }

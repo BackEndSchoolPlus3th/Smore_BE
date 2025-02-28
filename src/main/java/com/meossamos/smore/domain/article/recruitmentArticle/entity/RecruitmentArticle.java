@@ -29,6 +29,9 @@ public class RecruitmentArticle extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
+    private String introduction;
+
     @Column(nullable = true)
     private String region;
 
