@@ -44,39 +44,8 @@ public class ApiV1RecruitmentArticleController {
 
         // RecruitmentArticleService 내부에서 RecruitmentArticleDocService의 findByHashTags 메서드를 호출하여 페이지 결과를 얻음
         List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByHashTags(hashTagList, page, size);
-        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = new ArrayList<>();
-        for (RecruitmentArticleDoc recruitmentArticleDoc : resultPage) {
-            Member member = memberService.findById(recruitmentArticleDoc.getMember_id());
-            RecruitmentArticleResponseData recruitmentArticleResponseData = RecruitmentArticleResponseData.builder()
-                    .id(Long.valueOf(recruitmentArticleDoc.getId()))
-                    .title(recruitmentArticleDoc.getTitle())
-                    .introduction(recruitmentArticleDoc.getIntroduction())
-                    .hashTags(recruitmentArticleDoc.getHash_tags())
-                    .region(recruitmentArticleDoc.getRegion())
-                    .imageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
-                    .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
-                    .ClipCount(recruitmentArticleDoc.getClip_count())
-                    .writerName(member.getNickname())
-                    .writerProfileImageUrl(member.getProfileImageUrl())
-                    .build();
-            recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
-        }
+        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
 
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
-    }
-
-    @GetMapping("/recruitmentArticle/test")
-    public RsData<?> test() {
-        RecruitmentArticle testRecruitmentArticle = RecruitmentArticle.builder()
-                .title("테스트")
-                .content("테스트")
-                .region("테스트")
-                .imageUrls("테스트")
-                .startDate(null)
-                .endDate(null)
-                .isRecruiting(true)
-                .maxMember(1)
-                .build();
-        return new RsData<>("200", "테스트 성공", testRecruitmentArticle);
     }
 }

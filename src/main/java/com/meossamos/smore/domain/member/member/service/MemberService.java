@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -92,5 +93,9 @@ public class MemberService {
 
     public Member findById(Long id) {
         return memberRepository.findById(id).orElseThrow(() -> new RuntimeException("해당하는 회원이 없습니다."));
+    }
+
+    public List<Member> findByIds(List<Long> memberIds) {
+        return memberRepository.findByIdIn(memberIds);
     }
 }

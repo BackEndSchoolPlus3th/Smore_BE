@@ -7,7 +7,10 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.FieldSort;
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
+import com.meossamos.smore.domain.member.member.entity.Member;
+import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,7 @@ public class RecruitmentArticleDocService {
     private static final int BLOCK_SIZE = 10;
     private static final String ES_INDEX_NAME = "es_recruitment_article";
     private final Map<String, ElasticSearchUtil.SearchResult<RecruitmentArticleDoc>> blockCache = new HashMap<>();
+    private final MemberService memberService;
 
 
     /**
@@ -43,7 +49,6 @@ public class RecruitmentArticleDocService {
     public List<RecruitmentArticleDoc> findByHashTags(List<String> hashTagList, int pageNum, int pageSize) {
         // 1. 1-indexed 페이지 번호를 0-indexed로 변환
         int adjustedPageNum = pageNum - 1;
-        List<RecruitmentArticleDoc> result = new ArrayList<>();
 
         // 2. 블록 번호 계산 (예: BLOCK_SIZE = 10)
         int blockNumber = adjustedPageNum / BLOCK_SIZE;
@@ -60,27 +65,21 @@ public class RecruitmentArticleDocService {
         System.out.println("searchSize: " + searchSize);
 
         // 캐시 키 구성 (간단하게 해시태그 리스트와 blockNumber 결합)
-        String cacheKey = hashTagList.toString() + "_block_" + blockNumber;
+        String cacheKey = hashTagList.toString() + "_block_" + blockNumber + "_size_" + searchSize;
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult;
 
         if (blockCache.containsKey(cacheKey)) {
             // 캐시된 결과 사용
+            System.out.println("Using cache");
             searchResult = blockCache.get(cacheKey);
         } else {
             // Elasticsearch에서 해당 블록 검색 후 캐시 저장
+            System.out.println("Searching from Elasticsearch");
             searchResult = searchByHashTagList(hashTagList, pageStart, searchSize);
             blockCache.put(cacheKey, searchResult);
         }
 
-        // 페이징 처리
-        int startIdx = adjustedPageNum % BLOCK_SIZE * pageSize;
-        int endIdx = Math.min(startIdx + pageSize, searchResult.getDocs().size());
-        for (int i = startIdx; i < endIdx; i++) {
-            RecruitmentArticleDoc doc = searchResult.getDocs().get(i);
-            result.add(doc);
-        }
-
-        return result;
+        return searchResult.getDocs();
     }
 
     /**
@@ -133,5 +132,38 @@ public class RecruitmentArticleDocService {
             // 예외 발생 시 빈 결과 반환
             return new ElasticSearchUtil.SearchResult<>(new ArrayList<>(), 0);
         }
+    }
+
+    public List<RecruitmentArticleResponseData> convertToResponseData(List<RecruitmentArticleDoc> recruitmentArticleDocs) {
+        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = new ArrayList<>();
+
+        // 모든 회원 ID를 추출 (중복 제거)
+        List<Long> memberIds = recruitmentArticleDocs.stream()
+                .map(RecruitmentArticleDoc::getMember_id)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Member> members = memberService.findByIds(memberIds);
+
+        // 조회된 회원들을 ID별 Map으로 변환
+        Map<Long, Member> memberMap = members.stream()
+                .collect(Collectors.toMap(Member::getId, Function.identity()));
+
+        for (RecruitmentArticleDoc recruitmentArticleDoc : recruitmentArticleDocs) {
+            Member member = memberMap.get(recruitmentArticleDoc.getMember_id());
+            RecruitmentArticleResponseData recruitmentArticleResponseData = RecruitmentArticleResponseData.builder()
+                    .id(Long.valueOf(recruitmentArticleDoc.getId()))
+                    .title(recruitmentArticleDoc.getTitle())
+                    .introduction(recruitmentArticleDoc.getIntroduction())
+                    .hashTags(recruitmentArticleDoc.getHash_tags())
+                    .region(recruitmentArticleDoc.getRegion())
+                    .imageUrl(recruitmentArticleDoc.getImage_urls().split(",")[0])
+                    .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
+                    .ClipCount(recruitmentArticleDoc.getClip_count())
+                    .writerName(member.getNickname())
+                    .writerProfileImageUrl(member.getProfileImageUrl())
+                    .build();
+            recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
+        }
+        return recruitmentArticleResponseDataList;
     }
 }
