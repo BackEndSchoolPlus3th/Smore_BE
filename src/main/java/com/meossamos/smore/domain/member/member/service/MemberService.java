@@ -33,7 +33,7 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String hashTags) {
+    public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
 
         Member member = Member.builder()
                 .email(email)
@@ -41,6 +41,7 @@ public class MemberService {
                 .nickname(nickname)
                 .birthdate(birthdate)
                 .region(region)
+                .profileImageUrl(profileImageUrl)
                 .build();
         return memberRepository.save(member);
     }

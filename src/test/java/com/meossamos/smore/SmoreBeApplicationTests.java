@@ -3,6 +3,8 @@ package com.meossamos.smore;
 import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
+import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
+import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagDocService;
@@ -74,7 +76,7 @@ class SmoreBeApplicationTests {
     @Autowired
     private StudyScheduleService studyScheduleService;
     @Autowired
-    private RecruitmentArticleHashTagDocService recruitmentArticleHashTagDocService;
+    private RecruitmentArticleDocService recruitmentArticleDocService;
 
 
     private Long nextId = 0L;
@@ -92,7 +94,7 @@ class SmoreBeApplicationTests {
     private RecruitmentArticleHashTag[] recruitmentArticleHashTag;
     private StudySchedule studySchedule;
 
-    private Random random = new Random();
+    private final Random random = new Random();
     private int leaderNum;
     private int[] memberNums;
 
@@ -107,11 +109,11 @@ class SmoreBeApplicationTests {
         Long maxMemberId = memberService.getMaxMemberId();
         nextId = (maxMemberId != null ? maxMemberId : 0L) + 1;
 
-        Member member1 = saveMember("email" + nextId + "email.com", "password" + nextId, "user" + nextId, LocalDate.now(), "region" + (nextId % 3));
-        Member member2 = saveMember("email" + (nextId + 1) + "email.com", "password" + (nextId + 1), "user" + (nextId + 1), LocalDate.now(), "region" + ((nextId + 1) % 3));
-        Member member3 = saveMember("email" + (nextId + 2) + "email.com", "password" + (nextId + 2), "user" + (nextId + 2), LocalDate.now(), "region" + ((nextId + 2) % 3));
-        Member member4 = saveMember("email" + (nextId + 3) + "email.com", "password" + (nextId + 3), "user" + (nextId + 3), LocalDate.now(), "region" + ((nextId + 3) % 3));
-        Member member5 = saveMember("email" + (nextId + 4) + "email.com", "password" + (nextId + 4), "user" + (nextId + 4), LocalDate.now(), "region" + ((nextId + 4) % 3));
+        Member member1 = saveMember("email" + nextId + "email.com", "password" + nextId, "user" + nextId, LocalDate.now(), "region" + (nextId % 3), "https://picsum.photos/200/200?random=1");
+        Member member2 = saveMember("email" + (nextId + 1) + "email.com", "password" + (nextId + 1), "user" + (nextId + 1), LocalDate.now(), "region" + ((nextId + 1) % 3), "https://picsum.photos/200/200?random=1");
+        Member member3 = saveMember("email" + (nextId + 2) + "email.com", "password" + (nextId + 2), "user" + (nextId + 2), LocalDate.now(), "region" + ((nextId + 2) % 3), "https://picsum.photos/200/200?random=1");
+        Member member4 = saveMember("email" + (nextId + 3) + "email.com", "password" + (nextId + 3), "user" + (nextId + 3), LocalDate.now(), "region" + ((nextId + 3) % 3), "https://picsum.photos/200/200?random=1");
+        Member member5 = saveMember("email" + (nextId + 4) + "email.com", "password" + (nextId + 4), "user" + (nextId + 4), LocalDate.now(), "region" + ((nextId + 4) % 3), "https://picsum.photos/200/200?random=1");
 
         this.memberList = Arrays.asList(member1, member2, member3, member4, member5);
 
@@ -123,7 +125,7 @@ class SmoreBeApplicationTests {
     public void saveStudyTest() {
         leaderNum = random.nextInt(5);
         int randomMemberNum = random.nextInt(20 - 1 + 1) + 1; // 1부터 20까지의 랜덤 정수
-        Study study = saveStudy("title" + nextId, randomMemberNum, "imageUrls" + nextId, "introduction" + nextId, memberList.get(leaderNum));
+        Study study = saveStudy("title" + nextId, randomMemberNum, "https://picsum.photos/400/600?random=1", "introduction" + nextId, memberList.get(leaderNum));
 
         this.study = study;
 
@@ -153,7 +155,21 @@ class SmoreBeApplicationTests {
     public void saveRecruitmentArticleTest() {
         int randomNum = random.nextInt(100 - 5 + 1) + 5; // 5부터 100까지의 랜덤 정수
 
-        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "region" + ((nextId + 1) % 3), "imageUrls" + nextId, LocalDateTime.now(), LocalDateTime.now(), true, randomNum, memberList.get(leaderNum), study);
+        List<String> hashTags = HashTagUtil.getRandomHashTags();
+        String hashTag = HashTagUtil.mergeHashTagList(hashTags);
+
+        int randomImageNum = random.nextInt(5);
+        StringBuilder imageUrls = new StringBuilder();
+
+        for (int i = 0; i < randomImageNum; i++) {
+            imageUrls.append("https://picsum.photos/400/600?random=1");
+            // 마지막 URL이 아니라면 콤마를 추가
+            if (i < randomImageNum - 1) {
+                imageUrls.append(",");
+            }
+        }
+
+        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "region" + ((nextId + 1) % 3), imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study);
 
         this.recruitmentArticle = recruitmentArticle;
 
@@ -163,7 +179,7 @@ class SmoreBeApplicationTests {
     @Test
     @Order(4)
     public void saveStudyArticleTest() {
-        StudyArticle studyArticle = saveStudyArticle("title" + nextId, "content" + nextId, "imageUrls" + nextId, "attachments" + nextId, memberList.get(leaderNum), study);
+        StudyArticle studyArticle = saveStudyArticle("title" + nextId, "content" + nextId, "https://picsum.photos/200/200?random=1", "attachments" + nextId, memberList.get(leaderNum), study);
 
         this.studyArticle = studyArticle;
 
@@ -301,30 +317,40 @@ class SmoreBeApplicationTests {
     @Test
     @Order(4)
     public void saveStudyScheduleTest() {
-        StudySchedule studySchedule = saveStudySchedule("title" + nextId, "content" + nextId, LocalDateTime.now(), LocalDateTime.now(), memberList.get(leaderNum), study);
+        StudySchedule studySchedule = saveStudySchedule("title" + nextId, "content" + nextId, LocalDateTime.now(), LocalDateTime.now(), false, memberList.get(leaderNum), study);
 
         this.studySchedule = studySchedule;
 
         System.out.println(studySchedule);
     }
 
-//    @Test
-//    @Order(5)
-//    public void searchByHashTag() throws IOException {
-//        List<String> hashTagList = new ArrayList<>();
-//        hashTagList.add("java");
-//        hashTagList.add("spring boot");
-//        hashTagList.add("개발자");
-//        hashTagList.add("백엔드");
-//        hashTagList.add("프론트엔드");
-//        Page<Long> resultIds = recruitmentArticleHashTagDocService.searchByHashTag(hashTagList, 0, 12);
-//
-//        System.out.println(resultIds);
-//    }
+    @Test
+    @Order(5)
+    public void findRecruitmentArticleByHashTagTest() {
+        List<String> hashTags = HashTagUtil.getRandomHashTags();
+        List<String> hashTags2 = new ArrayList<>();
+        hashTags2.add("백엔드");
+        hashTags2.add("postgresql");
+        hashTags2.add("프론트");
+        List<String> hashTags3 = new ArrayList<>();
+        List<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByHashTag(hashTags2, 2, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles2 = findRecruitmentArticleByHashTag(hashTags2, 3, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles3 = findRecruitmentArticleByHashTag(hashTags2, 12, 12);
+        List<RecruitmentArticleDoc> recruitmentArticles4 = findRecruitmentArticleByHashTag(hashTags3, 1, 12);
 
 
-    private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region) {
-        return memberService.saveMember(email, password, nickname, birthdate, region);
+        System.out.print("find RecruitmentArticle by HashTag: ");
+        hashTags.forEach(hashTag -> System.out.print(hashTag + ", "));
+
+        System.out.print("\nfounded RecruitmentArticles: ");
+        recruitmentArticles.forEach(recruitmentArticle -> System.out.print(recruitmentArticle.getId() + ", "));
+
+        System.out.println("\n\n\n\n");
+    }
+
+
+    private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
+        return memberService.saveMember(email, password, nickname, birthdate, region, profileImageUrl);
     }
 
     private Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, Member leader) {
@@ -335,8 +361,8 @@ class SmoreBeApplicationTests {
         return chatRoomService.saveChatRoom(member1, member2);
     }
 
-    private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, Member member, Study study) {
-        return recruitmentArticleService.saveRecruitmentArticle(title, content, region, imageUrls, startDate, endDate, isRecruiting, maxMember, member, study);
+    private RecruitmentArticle saveRecruitmentArticle(String title, String content, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study) {
+        return recruitmentArticleService.saveRecruitmentArticle(title, content, region, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study);
     }
 
     private MemberHashTag saveMemberHashTag(String hashTag, Member member) {
@@ -355,8 +381,8 @@ class SmoreBeApplicationTests {
         return studyArticleService.saveStudyArticle(title, content, imageUrls, attachments, member, study);
     }
 
-    private StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, Member member, Study study) {
-        return studyScheduleService.saveStudySchedule(title, content, startDate, endDate, member, study);
+    private StudySchedule saveStudySchedule(String title, String content, LocalDateTime startDate, LocalDateTime endDate, boolean allDay, Member member, Study study) {
+        return studyScheduleService.saveStudySchedule(title, content, startDate, endDate, allDay, member, study);
     }
 
     private StudyDocument saveStudyDocument(String name, String url, String type, Study study, StudyArticle studyArticle) {
@@ -379,4 +405,7 @@ class SmoreBeApplicationTests {
         return groupChatRoomService.saveGroupChatRoom(study);
     }
 
+    private List<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTags, int page, int size) {
+        return recruitmentArticleDocService.findByHashTags(hashTags, page, size);
+    }
 }

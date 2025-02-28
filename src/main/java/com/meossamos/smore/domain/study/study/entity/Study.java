@@ -37,6 +37,9 @@ public class Study extends BaseEntity {
     @Column(nullable = true)
     private String introduction;
 
+    @Column(nullable = true)
+    private String hashTags;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Member leader;
 

@@ -12,7 +12,30 @@ spring:
   docker:
     compose:
       enabled: false
+  elasticsearch:
+    restclient:
+      uris: http://localhost:9200
+      # 필요한 경우 타임아웃이나 인증 정보도 추가할 수 있습니다.
+      # connection-timeout: 5000
+      # read-timeout: 60000
+    rest:
+      uris: http://localhost:9200
+      # 필요한 경우 타임아웃이나 인증 정보도 추가할 수 있습니다.
+      # connection-timeout: 5000
+      # read-timeout: 60000
 
   jpa:
     hibernate:
       ddl-auto: update
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        security: DEBUG
+        data:
+          elasticsearch: DEBUG
+          jpa: DEBUG
+custom:
+  elasticsearch:
+    uri: http://localhost:9200
