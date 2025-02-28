@@ -44,6 +44,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @Profile("dev")
 public class BaseInitDataDev {
+    private final StudyScheduleService studyScheduleService;
+    private final MemberService memberService;
+    private final StudyService studyService;
+    private final GroupChatRoomService groupChatRoomService;
+    private final ChatRoomService chatRoomService;
+    private final RecruitmentArticleService recruitmentArticleService;
+    private final StudyArticleService studyArticleService;
+    private final StudyDocumentService studyDocumentService;
+    private final AlarmService alarmService;
+    private final StudyMemberService studyMemberService;
+    private final ChatMessageService chatMessageService;
+
     @Bean
     public ApplicationRunner baseInitDataApplicationRunner() {
         return args -> {
