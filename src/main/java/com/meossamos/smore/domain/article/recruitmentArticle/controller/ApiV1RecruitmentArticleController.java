@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
@@ -47,5 +48,32 @@ public class ApiV1RecruitmentArticleController {
         List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
 
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
+    }
+
+    @GetMapping("/recruitmentArticles/detail")
+    public RsData<?> getRecruitmentArticleDetail(
+            @RequestParam(value = "id") Long id
+    ) {
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(id);
+        Member member = memberService.findById(recruitmentArticle.getMember().getId());
+
+        RecruitmentArticleDetailResponseData recruitmentArticleResponseData = RecruitmentArticleDetailResponseData.builder()
+                .id(recruitmentArticle.getId())
+                .title(recruitmentArticle.getTitle())
+                .content(recruitmentArticle.getContent())
+                .introduction(recruitmentArticle.getIntroduction())
+                .region(recruitmentArticle.getRegion())
+                .imageUrls(recruitmentArticle.getImageUrls())
+                .startDate(recruitmentArticle.getStartDate().toString())
+                .endDate(recruitmentArticle.getEndDate().toString())
+                .isRecruiting(recruitmentArticle.getIsRecruiting())
+                .maxMember(recruitmentArticle.getMaxMember())
+                .hashTags(recruitmentArticle.getHashTags())
+                .clipCount(recruitmentArticle.getClipCount())
+                .writerName(member.getNickname())
+                .writerProfileImageUrl(member.getProfileImageUrl())
+                .build();
+
+        return new RsData<>("200", "모집글 상세 조회 성공", recruitmentArticleResponseData);
     }
 }
