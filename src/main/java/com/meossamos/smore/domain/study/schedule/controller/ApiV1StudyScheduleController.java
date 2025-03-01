@@ -2,6 +2,7 @@ package com.meossamos.smore.domain.study.schedule.controller;
 
 import com.meossamos.smore.domain.study.schedule.dto.AddStudyScheduleDto;
 import com.meossamos.smore.domain.study.schedule.dto.StudyScheduleDto;
+import com.meossamos.smore.domain.study.schedule.dto.UpdateStudyScheduleDto;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.schedule.repository.StudyScheduleRepository;
 import com.meossamos.smore.domain.study.schedule.service.StudyScheduleService;
@@ -44,6 +45,7 @@ public class ApiV1StudyScheduleController {
                                                   @RequestBody AddStudyScheduleDto addstudyScheduleDto){
         try {
             StudySchedule studySchedule = studyScheduleService.addStudySchedule(study_id, addstudyScheduleDto);
+            System.out.println(addstudyScheduleDto.toString());
             return new RsData<>("200","스케쥴 저장 성공", addstudyScheduleDto);
         } catch (RuntimeException e) {
             return new RsData<>("500", "스케쥴 저장 실패" + e.getMessage(), null);
@@ -64,6 +66,16 @@ public class ApiV1StudyScheduleController {
     }
 
     // 수정
-
+    @PutMapping("/{study_id}/schedules")
+    public ResponseEntity<RsData> updateSchedule(@RequestBody UpdateStudyScheduleDto updateStudyScheduleDto){
+        try {
+            studyScheduleService.updateSchedule(updateStudyScheduleDto);
+            return ResponseEntity.ok(new RsData<>("200", "스케쥴 수정 성공", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new RsData<>("400"," 스케쥴 수정 실패 " + e.getMessage(), null));
+        }
+        
+    }
 
 }
