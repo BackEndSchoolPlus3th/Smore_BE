@@ -13,8 +13,8 @@ import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Document(indexName = "es_recruitment_article", createIndex = true)
-@Setting(settingPath = "elasticsearch/settings.json")
-@Mapping(mappingPath = "elasticsearch/mappings.json")
+//@Setting(settingPath = "elasticsearch/settings.json")
+//@Mapping(mappingPath = "elasticsearch/mappings.json")
 @Getter
 @Setter
 @Builder

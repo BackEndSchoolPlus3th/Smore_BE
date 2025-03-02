@@ -34,7 +34,7 @@ services:
     container_name: smore_logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
-      - MYSQL_HOST=smore-dev-mysql.c7cca4g8ujfq.ap-northeast-2.rds.amazonaws.com
+      - MYSQL_HOST=host.docker.internal
       - MYSQL_USER=root
       - MYSQL_PASSWORD=00001234
       - MYSQL_DRIVER_LIBRARY=/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar
