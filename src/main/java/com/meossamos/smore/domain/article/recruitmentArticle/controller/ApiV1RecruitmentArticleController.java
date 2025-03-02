@@ -67,6 +67,7 @@ public class ApiV1RecruitmentArticleController {
                 .startDate(recruitmentArticle.getStartDate().toString())
                 .endDate(recruitmentArticle.getEndDate().toString())
                 .isRecruiting(recruitmentArticle.getIsRecruiting())
+                .createdDate(recruitmentArticle.getCreatedDate())
                 .maxMember(recruitmentArticle.getMaxMember())
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())

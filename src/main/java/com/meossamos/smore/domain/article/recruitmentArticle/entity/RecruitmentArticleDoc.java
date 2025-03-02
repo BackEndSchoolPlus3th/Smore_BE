@@ -37,6 +37,8 @@ public class RecruitmentArticleDoc {
     @Field(type = FieldType.Text, name = "hash_tags")
     private String hash_tags;
 
+    private String thumbnail_url;
+
     @Field(type = FieldType.Text, name = "image_urls")
     private String image_urls;
 

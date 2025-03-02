@@ -47,6 +47,7 @@ public class AddDataTest {
         int randomImageNum = random.nextInt(5) + 1;
         int maxMember = random.nextInt(50) + 1;
         int currentMember = random.nextInt(maxMember) + 1;
+        String thumbnailUrl = "https://picsum.photos/400/600?random=1";
         StringBuilder imageUrls = new StringBuilder();
         LocalDateTime endDate = RandomUtil.getRandomEndDate();
 
@@ -73,7 +74,7 @@ public class AddDataTest {
         Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, "https://picsum.photos/200/200?random=1");
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
-        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
+        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
 
     }
 }

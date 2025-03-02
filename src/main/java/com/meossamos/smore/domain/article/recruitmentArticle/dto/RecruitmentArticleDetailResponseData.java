@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -26,4 +28,5 @@ public class RecruitmentArticleDetailResponseData {
     private Integer clipCount;
     private String writerName;
     private String writerProfileImageUrl;
+    private LocalDateTime createdDate;
 }
