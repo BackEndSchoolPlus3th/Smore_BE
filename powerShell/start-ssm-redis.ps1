@@ -1,8 +1,8 @@
 # JSON 객체를 생성하고 문자열로 변환
 $jsonParams = @{
-    host = @("smore-rds-instance.c7cca4g8ujfq.ap-northeast-2.rds.amazonaws.com")
-    portNumber = @("3306")
-    localPortNumber = @("3306")
+    host = @("smore-redis-cluster.5w9cd3.0001.apn2.cache.amazonaws.com")
+    portNumber = @("6379")
+    localPortNumber = @("6379")
 } | ConvertTo-Json -Compress
 
 # 큰따옴표를 이스케이프하여 JSON을 AWS CLI에 올바르게 전달

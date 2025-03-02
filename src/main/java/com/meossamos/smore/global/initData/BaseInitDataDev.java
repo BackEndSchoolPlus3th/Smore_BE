@@ -3,6 +3,8 @@ package com.meossamos.smore.global.initData;
 import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
+
+import com.meossamos.smore.domain.chat.dm.service.DmRoomService;
 import com.meossamos.smore.domain.chat.groupChat.service.GroupChatRoomService;
 import com.meossamos.smore.domain.chat.message.service.ChatMessageService;
 import com.meossamos.smore.domain.member.member.service.MemberService;
@@ -24,6 +26,7 @@ public class BaseInitDataDev {
     private final MemberService memberService;
     private final StudyService studyService;
     private final GroupChatRoomService groupChatRoomService;
+    private final DmRoomService chatRoomService;
     private final RecruitmentArticleService recruitmentArticleService;
     private final StudyArticleService studyArticleService;
     private final StudyDocumentService studyDocumentService;
