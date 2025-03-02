@@ -8,6 +8,7 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class RecruitmentArticleClipService {
     }
 
     // 모집글 클립 삭제
+    @Transactional
     public boolean delete(Long recruitmentArticleId, Long memberId) {
         if (isClipped(recruitmentArticleId, memberId)) {
             // 삭제 성공
