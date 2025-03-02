@@ -9,6 +9,9 @@ spring:
     mongodb:
 #      uri: "mongodb://root:00001234@127.0.0.1:27017/smore?tls=true&tlsAllowInvalidHostnames=true&authMechanism=SCRAM-SHA-1&retryWrites=false"
       uri: "mongodb://root:00001234@127.0.0.1:27017/smore_chat_db?authSource=admin"
+    redis:
+      host: 127.0.0.1
+      port: 6379
   docker:
     compose:
       enabled: false

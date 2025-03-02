@@ -10,6 +10,7 @@ import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.Recru
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagService;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
+import com.meossamos.smore.domain.chat.dm.dto.DmRoomResponseDto;
 import com.meossamos.smore.domain.chat.dm.entity.DmRoom;
 import com.meossamos.smore.domain.chat.dm.service.DmRoomService;
 import com.meossamos.smore.domain.chat.groupChat.entity.GroupChatRoom;
@@ -79,7 +80,7 @@ class SmoreBeApplicationTests {
     private Long nextId = 0L;
     private List<Member> memberList = new ArrayList<>();
     private Study study;
-    private DmRoom dmRoom;
+    private DmRoomResponseDto dmRoom;
     private RecruitmentArticle recruitmentArticle;
     private StudyArticle studyArticle;
     private StudyDocument studyDocument;
@@ -140,7 +141,7 @@ class SmoreBeApplicationTests {
         } while (first == second);
 
 
-        DmRoom dmRoom = saveChatRoom(memberList.get(first), memberList.get(second));
+        DmRoomResponseDto dmRoom = saveChatRoom(memberList.get(first), memberList.get(second));
 
         this.dmRoom = dmRoom;
 
@@ -256,7 +257,7 @@ class SmoreBeApplicationTests {
     public void saveChatMessageTest() {
         ChatMessage[] chatMessages = new ChatMessage[30];
         for (int i = 0; i < 30; i++) {
-            chatMessages[i] = saveChatMessage(dmRoom.getId().toString(), memberList.get((i + 2) % 5).getId().toString(), "message" + (nextId + (i % 10)), "attachment" + (nextId + ((i + 1) % 10)));
+            chatMessages[i] = saveChatMessage(dmRoom.getRoomId().toString(), memberList.get((i + 2) % 5).getId().toString(), "message" + (nextId + (i % 10)), "attachment" + (nextId + ((i + 1) % 10)));
         }
 
         this.chatMessages = chatMessages;
@@ -360,8 +361,8 @@ class SmoreBeApplicationTests {
         return studyService.saveStudy(title, memberCnt, imageUrls, introduction, leader);
     }
 
-    private DmRoom saveChatRoom(Member member1, Member member2) {
-        return dmRoomService.saveChatRoom(member1, member2);
+    private DmRoomResponseDto saveChatRoom(Member member1, Member member2) {
+        return dmRoomService.createDmRoom(member1.getId(), member2.getId());
     }
 
     private RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
