@@ -53,7 +53,7 @@ public class AddDataTest {
 
 
         for (int i = 0; i < randomImageNum; i++) {
-            imageUrls.append("https://picsum.photos/400/600?random=1");
+            imageUrls.append("https://picsum.photos/2000/4000?random=1");
             // 마지막 URL이 아니라면 콤마를 추가
             if (i < randomImageNum - 1) {
                 imageUrls.append(",");

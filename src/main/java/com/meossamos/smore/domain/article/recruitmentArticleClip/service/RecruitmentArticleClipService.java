@@ -9,6 +9,8 @@ import com.meossamos.smore.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class RecruitmentArticleClipService {
@@ -16,6 +18,7 @@ public class RecruitmentArticleClipService {
     private final MemberService memberService;
     private final RecruitmentArticleService recruitmentArticleService;
 
+    // 모집글 클립 저장
     public RecruitmentArticleClip save(Long recruitmentArticleId, Long memberId) {
         Member member = memberService.findById(memberId);
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentArticleId);
@@ -25,19 +28,30 @@ public class RecruitmentArticleClipService {
                 .build();
 
         RecruitmentArticleClip recruitmentArticleClipResult = recruitmentArticleClipRepository.save(recruitmentArticleClip);
-        recruitmentArticleService.UpdateClipCounter(recruitmentArticle, "up");
+        recruitmentArticleService.updateClipCounter(recruitmentArticle, "up");
         return recruitmentArticleClipResult;
     }
 
+    // 모집글 클립 삭제
     public boolean delete(Long recruitmentArticleId, Long memberId) {
-        if (recruitmentArticleClipRepository.findByRecruitmentArticleIdAndMemberId(recruitmentArticleId, memberId) != null) {
+        if (isClipped(recruitmentArticleId, memberId)) {
             // 삭제 성공
             recruitmentArticleClipRepository.deleteByRecruitmentArticleIdAndMemberId(recruitmentArticleId, memberId);
-            recruitmentArticleService.UpdateClipCounter(recruitmentArticleService.findById(recruitmentArticleId), "down");
+            recruitmentArticleService.updateClipCounter(recruitmentArticleService.findById(recruitmentArticleId), "down");
             return true;
         } else {
             // 삭제 실패
             return false;
         }
+    }
+
+    // 모집글 클립 여부 확인
+    public boolean isClipped(Long recruitmentArticleId, Long memberId) {
+        return recruitmentArticleClipRepository.findByRecruitmentArticleIdAndMemberId(recruitmentArticleId, memberId) != null;
+    }
+
+    // 사용자 클립한 모집글 id 전부 조회
+    public List<RecruitmentArticle> findClippedRecruitmentArticles(Long memberId) {
+        return recruitmentArticleClipRepository.findClippedRecruitmentArticlesByMemberId(memberId);
     }
 }

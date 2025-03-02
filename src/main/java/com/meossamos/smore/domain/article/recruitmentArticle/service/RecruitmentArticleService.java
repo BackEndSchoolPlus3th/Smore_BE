@@ -9,6 +9,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -54,7 +55,8 @@ public class RecruitmentArticleService {
                 .orElseThrow(() -> new EntityNotFoundException("RecruitmentArticle not found"));
     }
 
-    public Integer UpdateClipCounter(RecruitmentArticle recruitmentArticle, String upOrDown) {
+    @Transactional
+    public void updateClipCounter(RecruitmentArticle recruitmentArticle, String upOrDown) {
         Integer clipCount = recruitmentArticle.getClipCount();
         if (upOrDown.equals("up")) {
             clipCount++;
@@ -62,7 +64,5 @@ public class RecruitmentArticleService {
             clipCount--;
         }
         recruitmentArticle.setClipCount(clipCount);
-        recruitmentArticleRepository.save(recruitmentArticle);
-        return clipCount;
     }
 }

@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/recruitmentArticles")
 @RequiredArgsConstructor
 public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleService recruitmentArticleService;
     private final RecruitmentArticleDocService recruitmentArticleDocService;
     private final MemberService memberService;
 
-    @GetMapping("/recruitmentArticles")
+    @GetMapping("")
     public RsData<?> getRecruitmentArticles(
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "12") int size,
@@ -50,7 +50,7 @@ public class ApiV1RecruitmentArticleController {
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
     }
 
-    @GetMapping("/recruitmentArticles/detail")
+    @GetMapping("/detail")
     public RsData<?> getRecruitmentArticleDetail(
             @RequestParam(value = "id") Long id
     ) {
