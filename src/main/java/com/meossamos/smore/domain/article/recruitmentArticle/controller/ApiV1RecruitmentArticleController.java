@@ -6,6 +6,7 @@ import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentA
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
+import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.rsData.RsData;
@@ -27,6 +28,7 @@ public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleService recruitmentArticleService;
     private final RecruitmentArticleDocService recruitmentArticleDocService;
     private final MemberService memberService;
+    private final RecruitmentArticleClipService recruitmentArticleClipService;
 
     @GetMapping("")
     public RsData<?> getRecruitmentArticles(
@@ -52,10 +54,14 @@ public class ApiV1RecruitmentArticleController {
 
     @GetMapping("/detail")
     public RsData<?> getRecruitmentArticleDetail(
-            @RequestParam(value = "id") Long id
+            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
     ) {
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(id);
-        Member member = memberService.findById(recruitmentArticle.getMember().getId());
+        long devMemberId = 1L;
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentArticleId);
+        Member writer = memberService.findById(recruitmentArticle.getMember().getId());
+        Member user = memberService.findById(devMemberId);
+
+        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId);
 
         RecruitmentArticleDetailResponseData recruitmentArticleResponseData = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
@@ -71,8 +77,9 @@ public class ApiV1RecruitmentArticleController {
                 .maxMember(recruitmentArticle.getMaxMember())
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())
-                .writerName(member.getNickname())
-                .writerProfileImageUrl(member.getProfileImageUrl())
+                .isClipped(isClipped)
+                .writerName(writer.getNickname())
+                .writerProfileImageUrl(writer.getProfileImageUrl())
                 .build();
 
         return new RsData<>("200", "모집글 상세 조회 성공", recruitmentArticleResponseData);
