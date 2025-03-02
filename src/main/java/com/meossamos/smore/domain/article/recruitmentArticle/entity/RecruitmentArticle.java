@@ -35,7 +35,7 @@ public class RecruitmentArticle extends BaseEntity {
     @Column(nullable = true)
     private String region;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String thumbnailUrl;
 
     @Column(nullable = true)
