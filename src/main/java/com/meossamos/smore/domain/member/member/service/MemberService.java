@@ -7,6 +7,8 @@ import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.rsData.RsData;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -67,24 +71,25 @@ public class MemberService {
         return tokenDto;
 
     }
+
     @Transactional
-    public TokenDto refresh(@RequestBody TokenRequestDto tokenRequestDto) {
-        // 1. Refresh Token 검증
-        if (!tokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
-            throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");
+    public TokenDto refresh(HttpServletRequest request){
+
+        String requestToken = extractRefreshTokenFromCookies(request);
+
+        Authentication authentication = tokenProvider.getAuthentication(requestToken);
+
+        return tokenProvider.generateTokenDto(authentication);
+    }
+    private String extractRefreshTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("refreshToken")) {
+                    return cookie.getValue();
+                }
+            }
         }
-
-        // 2. Access Token 에서 Member ID 가져오기
-        Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
-
-        // 3. 저장소에서 Member ID 에 해당하는 Member 가 있는지 확인하기
-        Member member = memberRepository.findById(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
-
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        // 토큰 발급
-        return tokenDto;
+        return null;
     }
     public Long getMaxMemberId() {
         Long maxId = memberRepository.findMaxMemberId();
