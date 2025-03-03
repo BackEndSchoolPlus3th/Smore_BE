@@ -53,6 +53,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/recruitmentArticles").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
+                        .requestMatchers("/api/member/refresh").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http));

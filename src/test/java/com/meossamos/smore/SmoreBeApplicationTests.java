@@ -7,7 +7,6 @@ import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentA
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
-import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagDocService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.RecruitmentArticleHashTagService;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
