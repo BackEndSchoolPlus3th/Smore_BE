@@ -9,7 +9,7 @@ import java.util.List;
 // MongoDB에서 메시지 저장 및 조회
 @Repository
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String> {
-    // 특정 채팅방의 메시지 목록 조회
+    // 특정 채팅방의 메시지 목록 조회 (그룹, 1:1 모두)
     List<ChatMessage> findByRoomId(String roomId);
     // 특정 사용자가 보낸 메시지 조회
     List<ChatMessage> findBySenderId(String senderId);

@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ChatMessageRequestDto {
+    private String roomId;
     private String senderId;
     private String message;
     private LocalDateTime timestamp;
     private String attachment;
+
 }
