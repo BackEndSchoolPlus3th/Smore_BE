@@ -3,6 +3,7 @@ package com.meossamos.smore.domain.study.schedule.service;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.domain.study.schedule.dto.AddStudyScheduleDto;
+import com.meossamos.smore.domain.study.schedule.dto.UpdateStudyScheduleDto;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.schedule.repository.StudyScheduleRepository;
 import com.meossamos.smore.domain.study.study.entity.Study;
@@ -10,6 +11,7 @@ import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.global.exception.MemberNotFoundException;
 import com.meossamos.smore.global.exception.StudyNotFoundException;
 import com.meossamos.smore.global.exception.StudyScheduleNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +68,7 @@ public class StudyScheduleService {
         if (studySchedule == null) {
             throw new RuntimeException("Schedule creation failed.");
         }
-                                
+//        System.out.println(studySchedule.toString());
         return studyScheduleRepository.save(studySchedule);
     }
 
@@ -79,4 +81,19 @@ public class StudyScheduleService {
 
     }
 
+    // 수정
+    @Transactional
+    public void updateSchedule(UpdateStudyScheduleDto updateStudyScheduleDto) {
+        Long target_id = updateStudyScheduleDto.getId();
+        StudySchedule target_schedule = studyScheduleRepository.findById(target_id).orElseThrow(() ->
+                new StudyScheduleNotFoundException("StudySchedule not found with ID " + target_id));
+
+        target_schedule.setTitle(updateStudyScheduleDto.getTitle());
+        target_schedule.setContent(updateStudyScheduleDto.getContent());
+        target_schedule.setStartDate(updateStudyScheduleDto.getStartDate());
+        target_schedule.setEndDate(updateStudyScheduleDto.getEndDate());
+
+
+        studyScheduleRepository.save(target_schedule);
+    }
 }
