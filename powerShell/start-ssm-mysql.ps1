@@ -10,6 +10,6 @@ $jsonParams = $jsonParams -replace '"', '\"'
 
 # AWS SSM 명령어 실행
 aws ssm start-session `
-  --target i-0d302d710d3bb27b0 `
+  --target i-039e751d7fc2e2be6 `
   --document-name AWS-StartPortForwardingSessionToRemoteHost `
   --parameters "$jsonParams"
