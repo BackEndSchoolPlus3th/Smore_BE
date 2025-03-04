@@ -2,6 +2,7 @@ package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleSearchDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
@@ -32,21 +33,21 @@ public class ApiV1RecruitmentArticleController {
 
     @GetMapping("")
     public RsData<?> getRecruitmentArticles(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size,
-            @RequestParam(value = "hashTags", required = false) String hashTags
+            RecruitmentArticleSearchDto searchDto
     ) {
-        List<String> hashTagList = new ArrayList<>();
-        if (hashTags == null) {
-            hashTags = "";
-        }
+        List<String> titleList = searchDto.getTitleList();
+        List<String> contentList = searchDto.getContentList();
+        List<String> introductionList = searchDto.getIntroductionList();
+        List<String> regionList = searchDto.getRegionList();
+        List<String> hashTagList = searchDto.getHashTagsList();
 
-        // 해시태그가 콤마로 구분된 문자열로 저장되는 경우 String으로 사용
-        hashTagList = List.of(hashTags.split(","));
-        System.out.println("hashTags: " + hashTags);
+        System.out.println("Titles: " + titleList);
+        System.out.println("Contents: " + contentList);
+        System.out.println("Introductions: " + introductionList);
+        System.out.println("Regions: " + regionList);
+        System.out.println("HashTags: " + hashTagList);
 
-        // RecruitmentArticleService 내부에서 RecruitmentArticleDocService의 findByHashTags 메서드를 호출하여 페이지 결과를 얻음
-        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByHashTags(hashTagList, page, size);
+        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, searchDto.getPage(), searchDto.getSize());
         List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
 
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);

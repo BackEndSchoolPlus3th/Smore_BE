@@ -338,17 +338,11 @@ class SmoreBeApplicationTests {
         hashTags2.add("postgresql");
         hashTags2.add("프론트");
         List<String> hashTags3 = new ArrayList<>();
-        List<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByHashTag(hashTags2, 2, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles2 = findRecruitmentArticleByHashTag(hashTags2, 3, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles3 = findRecruitmentArticleByHashTag(hashTags2, 12, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles4 = findRecruitmentArticleByHashTag(hashTags3, 1, 12);
-
 
         System.out.print("find RecruitmentArticle by HashTag: ");
         hashTags.forEach(hashTag -> System.out.print(hashTag + ", "));
 
         System.out.print("\nfounded RecruitmentArticles: ");
-        recruitmentArticles.forEach(recruitmentArticle -> System.out.print(recruitmentArticle.getId() + ", "));
 
         System.out.println("\n\n\n\n");
     }
@@ -410,7 +404,4 @@ class SmoreBeApplicationTests {
         return groupChatRoomService.saveGroupChatRoom(study);
     }
 
-    private List<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTags, int page, int size) {
-        return recruitmentArticleDocService.findByHashTags(hashTags, page, size);
-    }
 }
