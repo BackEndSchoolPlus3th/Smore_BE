@@ -32,6 +32,7 @@ public class ApiV1StudyScheduleController {
         studyScheduleDtoList.forEach(studyScheduleDto ->
                 System.out.println(studyScheduleDto.getContent())
                 );
+//        System.out.println();
         return new RsData<>(
                 "200",
         "스케줄 다건 조회",
