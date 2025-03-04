@@ -47,13 +47,13 @@ public class AddDataTest {
         int randomImageNum = random.nextInt(5) + 1;
         int maxMember = random.nextInt(50) + 1;
         int currentMember = random.nextInt(maxMember) + 1;
-        String thumbnailUrl = "https://picsum.photos/400/600?random=1";
+        String thumbnailUrl = "https://picsum.photos/400/600";
         StringBuilder imageUrls = new StringBuilder();
         LocalDateTime endDate = RandomUtil.getRandomEndDate();
 
 
         for (int i = 0; i < randomImageNum; i++) {
-            imageUrls.append("https://picsum.photos/2000/4000?random=1");
+            imageUrls.append("https://picsum.photos/2000/4000");
             // 마지막 URL이 아니라면 콤마를 추가
             if (i < randomImageNum - 1) {
                 imageUrls.append(",");
@@ -71,7 +71,7 @@ public class AddDataTest {
         List<String> memberHashTags = HashTagUtil.getRandomHashTags();
         String memberHashTag = HashTagUtil.mergeHashTagList(memberHashTags);
 
-        Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, "https://picsum.photos/200/200?random=1");
+        Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, "https://picsum.photos/200/200");
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
         RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
