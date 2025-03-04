@@ -3,8 +3,9 @@ package com.meossamos.smore.domain.member.member.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
+import com.meossamos.smore.domain.article.recruitmentArticleClip.entity.RecruitmentArticleClip;
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
-import com.meossamos.smore.domain.chat.chat.entity.ChatRoom;
+import com.meossamos.smore.domain.chat.dm.entity.DmRoom;
 import com.meossamos.smore.domain.member.hashTag.entity.MemberHashTag;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.study.entity.Study;
@@ -44,6 +45,11 @@ public class Member extends BaseEntity {
     private String region;
 
     @Column(nullable = true)
+    private String hashTags;
+
+    @Enumerated(EnumType.STRING)
+    private Authority authority;
+    @Column(nullable = true)
     private String profileImageUrl;
 
     @JsonIgnore
@@ -56,13 +62,13 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member1", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList1 = new ArrayList<>();
+    private List<DmRoom> dmRoomList1 = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "member2", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     @ToString.Exclude
-    private List<ChatRoom> chatRoomList2 = new ArrayList<>();
+    private List<DmRoom> dmRoomList2 = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -99,4 +105,10 @@ public class Member extends BaseEntity {
     @Builder.Default
     @ToString.Exclude
     private List<MemberHashTag> memberHashTagList = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<RecruitmentArticleClip> recruitmentArticleClipList = new ArrayList<>();
 }

@@ -1,16 +1,15 @@
 package com.meossamos.smore.domain.article.studyArticle.entity;
 
-import co.elastic.clients.util.DateTime;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.global.jpa.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
@@ -31,8 +30,9 @@ public class StudyArticle extends BaseEntity {
     @Column(nullable = true)
     private String imageUrls;
 
+    @ElementCollection
     @Column(nullable = true)
-    private String attachments;
+    private List<String> attachments = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Study study;
