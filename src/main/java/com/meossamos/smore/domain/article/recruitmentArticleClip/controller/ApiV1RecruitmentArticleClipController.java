@@ -22,17 +22,16 @@ public class ApiV1RecruitmentArticleClipController {
     // 모집글 클립
     @PostMapping("/clip")
     public RsData<?> clipRecruitmentArticle(
-//            @RequestBody Map<String, String> body
+            @RequestBody Map<String, Long> body
             ) {
-        long devRecruitmentArticleId = 1l; // 테스트용 recruitmentArticleId
+        System.out.println(body);
         long devMemberId = 1L; // 테스트용 devMemberId
 //        long recruitmentArticleId = Long.parseLong(body.get("recruitmentArticleId"));
-        System.out.println(devRecruitmentArticleId);
-        if (recruitmentArticleClipService.isClipped(devRecruitmentArticleId, devMemberId)) {
+        if (recruitmentArticleClipService.isClipped(body.get("recruitmentArticleId"), devMemberId)) {
             return new RsData<>("400", "이미 클립한 모집글입니다.", null);
         }
         RecruitmentArticleClip recruitmentArticleClip =
-                recruitmentArticleClipService.save(devRecruitmentArticleId,devMemberId);
+                recruitmentArticleClipService.save(body.get("recruitmentArticleId"),devMemberId);
         return new RsData<>("200", "모집글 클립 성공", recruitmentArticleClip);
     }
 
@@ -40,14 +39,13 @@ public class ApiV1RecruitmentArticleClipController {
     // 모집글 클립 취소
     @DeleteMapping("/clip")
     public RsData<?> unClipRecruitmentArticle(
-//            @RequestParam(value = "recruitmentArticleId", defaultValue = "1") long recruitmentArticleId
+            @RequestParam(value = "recruitmentArticleId") long recruitmentArticleId
     ) {
-        long devRecruitmentArticleId = 1l; // 테스트용 recruitmentArticleId
         long devMemberId = 1L; // 테스트용 devMemberId
-        if (!recruitmentArticleClipService.isClipped(devRecruitmentArticleId, devMemberId)) {
+        if (!recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId)) {
             return new RsData<>("400", "클립하지 않은 모집글입니다.", null);
         }
-        boolean result = recruitmentArticleClipService.delete(devRecruitmentArticleId, devMemberId);
+        boolean result = recruitmentArticleClipService.delete(recruitmentArticleId, devMemberId);
         if (result) {
             return new RsData<>("200", "모집글 클립 취소 성공", result);
         } else {
