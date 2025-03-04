@@ -59,10 +59,10 @@ public class RecruitmentArticle extends BaseEntity {
     @Column(nullable = false)
     private Integer clipCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private Study study;
 
     @JsonIgnore

@@ -2,10 +2,12 @@ package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleSearchDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
+import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.rsData.RsData;
@@ -21,41 +23,46 @@ import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/recruitmentArticles")
 @RequiredArgsConstructor
 public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleService recruitmentArticleService;
     private final RecruitmentArticleDocService recruitmentArticleDocService;
     private final MemberService memberService;
+    private final RecruitmentArticleClipService recruitmentArticleClipService;
 
-    @GetMapping("/recruitmentArticles")
+    @GetMapping("")
     public RsData<?> getRecruitmentArticles(
-            @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "12") int size,
-            @RequestParam(value = "hashTags", required = false) String hashTags
+            RecruitmentArticleSearchDto searchDto
     ) {
-        List<String> hashTagList = new ArrayList<>();
-        if (hashTags == null) {
-            hashTags = "";
-        }
+        List<String> titleList = searchDto.getTitleList();
+        List<String> contentList = searchDto.getContentList();
+        List<String> introductionList = searchDto.getIntroductionList();
+        List<String> regionList = searchDto.getRegionList();
+        List<String> hashTagList = searchDto.getHashTagsList();
 
-        // 해시태그가 콤마로 구분된 문자열로 저장되는 경우 String으로 사용
-        hashTagList = List.of(hashTags.split(","));
-        System.out.println("hashTags: " + hashTags);
+        System.out.println("Titles: " + titleList);
+        System.out.println("Contents: " + contentList);
+        System.out.println("Introductions: " + introductionList);
+        System.out.println("Regions: " + regionList);
+        System.out.println("HashTags: " + hashTagList);
 
-        // RecruitmentArticleService 내부에서 RecruitmentArticleDocService의 findByHashTags 메서드를 호출하여 페이지 결과를 얻음
-        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByHashTags(hashTagList, page, size);
+        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, searchDto.getPage(), searchDto.getSize());
         List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
 
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
     }
 
-    @GetMapping("/recruitmentArticles/detail")
+    @GetMapping("/detail")
     public RsData<?> getRecruitmentArticleDetail(
-            @RequestParam(value = "id") Long id
+            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
     ) {
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(id);
-        Member member = memberService.findById(recruitmentArticle.getMember().getId());
+        long devMemberId = 1L;
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentArticleId);
+        Member writer = memberService.findById(recruitmentArticle.getMember().getId());
+        Member user = memberService.findById(devMemberId);
+
+        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId);
 
         RecruitmentArticleDetailResponseData recruitmentArticleResponseData = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
@@ -71,8 +78,9 @@ public class ApiV1RecruitmentArticleController {
                 .maxMember(recruitmentArticle.getMaxMember())
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())
-                .writerName(member.getNickname())
-                .writerProfileImageUrl(member.getProfileImageUrl())
+                .isClipped(isClipped)
+                .writerName(writer.getNickname())
+                .writerProfileImageUrl(writer.getProfileImageUrl())
                 .build();
 
         return new RsData<>("200", "모집글 상세 조회 성공", recruitmentArticleResponseData);

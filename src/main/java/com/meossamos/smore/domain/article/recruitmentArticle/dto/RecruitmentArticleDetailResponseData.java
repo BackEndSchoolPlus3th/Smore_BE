@@ -29,4 +29,5 @@ public class RecruitmentArticleDetailResponseData {
     private String writerName;
     private String writerProfileImageUrl;
     private LocalDateTime createdDate;
+    private boolean isClipped;
 }

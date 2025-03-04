@@ -16,7 +16,7 @@ public class RecruitmentArticleResponseData {
     private String title;
     private String introduction;
     private String region;
-    private String imageUrl;
+    private String thumbnailUrl;
     private Boolean isRecruiting;
     private String writerName;
     private String writerProfileImageUrl;
