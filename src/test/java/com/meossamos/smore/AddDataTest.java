@@ -75,7 +75,7 @@ public class AddDataTest {
         Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, profileImageUrl);
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
-        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
+        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
 
     }
 }

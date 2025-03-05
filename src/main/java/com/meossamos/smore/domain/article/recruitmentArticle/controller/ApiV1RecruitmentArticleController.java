@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.NewRecruitmentArticleDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleSearchDto;
@@ -13,17 +14,16 @@ import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 @RestController
-@RequestMapping("/api/v1/recruitmentArticles")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleService recruitmentArticleService;
@@ -31,7 +31,7 @@ public class ApiV1RecruitmentArticleController {
     private final MemberService memberService;
     private final RecruitmentArticleClipService recruitmentArticleClipService;
 
-    @GetMapping("")
+    @GetMapping("/recruitmentArticles")
     public RsData<?> getRecruitmentArticles(
             RecruitmentArticleSearchDto searchDto
     ) {
@@ -53,7 +53,7 @@ public class ApiV1RecruitmentArticleController {
         return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
     }
 
-    @GetMapping("/detail")
+    @GetMapping("/recruitmentArticles/detail")
     public RsData<?> getRecruitmentArticleDetail(
             @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
     ) {
@@ -84,5 +84,29 @@ public class ApiV1RecruitmentArticleController {
                 .build();
 
         return new RsData<>("200", "모집글 상세 조회 성공", recruitmentArticleResponseData);
+    }
+
+    @PostMapping("/study/{studyId}/recruitmentArticle")
+    public ResponseEntity<?> createRecruitmentArticle(
+            @PathVariable("studyId") Long studyId,
+            @ModelAttribute NewRecruitmentArticleDto dto
+    ) {
+        // 예시: 전달받은 데이터 출력 (실제 서비스 로직에서는 dto를 바탕으로 저장 처리)
+        System.out.println("Title: " + dto.getTitle());
+        System.out.println("Content: " + dto.getContent());
+        System.out.println("Introduction: " + dto.getIntroduction());
+        System.out.println("Region: " + dto.getRegion());
+        System.out.println("Start Date: " + dto.getStartDate());
+        System.out.println("End Date: " + dto.getEndDate());
+        System.out.println("Hashtags: " + dto.getHashtagList());
+            System.out.println("Thumbnail file name: " + dto.getThumbnailUrl());
+
+
+//        RecuritmentArticle recuritmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, 10, dto.getHashtagList().toString(), memberService.findById(1L), studyService.findById(studyId), 0);
+
+        // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
+        // 예: recruitmentArticleService.createArticle(studyId, dto);
+
+        return ResponseEntity.ok("모집글이 성공적으로 게시되었습니다.");
     }
 }
