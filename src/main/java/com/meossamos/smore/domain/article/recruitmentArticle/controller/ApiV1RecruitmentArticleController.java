@@ -9,6 +9,7 @@ import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentA
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
+import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.rsData.RsData;
@@ -29,6 +30,7 @@ public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleDocService recruitmentArticleDocService;
     private final MemberService memberService;
     private final RecruitmentArticleClipService recruitmentArticleClipService;
+    private final RecruitmentArticleCommentService recruitmentArticleCommentService;
 
     @GetMapping("/recruitmentArticles")
     public RsData<?> getRecruitmentArticles(
