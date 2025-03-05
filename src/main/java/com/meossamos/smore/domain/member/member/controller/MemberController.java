@@ -77,6 +77,23 @@ public class MemberController {
                 .body(Map.of("server", "refresh ok"));
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // refreshToken 쿠키 삭제 (maxAge=0)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(Map.of("server", "logout ok"));
+    }
+
+
 
     @PostMapping("/check")
     public String check(){
