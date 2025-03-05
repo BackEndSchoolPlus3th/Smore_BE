@@ -33,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        
+
         // 1. Request Header 에서 토큰을 꺼냄
         String bearerToken =  request.getHeader(AUTHORIZATION_HEADER);
 

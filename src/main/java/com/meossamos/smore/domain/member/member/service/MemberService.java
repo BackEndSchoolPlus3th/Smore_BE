@@ -5,8 +5,11 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.rsData.RsData;
+import com.meossamos.smore.global.sse.SseEmitters;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +19,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -34,6 +41,7 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final SseEmitters sseEmitters;
     public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
 
         Member member = Member.builder()
@@ -64,27 +72,43 @@ public class MemberService {
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
+        SseEmitter emitter = new SseEmitter();
+
+        // 생성된 emitter를 컬렉션에 추가하여 관리
+        sseEmitters.add(emitter);
+
+        try {
+            // 연결된 클라이언트에게 초기 연결 성공 메시지 전송
+            emitter.send(SseEmitter.event()
+                    .name("connect")    // 이벤트 이름을 "connect"로 지정
+                    .data("connected!")); // 전송할 데이터
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
+        }
+
         return tokenDto;
 
     }
+
     @Transactional
-    public TokenDto refresh(@RequestBody TokenRequestDto tokenRequestDto) {
-        // 1. Refresh Token 검증
-        if (!tokenProvider.validateToken(tokenRequestDto.getRefreshToken())) {
-            throw new RuntimeException("Refresh Token 이 유효하지 않습니다.");
+    public TokenDto refresh(HttpServletRequest request){
+
+        String requestToken = extractRefreshTokenFromCookies(request);
+
+        Authentication authentication = tokenProvider.getAuthentication(requestToken);
+
+        return tokenProvider.generateTokenDto(authentication);
+    }
+    private String extractRefreshTokenFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("refreshToken")) {
+                    return cookie.getValue();
+                }
+            }
         }
-
-        // 2. Access Token 에서 Member ID 가져오기
-        Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
-
-        // 3. 저장소에서 Member ID 에 해당하는 Member 가 있는지 확인하기
-        Member member = memberRepository.findById(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
-
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        // 토큰 발급
-        return tokenDto;
+        return null;
     }
     public Long getMaxMemberId() {
         Long maxId = memberRepository.findMaxMemberId();
@@ -97,5 +121,9 @@ public class MemberService {
 
     public List<Member> findByIds(List<Long> memberIds) {
         return memberRepository.findByIdIn(memberIds);
+    }
+
+    public Member getReferenceById(Long memberId) {
+        return memberRepository.getReferenceById(memberId);
     }
 }
