@@ -54,6 +54,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
                         .requestMatchers("/api/member/refresh").permitAll()
+                        .requestMatchers("/sse/connect").permitAll()
 
                         .anyRequest().authenticated()
                 )

@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.rsData.RsData;
+import com.meossamos.smore.global.sse.SseEmitters;
 import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
@@ -23,7 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +40,7 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final SseEmitters sseEmitters;
     public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
 
         Member member = Member.builder()
@@ -66,6 +70,21 @@ public class MemberService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
+
+        SseEmitter emitter = new SseEmitter();
+
+        // 생성된 emitter를 컬렉션에 추가하여 관리
+        sseEmitters.add(emitter);
+
+        try {
+            // 연결된 클라이언트에게 초기 연결 성공 메시지 전송
+            emitter.send(SseEmitter.event()
+                    .name("connect")    // 이벤트 이름을 "connect"로 지정
+                    .data("connected!")); // 전송할 데이터
+        } catch (
+                IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return tokenDto;
 
