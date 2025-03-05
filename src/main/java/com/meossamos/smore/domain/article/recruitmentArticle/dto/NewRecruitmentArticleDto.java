@@ -15,16 +15,12 @@ public class NewRecruitmentArticleDto {
     private String content;
     private String introduction;
     private String region;
-    // 모집 시작일과 종료일은 문자열로 받아서 이후 LocalDate로 변환하거나,
-    // 혹은 프론트엔드에서 ISO 형식(yyyy-MM-dd)으로 보내면 바로 LocalDate로 매핑할 수 있습니다.
+    private int maxMember;
     private LocalDate startDate;
     private LocalDate endDate;
-    /**
-     * 해시태그는 프론트엔드에서 JSON 문자열(ex. '["tag1", "tag2"]')로 전달합니다.
-     * 이후 getHashtagList()를 통해 List<String>로 변환할 수 있습니다.
-     */
     private String hashtags;
     private String thumbnailUrl;
+    private String imageUrls;
 
     // JSON 문자열로 받은 hashtags를 List<String>으로 변환하는 헬퍼 메서드
     public List<String> getHashtagList() {
