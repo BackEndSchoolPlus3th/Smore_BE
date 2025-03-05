@@ -122,4 +122,8 @@ public class MemberService {
     public List<Member> findByIds(List<Long> memberIds) {
         return memberRepository.findByIdIn(memberIds);
     }
+
+    public Member getReferenceById(Long memberId) {
+        return memberRepository.getReferenceById(memberId);
+    }
 }
