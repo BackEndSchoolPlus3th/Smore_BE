@@ -7,7 +7,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m -Dlog4j2.disableJmx=true
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g -Dlog4j2.disableJmx=true -XX:-UseContainerSupport
     command: >
       bash -c '
         if [ -d "plugins/analysis-nori" ]; then
