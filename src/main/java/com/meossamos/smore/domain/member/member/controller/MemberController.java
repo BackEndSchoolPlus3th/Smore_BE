@@ -33,8 +33,9 @@ public class MemberController {
     private final TokenProvider tokenProvider;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-        TokenDto tokenDto = memberService.login(loginDto);
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",tokenDto.getRefreshToken())
+        LoginResponseDto responseDto = memberService.login(loginDto);
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",responseDto.getToken().getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -44,8 +45,8 @@ public class MemberController {
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
-                .body(tokenDto);
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + responseDto.getToken().getAccessToken())
+                .body(responseDto);
     }
 
     @PostMapping("/signup")

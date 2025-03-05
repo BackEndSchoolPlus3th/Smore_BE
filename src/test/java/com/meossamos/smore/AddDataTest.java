@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -49,7 +48,7 @@ public class AddDataTest {
         int currentMember = random.nextInt(maxMember) + 1;
         String thumbnailUrl = "https://picsum.photos/400/600?random=" + idx;
         StringBuilder imageUrls = new StringBuilder();
-        LocalDateTime endDate = RandomUtil.getRandomEndDate();
+        LocalDate endDate = LocalDate.from(RandomUtil.getRandomEndDate());
         String profileImageUrl = "https://picsum.photos/200/200?random=" + idx;
 
 
@@ -72,10 +71,10 @@ public class AddDataTest {
         List<String> memberHashTags = HashTagUtil.getRandomHashTags();
         String memberHashTag = HashTagUtil.mergeHashTagList(memberHashTags);
 
-        Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, profileImageUrl);
+        Member savedMember = memberService.saveInitMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, profileImageUrl);
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
-        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
+        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDate.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
 
     }
 }
