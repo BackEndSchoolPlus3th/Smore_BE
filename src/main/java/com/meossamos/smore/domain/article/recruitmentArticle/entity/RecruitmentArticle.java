@@ -2,6 +2,7 @@ package com.meossamos.smore.domain.article.recruitmentArticle.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.entity.RecruitmentArticleClip;
+import com.meossamos.smore.domain.article.recruitmentArticleComment.entity.RecruitmentArticleComment;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
@@ -11,6 +12,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +44,10 @@ public class RecruitmentArticle extends BaseEntity {
     private String imageUrls;
 
     @Column(nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(nullable = false)
     private Boolean isRecruiting;
@@ -77,4 +79,10 @@ public class RecruitmentArticle extends BaseEntity {
     @Builder.Default
     @ToString.Exclude
     private List<RecruitmentArticleClip> recruitmentArticleClipList = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "recruitmentArticle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    @ToString.Exclude
+    private List<RecruitmentArticleComment> recruitmentArticleCommentList = new ArrayList<>();
 }

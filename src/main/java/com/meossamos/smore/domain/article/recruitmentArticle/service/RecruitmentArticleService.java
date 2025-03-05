@@ -3,7 +3,9 @@ package com.meossamos.smore.domain.article.recruitmentArticle.service;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.repository.RecruitmentArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
+import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.domain.study.study.entity.Study;
+import com.meossamos.smore.domain.study.study.service.StudyService;
 import com.meossamos.smore.global.util.HashTagUtil;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.EntityNotFoundException;
@@ -11,14 +13,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class RecruitmentArticleService {
     private final RecruitmentArticleRepository recruitmentArticleRepository;
+    private final MemberService memberService;
+    private final StudyService studyService;
 
-    public RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl, @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
+    public RecruitmentArticle save(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl, @Nullable String imageUrls, LocalDate startDate, LocalDate endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Long memberId, Long studyId, Integer clipCount) {
+        Member member = memberService.getReferenceById(memberId);
+        Study study = studyService.getReferenceById(studyId);
+
         RecruitmentArticle recruitmentArticle = RecruitmentArticle.builder()
                 .title(title)
                 .content(content)

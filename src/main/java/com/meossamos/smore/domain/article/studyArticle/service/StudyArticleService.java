@@ -112,4 +112,13 @@ public class StudyArticleService {
                 .member(studyArticle.getMember())
                 .build();
     }
+
+    public StudyArticle findById(Long articleId) {
+        return studyArticleRepository.findById(articleId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+    }
+
+    public StudyArticle save(StudyArticle studyArticle) {
+        return studyArticleRepository.save(studyArticle);
+    }
 }
