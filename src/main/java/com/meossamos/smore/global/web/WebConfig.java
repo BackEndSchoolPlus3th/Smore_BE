@@ -13,7 +13,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+                        .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5080")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*") // 모든 헤더 허용
                         .exposedHeaders("Authorization") // 응답에 포함될 헤더 지정

@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
                         .requestMatchers("/api/member/refresh").permitAll()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
 
                         .anyRequest().authenticated()
                 )

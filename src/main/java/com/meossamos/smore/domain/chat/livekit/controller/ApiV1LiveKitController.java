@@ -10,19 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-
-@RequestMapping("/api/v1/livekit")
+//@CrossOrigin("*")
+//@RequestMapping("/api/v1/livekit")
 @RestController
 public class ApiV1LiveKitController {
 
-    @Value("${livekit.apiKey")
+    @Value("${livekit.apiKey}")
     private String apikey;
 
     @Value("${livekit.apiSecret}")
     private String apiSecret;
 
-    @GetMapping("/getToken")
-    public ResponseEntity<Map<String, String>> getToken(@RequestParam Map<String, String> params) {
+//    @CrossOrigin("*")
+    @PostMapping("/api/v1/token")
+    public ResponseEntity<Map<String, String>> getToken(@RequestBody Map<String, String> params) {
         String roomName = params.get("roomName");
         String participantName = params.get("participantName");
 
@@ -35,7 +36,7 @@ public class ApiV1LiveKitController {
         token.setIdentity(participantName);
         token.addGrants(new RoomJoin(true), new RoomName(roomName));
 
-
+        System.out.println(token.toString());
         return ResponseEntity.ok(Map.of("token", token.toJwt()));
     }
 
