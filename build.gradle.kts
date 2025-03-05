@@ -48,8 +48,18 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
+    // websocket 의존성
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
+
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// 메서드의 실제 파라미터 이름을 클래스 파일에 포함시키기 위함
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
