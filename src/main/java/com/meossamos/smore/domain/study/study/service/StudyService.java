@@ -32,6 +32,12 @@ public class StudyService {
         return studyRepository.save(study);
     }
 
+    // study entity 반환 메서드 (GroupChatRoomService 로직때문에 추가)
+    public Study getStudyEntityById(Long studyId) {
+        return studyRepository.findById(studyId)
+                .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
+    }
+
     // Dto 변환
     private StudyDto convertToStudyDto(Study study) {
 
@@ -68,6 +74,7 @@ public class StudyService {
     public StudyDto updateStudyIntroductions(Long studyId, StudyDto studyDto) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
+        
 
         List<StudyHashTag> updatedHashTags = studyDto.getHashTags().stream()
                 .map(tag -> new StudyHashTag(tag, study)) // StudyHashTag 생성

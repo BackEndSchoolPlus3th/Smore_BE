@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/recruitmentArticles/detail").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
+                        .requestMatchers("/api/chatrooms/**").permitAll() // 채팅 테스트용
                         .anyRequest().authenticated()
                 )
                 .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http));

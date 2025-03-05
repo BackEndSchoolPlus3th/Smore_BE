@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.chat.message.controller;
 
+import com.meossamos.smore.domain.chat.message.dto.ChatMessageRequestDto;
 import com.meossamos.smore.domain.chat.message.dto.ChatMessageResponseDto;
 import com.meossamos.smore.domain.chat.message.entity.ChatMessage;
 import com.meossamos.smore.domain.chat.message.service.ChatMessageService;
@@ -8,36 +9,67 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/chat/messages")
+@RequestMapping("/api/chatrooms")
 @RequiredArgsConstructor
 public class MessageController {
 
     private final ChatMessageService chatMessageService;
 
     /**
-     * 특정 채팅방의 메시지 이력을 조회합니다.
-     * GET /api/chat/messages/{roomId}
+     * DM 메시지 전송
+     * POST /api/chatrooms/dm/{roomId}/messages
      */
-    @GetMapping("/{roomId}")
-    public ResponseEntity<List<ChatMessageResponseDto>> getMessages(@PathVariable String roomId) {
-        List<ChatMessage> messages = chatMessageService.findMessagesList(roomId);
+    @PostMapping("/dm/{roomId}/messages")
+    public ResponseEntity<ChatMessageResponseDto> sendDmMessage(
+            @PathVariable("roomId") String roomId,
+            @RequestBody ChatMessageRequestDto messageRequestDto) {
 
-        // 엔티티를 Response DTO로 변환
-        List<ChatMessageResponseDto> dtos = messages.stream().map(message ->
-                ChatMessageResponseDto.builder()
-                        .messageId(message.getId())
-                        .roomId(message.getRoomId())
-                        .senderId(message.getSenderId())
-                        .message(message.getMessage())
-                        .attachment(message.getAttachment())
-                        .timestamp(message.getCreatedDate() != null ? message.getCreatedDate() : LocalDateTime.now())
-                        .build()
-        ).collect(Collectors.toList());
+        ChatMessage savedMessage = chatMessageService.saveChatMessage(
+                roomId,
+                messageRequestDto.getSenderId(),
+                messageRequestDto.getMessage(),
+                messageRequestDto.getAttachment()
+        );
 
-        return ResponseEntity.ok(dtos);
+        ChatMessageResponseDto response = ChatMessageResponseDto.builder()
+                .messageId(savedMessage.getId())
+                .roomId(savedMessage.getRoomId())
+                .senderId(savedMessage.getSenderId())
+                .message(savedMessage.getMessage())
+                .attachment(savedMessage.getAttachment())
+                .timestamp(savedMessage.getCreatedDate() != null ? savedMessage.getCreatedDate() : LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 그룹 채팅 메시지 전송
+     * POST /api/chatrooms/group/{roomId}/messages
+     */
+    @PostMapping("/group/{roomId}/messages")
+    public ResponseEntity<ChatMessageResponseDto> sendGroupMessage(
+            @PathVariable("roomId") String roomId,
+            @RequestBody ChatMessageRequestDto messageRequestDto) {
+
+        ChatMessage savedMessage = chatMessageService.saveChatMessage(
+                roomId,
+                messageRequestDto.getSenderId(),
+                messageRequestDto.getMessage(),
+                messageRequestDto.getAttachment()
+        );
+
+        ChatMessageResponseDto response = ChatMessageResponseDto.builder()
+                .messageId(savedMessage.getId())
+                .roomId(savedMessage.getRoomId())
+                .senderId(savedMessage.getSenderId())
+                .message(savedMessage.getMessage())
+                .attachment(savedMessage.getAttachment())
+                .timestamp(savedMessage.getCreatedDate() != null ? savedMessage.getCreatedDate() : LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
     }
 }

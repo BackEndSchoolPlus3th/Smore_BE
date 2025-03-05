@@ -27,6 +27,13 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
+        // 채팅 관련 엔드포인트는 JWT 검증 건너뜀
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/api/chatrooms/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+        
         // 1. Request Header 에서 토큰을 꺼냄
         String bearerToken =  request.getHeader(AUTHORIZATION_HEADER);
 
