@@ -43,10 +43,16 @@ public class MemberController {
                 .sameSite("None")
                 .build();
 
+        LoginResponseBodyDto loginResponseBodyDto = LoginResponseBodyDto.builder()
+                .nickname(responseDto.getNickname())
+                .hashTags(responseDto.getHashTags())
+                .profileImageUrl(responseDto.getProfileImageUrl())
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + responseDto.getToken().getAccessToken())
-                .body(responseDto);
+                .body(loginResponseBodyDto);
     }
 
     @PostMapping("/signup")
