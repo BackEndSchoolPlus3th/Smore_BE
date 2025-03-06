@@ -7,7 +7,6 @@ import com.meossamos.smore.global.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -57,7 +56,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/signup").permitAll()
                         .requestMatchers("/api/chatrooms/**").permitAll() // 채팅 테스트용
                         .requestMatchers("/api/member/refresh").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/sse/connect").permitAll()
+
 
                         .anyRequest().authenticated()
                 )

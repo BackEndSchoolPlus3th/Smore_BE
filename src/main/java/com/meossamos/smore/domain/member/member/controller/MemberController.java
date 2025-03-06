@@ -1,28 +1,21 @@
 package com.meossamos.smore.domain.member.member.controller;
 
 import com.meossamos.smore.domain.member.member.dto.*;
-import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.Token;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.Optional;
-
-import static com.meossamos.smore.global.jwt.JwtFilter.AUTHORIZATION_HEADER;
 
 @RestController
 @RequestMapping("/api/member")
@@ -33,8 +26,9 @@ public class MemberController {
     private final TokenProvider tokenProvider;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-        TokenDto tokenDto = memberService.login(loginDto);
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",tokenDto.getRefreshToken())
+        LoginResponseDto responseDto = memberService.login(loginDto);
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",responseDto.getToken().getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -42,15 +36,27 @@ public class MemberController {
                 .sameSite("None")
                 .build();
 
+        LoginResponseBodyDto loginResponseBodyDto = LoginResponseBodyDto.builder()
+                .nickname(responseDto.getNickname())
+                .hashTags(responseDto.getHashTags())
+                .profileImageUrl(responseDto.getProfileImageUrl())
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
-                .body(tokenDto);
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + responseDto.getToken().getAccessToken())
+                .body(loginResponseBodyDto);
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
-        return ResponseEntity.ok(memberService.signup(memberRequestDto));
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
+        // 회원가입 전에 이메일 중복 체크
+        if (memberService.existsByEmail(memberRequestDto.getEmail())) {
+            // 이미 존재하는 이메일 409 error
+            return ResponseEntity.status(409).build();
+        }
+        MemberResponseDto memberResponseDto = memberService.signup(memberRequestDto);
+        return ResponseEntity.ok(memberResponseDto);
     }
 
     @PostMapping("/refresh")
@@ -69,6 +75,23 @@ public class MemberController {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
                 .body(Map.of("server", "refresh ok"));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // refreshToken 쿠키 삭제 (maxAge=0)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(Map.of("server", "logout ok"));
+    }
+
 
 
     @PostMapping("/check")

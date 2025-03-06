@@ -5,8 +5,8 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.entity.Recruitm
 import com.meossamos.smore.domain.article.recruitmentArticleClip.dto.RecruitmentArticleClipRequestDTO;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -21,35 +21,45 @@ public class ApiV1RecruitmentArticleClipController {
 
     // 모집글 클립
     @PostMapping("/clip")
-    public RsData<?> clipRecruitmentArticle(
+    public ResponseEntity<?> clipRecruitmentArticle(
             @RequestBody Map<String, Long> body
             ) {
         System.out.println(body);
         long devMemberId = 1L; // 테스트용 devMemberId
 //        long recruitmentArticleId = Long.parseLong(body.get("recruitmentArticleId"));
         if (recruitmentArticleClipService.isClipped(body.get("recruitmentArticleId"), devMemberId)) {
-            return new RsData<>("400", "이미 클립한 모집글입니다.", null);
+            // 이미 클립한 모집글 409 error
+            return ResponseEntity.badRequest().build();
         }
         RecruitmentArticleClip recruitmentArticleClip =
                 recruitmentArticleClipService.save(body.get("recruitmentArticleId"),devMemberId);
-        return new RsData<>("200", "모집글 클립 성공", recruitmentArticleClip);
+        if (recruitmentArticleClip == null) {
+            // 클립 실패
+            return ResponseEntity.badRequest().build();
+        } else {
+            // 클립 성공
+            return ResponseEntity.ok().build();
+        }
     }
 
 
     // 모집글 클립 취소
     @DeleteMapping("/clip")
-    public RsData<?> unClipRecruitmentArticle(
+    public ResponseEntity<?> unClipRecruitmentArticle(
             @RequestParam(value = "recruitmentArticleId") long recruitmentArticleId
     ) {
         long devMemberId = 1L; // 테스트용 devMemberId
         if (!recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId)) {
-            return new RsData<>("400", "클립하지 않은 모집글입니다.", null);
+            // 클립하지 않은 모집글 409 error
+            return ResponseEntity.badRequest().build();
         }
         boolean result = recruitmentArticleClipService.delete(recruitmentArticleId, devMemberId);
         if (result) {
-            return new RsData<>("200", "모집글 클립 취소 성공", result);
+            // 클립 취소 성공
+            return ResponseEntity.ok().build();
         } else {
-            return new RsData<>("400", "모집글 클립 취소 실패", null);
+            // 클립 취소 실패
+            return ResponseEntity.badRequest().build();
         }
     }
 }
