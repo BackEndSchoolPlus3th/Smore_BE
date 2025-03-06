@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/chatrooms")
@@ -17,10 +18,16 @@ public class MessageController {
 
     private final ChatMessageService chatMessageService;
 
-    /**
-     * DM 메시지 전송
-     * POST /api/chatrooms/dm/{roomId}/messages
-     */
+    // 채팅방의 기존 메시지 불러오기(dm, group구분은 chatType)
+    @GetMapping("/{chatType}/{roomId}/messages")
+    public ResponseEntity<List<ChatMessage>> getChatMessages(
+            @PathVariable("chatType") String chatType,
+            @PathVariable("roomId") String roomId) {
+        List<ChatMessage> messages = chatMessageService.findMessagesList(roomId, chatType);
+        return ResponseEntity.ok(messages);
+    }
+
+    // DM 메시지 전송
     @PostMapping("/dm/{roomId}/messages")
     public ResponseEntity<ChatMessageResponseDto> sendDmMessage(
             @PathVariable("roomId") String roomId,
@@ -45,10 +52,7 @@ public class MessageController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 그룹 채팅 메시지 전송
-     * POST /api/chatrooms/group/{roomId}/messages
-     */
+    // 그룹 채팅 메시지 전송
     @PostMapping("/group/{roomId}/messages")
     public ResponseEntity<ChatMessageResponseDto> sendGroupMessage(
             @PathVariable("roomId") String roomId,

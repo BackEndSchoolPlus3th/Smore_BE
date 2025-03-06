@@ -26,8 +26,8 @@ public class ChatMessageService {
     }
 
     // 특정 채팅방의 메시지 목록 조회 (그룹, 1:1 모두)
-    public List<ChatMessage> findMessagesList (String roomId) {
-        return chatMessageRepository.findByRoomId(roomId);
+    public List<ChatMessage> findMessagesList (String roomId, String chatType) {
+        return chatMessageRepository.findByRoomIdAndChatType(roomId, chatType);
     }
 
     // 특정 사용자가 보낸 메세지 조회
