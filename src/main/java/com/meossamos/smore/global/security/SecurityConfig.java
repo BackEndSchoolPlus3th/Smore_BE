@@ -49,10 +49,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         .requestMatchers("/api/v1/recruitmentArticles").permitAll()
                         .requestMatchers("/api/v1/recruitmentArticles/detail").permitAll()
+                        .requestMatchers("/api/v1/recruitmentArticle/clip").permitAll()
+                        .requestMatchers("/api/v1/recruitmentArticles/**").permitAll()
+                        .requestMatchers("/api/v1/study/**").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
+                        .requestMatchers("/api/chatrooms/**").permitAll() // 채팅 테스트용
                         .requestMatchers("/api/member/refresh").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
+                        .requestMatchers("/sse/connect").permitAll()
+
 
                         .anyRequest().authenticated()
                 )

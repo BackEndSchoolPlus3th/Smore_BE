@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -34,11 +33,11 @@ public class AddDataTest {
     @Test
     public void addTest() {
         for (int i = 0; i < 1000; i++) {
-            addData();
+            addData(i);
         }
         }
 
-    private void addData() {
+    private void addData(int idx) {
         String title = RandomUtil.getRandomTitle();
         String content = RandomUtil.getRandomContent();
         String introduction = RandomUtil.getRandomIntroduction();
@@ -47,13 +46,14 @@ public class AddDataTest {
         int randomImageNum = random.nextInt(5) + 1;
         int maxMember = random.nextInt(50) + 1;
         int currentMember = random.nextInt(maxMember) + 1;
-        String thumbnailUrl = "https://picsum.photos/400/600?random=1";
+        String thumbnailUrl = "https://picsum.photos/400/600?random=" + idx;
         StringBuilder imageUrls = new StringBuilder();
-        LocalDateTime endDate = RandomUtil.getRandomEndDate();
+        LocalDate endDate = LocalDate.from(RandomUtil.getRandomEndDate());
+        String profileImageUrl = "https://picsum.photos/200/200?random=" + idx;
 
 
         for (int i = 0; i < randomImageNum; i++) {
-            imageUrls.append("https://picsum.photos/400/600?random=1");
+            imageUrls.append("https://picsum.photos/2000/4000?random=").append(i + 1);
             // 마지막 URL이 아니라면 콤마를 추가
             if (i < randomImageNum - 1) {
                 imageUrls.append(",");
@@ -71,10 +71,10 @@ public class AddDataTest {
         List<String> memberHashTags = HashTagUtil.getRandomHashTags();
         String memberHashTag = HashTagUtil.mergeHashTagList(memberHashTags);
 
-        Member savedMember = memberService.saveMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, "https://picsum.photos/200/200?random=1");
+        Member savedMember = memberService.saveInitMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, profileImageUrl);
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
-        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
+        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDate.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
 
     }
 }

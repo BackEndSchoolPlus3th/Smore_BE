@@ -3,7 +3,6 @@ package com.meossamos.smore;
 import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
-import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleHashTag.entity.RecruitmentArticleHashTag;
@@ -11,7 +10,6 @@ import com.meossamos.smore.domain.article.recruitmentArticleHashTag.service.Recr
 import com.meossamos.smore.domain.article.studyArticle.entity.StudyArticle;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
 import com.meossamos.smore.domain.chat.dm.dto.DmRoomResponseDto;
-import com.meossamos.smore.domain.chat.dm.entity.DmRoom;
 import com.meossamos.smore.domain.chat.dm.service.DmRoomService;
 import com.meossamos.smore.domain.chat.groupChat.entity.GroupChatRoom;
 import com.meossamos.smore.domain.chat.groupChat.service.GroupChatRoomService;
@@ -338,24 +336,18 @@ class SmoreBeApplicationTests {
         hashTags2.add("postgresql");
         hashTags2.add("프론트");
         List<String> hashTags3 = new ArrayList<>();
-        List<RecruitmentArticleDoc> recruitmentArticles = findRecruitmentArticleByHashTag(hashTags2, 2, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles2 = findRecruitmentArticleByHashTag(hashTags2, 3, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles3 = findRecruitmentArticleByHashTag(hashTags2, 12, 12);
-        List<RecruitmentArticleDoc> recruitmentArticles4 = findRecruitmentArticleByHashTag(hashTags3, 1, 12);
-
 
         System.out.print("find RecruitmentArticle by HashTag: ");
         hashTags.forEach(hashTag -> System.out.print(hashTag + ", "));
 
         System.out.print("\nfounded RecruitmentArticles: ");
-        recruitmentArticles.forEach(recruitmentArticle -> System.out.print(recruitmentArticle.getId() + ", "));
 
         System.out.println("\n\n\n\n");
     }
 
 
     private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
-        return memberService.saveMember(email, password, nickname, birthdate, region, profileImageUrl);
+        return memberService.saveInitMember(email, password, nickname, birthdate, region, profileImageUrl);
     }
 
     private Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, Member leader) {
@@ -367,7 +359,7 @@ class SmoreBeApplicationTests {
     }
 
     private RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl,  @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
-        return recruitmentArticleService.saveRecruitmentArticle(title, content, introduction, region, thumbnailUrl, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
+        return recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
     }
 
     private MemberHashTag saveMemberHashTag(String hashTag, Member member) {
@@ -410,7 +402,4 @@ class SmoreBeApplicationTests {
         return groupChatRoomService.saveGroupChatRoom(study);
     }
 
-    private List<RecruitmentArticleDoc> findRecruitmentArticleByHashTag(List<String> hashTags, int page, int size) {
-        return recruitmentArticleDocService.findByHashTags(hashTags, page, size);
-    }
 }

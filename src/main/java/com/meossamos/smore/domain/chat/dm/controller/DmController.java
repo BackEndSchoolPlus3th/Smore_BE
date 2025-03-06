@@ -26,7 +26,7 @@ public class DmController {
 
     // DM 채팅방 목록 조회
     @GetMapping
-    public ResponseEntity<List<DmRoomResponseDto>> getDmRoomList(@RequestParam Long memberId) {
+    public ResponseEntity<List<DmRoomResponseDto>> getDmRoomList(@RequestParam("memberId") Long memberId) {
         return ResponseEntity.ok(dmRoomService.getUserDmRooms(memberId));
     }
 

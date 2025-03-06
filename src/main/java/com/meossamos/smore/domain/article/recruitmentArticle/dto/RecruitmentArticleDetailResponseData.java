@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.dto;
 
+import com.meossamos.smore.domain.article.recruitmentArticleComment.dto.RecruitmentArticleDetailCommentResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Setter
 @Getter
@@ -29,4 +31,5 @@ public class RecruitmentArticleDetailResponseData {
     private String writerName;
     private String writerProfileImageUrl;
     private LocalDateTime createdDate;
+    private boolean isClipped;
 }

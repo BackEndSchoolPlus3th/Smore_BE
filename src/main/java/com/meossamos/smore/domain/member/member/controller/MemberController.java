@@ -25,8 +25,9 @@ public class MemberController {
     private final TokenProvider tokenProvider;
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
-        TokenDto tokenDto = memberService.login(loginDto);
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",tokenDto.getRefreshToken())
+        LoginResponseDto responseDto = memberService.login(loginDto);
+
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",responseDto.getToken().getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -34,10 +35,16 @@ public class MemberController {
                 .sameSite("None")
                 .build();
 
+        LoginResponseBodyDto loginResponseBodyDto = LoginResponseBodyDto.builder()
+                .nickname(responseDto.getNickname())
+                .hashTags(responseDto.getHashTags())
+                .profileImageUrl(responseDto.getProfileImageUrl())
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
-                .body(tokenDto);
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + responseDto.getToken().getAccessToken())
+                .body(loginResponseBodyDto);
     }
 
     @PostMapping("/signup")
@@ -61,6 +68,23 @@ public class MemberController {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokenDto.getAccessToken())
                 .body(Map.of("server", "refresh ok"));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        // refreshToken 쿠키 삭제 (maxAge=0)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .sameSite("None")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
+                .body(Map.of("server", "logout ok"));
+    }
+
 
 
     @PostMapping("/check")
