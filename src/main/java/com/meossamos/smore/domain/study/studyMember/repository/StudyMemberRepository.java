@@ -26,5 +26,9 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
             "from StudyMember sm where sm.member.id = :memberId")
     List<StudyWithPositionDto> findStudiesWithPositionByMemberId(@Param("memberId") Long memberId);
 
+    // memberId와 studyId로 StudyMember 단건 조회
+    @Query("select sm from StudyMember sm where sm.member.id = :memberId and sm.study.id = :studyId")
+    Optional<StudyMember> findByMemberIdAndStudyId(@Param("memberId") Long memberId, @Param("studyId") Long studyId);
+
 }
 
