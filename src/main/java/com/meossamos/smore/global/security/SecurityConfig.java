@@ -56,9 +56,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/signup").permitAll()
                         .requestMatchers("/api/chatrooms/**").permitAll() // 채팅 테스트용
                         .requestMatchers("/api/member/refresh").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/sse/connect").permitAll()
                         .requestMatchers("/add").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
+
 
                         .anyRequest().authenticated()
                 )

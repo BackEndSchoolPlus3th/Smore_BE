@@ -347,7 +347,7 @@ class SmoreBeApplicationTests {
 
 
     private Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
-        return memberService.saveMember(email, password, nickname, birthdate, region, profileImageUrl);
+        return memberService.saveInitMember(email, password, nickname, birthdate, region, profileImageUrl);
     }
 
     private Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, Member leader) {
