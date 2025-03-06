@@ -26,6 +26,14 @@ public class JwtFilter extends OncePerRequestFilter {
     // JWT 토큰의 인증 정보를 현재 쓰레드의 SecurityContext 에 저장하는 역할 수행
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+
+        // 채팅 관련 엔드포인트는 JWT 검증 건너뜀
+        String requestURI = request.getRequestURI();
+        if (requestURI.startsWith("/api/chatrooms/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // 1. Request Header 에서 토큰을 꺼냄
         String bearerToken =  request.getHeader(AUTHORIZATION_HEADER);
 

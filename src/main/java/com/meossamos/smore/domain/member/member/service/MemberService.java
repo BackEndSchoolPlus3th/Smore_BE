@@ -1,33 +1,27 @@
 package com.meossamos.smore.domain.member.member.service;
 
 import com.meossamos.smore.domain.member.member.dto.*;
+import com.meossamos.smore.domain.member.member.entity.Authority;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.global.jwt.TokenProvider;
-import com.meossamos.smore.global.rsData.RsData;
-import com.nimbusds.oauth2.sdk.token.RefreshToken;
+import com.meossamos.smore.global.sse.SseEmitters;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -38,7 +32,8 @@ public class MemberService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    public Member saveMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
+    private final SseEmitters sseEmitters;
+    public Member saveInitMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
 
         Member member = Member.builder()
                 .email(email)
@@ -47,6 +42,7 @@ public class MemberService {
                 .birthdate(birthdate)
                 .region(region)
                 .profileImageUrl(profileImageUrl)
+                .authority(Authority.ROLE_USER)
                 .build();
         return memberRepository.save(member);
     }
@@ -60,17 +56,38 @@ public class MemberService {
         Member member = memberRequestDto.toMember(passwordEncoder);
         return MemberResponseDto.of(memberRepository.save(member));
     }
-    @Transactional
-    public TokenDto login(LoginDto loginDto){
-        UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
 
+    @Transactional
+    public LoginResponseDto login(LoginDto loginDto) {
+        // 로그인 인증 토큰 생성
+        UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
+        // JWT 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
-        return tokenDto;
+        // SSE Emitter (필요한 경우에만 사용)
+        SseEmitter emitter = new SseEmitter();
+        sseEmitters.add(emitter);
+        try {
+            emitter.send(SseEmitter.event().name("connect").data("connected!"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+        // 인증된 id로 회원 정보 조회
+        Member member = memberRepository.findById(Long.valueOf(authentication.getName()))
+                .orElseThrow(() -> new RuntimeException("해당 유저를 찾을 수 없습니다."));
+
+        // LoginResponseDto 생성 (재사용 가능한 형태)
+        return LoginResponseDto.builder()
+                .token(tokenDto)
+                .nickname(member.getNickname())
+                .hashTags(member.getHashTags())
+                .profileImageUrl(member.getProfileImageUrl())
+                .build();
     }
+
 
     @Transactional
     public TokenDto refresh(HttpServletRequest request){
@@ -102,5 +119,9 @@ public class MemberService {
 
     public List<Member> findByIds(List<Long> memberIds) {
         return memberRepository.findByIdIn(memberIds);
+    }
+
+    public Member getReferenceById(Long memberId) {
+        return memberRepository.getReferenceById(memberId);
     }
 }

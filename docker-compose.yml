@@ -1,14 +1,20 @@
+version: '3.7'
+
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.3
     container_name: smore_elasticsearch
+    privileged: true
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=-Xms2g -Xmx2g -Dlog4j2.disableJmx=true -XX:-UseContainerSupport
     command: >
       bash -c '
-        bin/elasticsearch-plugin install analysis-nori;
+        if [ -d "plugins/analysis-nori" ]; then
+          bin/elasticsearch-plugin remove analysis-nori;
+        fi;
+        bin/elasticsearch-plugin install --batch analysis-nori;
         /usr/local/bin/docker-entrypoint.sh elasticsearch
       '
     ports:

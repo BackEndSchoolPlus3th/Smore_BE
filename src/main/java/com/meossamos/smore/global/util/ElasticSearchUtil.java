@@ -111,5 +111,9 @@ public class ElasticSearchUtil {
         public long getTotalHits() {
             return totalHits;
         }
+
+        public long getTotal() {
+            return totalHits;
+        }
     }
 }
