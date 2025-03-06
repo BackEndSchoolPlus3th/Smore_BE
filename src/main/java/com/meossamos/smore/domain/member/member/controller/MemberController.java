@@ -4,6 +4,7 @@ import com.meossamos.smore.domain.member.member.dto.*;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

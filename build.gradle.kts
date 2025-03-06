@@ -51,6 +51,9 @@ dependencies {
 
     // livekit
     implementation("io.livekit:livekit-server:0.8.2")
+
+    // websocket 의존성
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {
