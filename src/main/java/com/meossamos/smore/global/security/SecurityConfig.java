@@ -54,11 +54,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/study/**").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/chatrooms/**").permitAll() // 채팅 테스트용
+                        .requestMatchers("/api/chatrooms/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/member/refresh").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/sse/connect").permitAll()
-
 
                         .anyRequest().authenticated()
                 )
