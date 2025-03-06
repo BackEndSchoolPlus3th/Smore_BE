@@ -2,6 +2,7 @@ package com.meossamos.smore.global.rsData;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.meossamos.smore.domain.member.member.dto.MemberResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,6 +16,11 @@ public class RsData<T> {
 
     public RsData(String resultCode, String msg) {
         this(resultCode, msg, null);
+    }
+
+
+    public static RsData<?> duplicateEmail() {
+        return new RsData<>("400-1", "이미 가입된 이메일입니다.");
     }
 
     @JsonIgnore

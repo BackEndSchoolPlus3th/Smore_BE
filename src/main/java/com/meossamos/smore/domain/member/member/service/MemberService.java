@@ -48,9 +48,6 @@ public class MemberService {
     }
     @Transactional
     public MemberResponseDto signup(MemberRequestDto memberRequestDto) {
-        if (memberRepository.existsByEmail(memberRequestDto.getEmail())) {
-            throw new RuntimeException("이미 가입되어 있는 유저입니다");
-        }
         //입력한 비밀번호 암호화
 
         Member member = memberRequestDto.toMember(passwordEncoder);
@@ -123,5 +120,10 @@ public class MemberService {
 
     public Member getReferenceById(Long memberId) {
         return memberRepository.getReferenceById(memberId);
+    }
+
+    // 이메일 중복 체크
+    public boolean existsByEmail(String email) {
+        return memberRepository.existsByEmail(email);
     }
 }
