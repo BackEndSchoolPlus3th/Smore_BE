@@ -6,6 +6,8 @@ import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.dto.MyStudyListResponse;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import jakarta.transaction.Transactional;
@@ -131,5 +133,15 @@ public class StudyMemberService {
         } else {
             throw new RuntimeException("User is not authenticated or principal is not an instance of User.");
         }
+    }
+
+
+    /**
+     * 멤버 아이디로 해당 멤버가 속한 Study와 position 목록 조회
+     * @param memberId 멤버의 ID
+     * @return Study와 position을 담은 DTO 리스트
+     */
+    public List<StudyWithPositionDto> getStudiesWithPositionByMemberId(Long memberId) {
+        return studyMemberRepository.findStudiesWithPositionByMemberId(memberId);
     }
 }
