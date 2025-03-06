@@ -3,7 +3,6 @@ package com.meossamos.smore.domain.member.member.controller;
 import com.meossamos.smore.domain.member.member.dto.*;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
-import com.meossamos.smore.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,21 +49,14 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public RsData<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
         // 회원가입 전에 이메일 중복 체크
         if (memberService.existsByEmail(memberRequestDto.getEmail())) {
-            return new RsData<>(
-                    "409",
-                    "이미 사용중인 이메일입니다.",
-                    null
-            );
+            // 이미 존재하는 이메일 409 error
+            return ResponseEntity.status(409).build();
         }
         MemberResponseDto memberResponseDto = memberService.signup(memberRequestDto);
-        return new RsData<> (
-                "200",
-                "회원가입 성공",
-                memberResponseDto
-        );
+        return ResponseEntity.ok(memberResponseDto);
     }
 
     @PostMapping("/refresh")
