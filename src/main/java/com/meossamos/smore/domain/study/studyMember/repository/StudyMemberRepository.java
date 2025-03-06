@@ -11,6 +11,6 @@ import java.util.Optional;
 
 @Repository
 public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> {
-    List<StudyMember> findByMember(Member member);
+    List<StudyMember> findByMemberId(Long memberId);
     Optional<StudyMember> findByMemberAndStudy(Member member, Study study);
 }
