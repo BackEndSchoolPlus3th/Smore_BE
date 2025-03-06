@@ -4,6 +4,7 @@ import com.meossamos.smore.domain.member.member.dto.*;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.global.rsData.RsData;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.Token;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -56,9 +58,23 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
-        return ResponseEntity.ok(memberService.signup(memberRequestDto));
+    public RsData<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
+        // 회원가입 전에 이메일 중복 체크
+        if (memberService.existsByEmail(memberRequestDto.getEmail())) {
+            return new RsData<>(
+                    "409",
+                    "이미 사용중인 이메일입니다.",
+                    null
+            );
+        }
+        MemberResponseDto memberResponseDto = memberService.signup(memberRequestDto);
+        return new RsData<> (
+                "200",
+                "회원가입 성공",
+                memberResponseDto
+        );
     }
+
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refresh(@RequestBody AccessTokenDto accessTokenDto,HttpServletRequest request) {
