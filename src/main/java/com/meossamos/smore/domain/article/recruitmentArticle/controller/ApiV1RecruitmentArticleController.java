@@ -12,7 +12,6 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +32,7 @@ public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
 
     @GetMapping("/recruitmentArticles")
-    public RsData<?> getRecruitmentArticles(
+    public ResponseEntity<?> getRecruitmentArticles(
             RecruitmentArticleSearchDto searchDto
     ) {
         List<String> titleList = searchDto.getTitleList();
@@ -51,11 +50,11 @@ public class ApiV1RecruitmentArticleController {
         List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, searchDto.getPage(), searchDto.getSize());
         List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
 
-        return new RsData<>("200", "모집글 목록 조회 성공", recruitmentArticleResponseDataList);
+        return ResponseEntity.ok(recruitmentArticleResponseDataList);
     }
 
     @GetMapping("/recruitmentArticles/detail")
-    public RsData<?> getRecruitmentArticleDetail(
+    public ResponseEntity<?> getRecruitmentArticleDetail(
             @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
     ) {
         long devMemberId = 1L;
@@ -83,13 +82,12 @@ public class ApiV1RecruitmentArticleController {
                 .writerName(writer.getNickname())
                 .writerProfileImageUrl(writer.getProfileImageUrl())
                 .build();
-
-        return new RsData<>("200", "모집글 상세 조회 성공", recruitmentArticleResponseData);
+        return ResponseEntity.ok(recruitmentArticleResponseData);
     }
 
 
     @PostMapping("/study/{studyId}/recruitmentArticle")
-    public RsData<?> createRecruitmentArticle(
+    public ResponseEntity<?> createRecruitmentArticle(
             @PathVariable("studyId") Long studyId,
             @ModelAttribute NewRecruitmentArticleDto dto
     ) {
@@ -109,7 +107,6 @@ public class ApiV1RecruitmentArticleController {
 
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);
-
-        return new RsData<>("200", "모집글 생성 성공", null);
+        return  ResponseEntity.ok(recruitmentArticle.getId());
     }
 }

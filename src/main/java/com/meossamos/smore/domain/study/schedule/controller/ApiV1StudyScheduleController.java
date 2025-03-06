@@ -6,7 +6,6 @@ import com.meossamos.smore.domain.study.schedule.dto.UpdateStudyScheduleDto;
 import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.schedule.repository.StudyScheduleRepository;
 import com.meossamos.smore.domain.study.schedule.service.StudyScheduleService;
-import com.meossamos.smore.global.rsData.RsData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +24,7 @@ public class ApiV1StudyScheduleController {
 
     // 다건 조회
     @GetMapping("/{study_id}/schedules")
-    public RsData<List<StudyScheduleDto>> getSchedules(@PathVariable Long study_id){
+    public ResponseEntity<List<StudyScheduleDto>> getSchedules(@PathVariable Long study_id){
         List<StudySchedule> StudyScheduleList =  studyScheduleRepository.findByStudy_Id(study_id);
         List<StudyScheduleDto> studyScheduleDtoList = StudyScheduleList.stream()
                 .map(StudyScheduleDto::new).toList();
@@ -33,48 +32,45 @@ public class ApiV1StudyScheduleController {
                 System.out.println(studyScheduleDto.getContent())
                 );
 //        System.out.println();
-        return new RsData<>(
-                "200",
-        "스케줄 다건 조회",
-                studyScheduleDtoList
-                );
+        return ResponseEntity.ok(studyScheduleDtoList);
     }
 
     // 생성
     @PostMapping("/{study_id}/schedules")
-    public RsData<AddStudyScheduleDto> addSchedule(@PathVariable Long study_id,
+    public ResponseEntity<?> addSchedule(@PathVariable Long study_id,
                                                   @RequestBody AddStudyScheduleDto addstudyScheduleDto){
         try {
             StudySchedule studySchedule = studyScheduleService.addStudySchedule(study_id, addstudyScheduleDto);
             System.out.println(addstudyScheduleDto.toString());
-            return new RsData<>("200","스케쥴 저장 성공", addstudyScheduleDto);
+            return ResponseEntity.ok(addstudyScheduleDto);
         } catch (RuntimeException e) {
-            return new RsData<>("500", "스케쥴 저장 실패" + e.getMessage(), null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("스케쥴 생성 실패 " + e.getMessage());
         }
     }
 
     // 삭제
     @DeleteMapping("/{study_id}/schedules")
-    public ResponseEntity<RsData> deleteSchedule(@RequestBody Map<String, Long> request){
+    public ResponseEntity<?> deleteSchedule(@RequestBody Map<String, Long> request){
         Long eventId = request.get("id");
         try {
             studyScheduleService.deleteSchedule(eventId);
-            return ResponseEntity.ok(new RsData<>("200", "스케쥴 삭제 성공", null));
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new RsData<>("400"," 스케쥴 삭제 실패 " + e.getMessage(), null));
+            return ResponseEntity.badRequest()
+                            .body("스케쥴 삭제 실패 " + e.getMessage());
         }
     }
 
     // 수정
     @PutMapping("/{study_id}/schedules")
-    public ResponseEntity<RsData> updateSchedule(@RequestBody UpdateStudyScheduleDto updateStudyScheduleDto){
+    public ResponseEntity<?> updateSchedule(@RequestBody UpdateStudyScheduleDto updateStudyScheduleDto){
         try {
             studyScheduleService.updateSchedule(updateStudyScheduleDto);
-            return ResponseEntity.ok(new RsData<>("200", "스케쥴 수정 성공", null));
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new RsData<>("400"," 스케쥴 수정 실패 " + e.getMessage(), null));
+            return ResponseEntity.badRequest()
+                    .body("스케쥴 수정 실패 " + e.getMessage());
         }
         
     }

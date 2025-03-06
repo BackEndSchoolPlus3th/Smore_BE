@@ -49,8 +49,14 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody MemberRequestDto memberRequestDto) {
-        return ResponseEntity.ok(memberService.signup(memberRequestDto));
+    public ResponseEntity<?> signup(@RequestBody MemberRequestDto memberRequestDto) {
+        // 회원가입 전에 이메일 중복 체크
+        if (memberService.existsByEmail(memberRequestDto.getEmail())) {
+            // 이미 존재하는 이메일 409 error
+            return ResponseEntity.status(409).build();
+        }
+        MemberResponseDto memberResponseDto = memberService.signup(memberRequestDto);
+        return ResponseEntity.ok(memberResponseDto);
     }
 
     @PostMapping("/refresh")
