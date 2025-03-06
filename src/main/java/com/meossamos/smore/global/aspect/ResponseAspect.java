@@ -1,8 +1,6 @@
 package com.meossamos.smore.global.aspect;
 
 
-import com.meossamos.smore.global.rsData.RsData;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,8 +11,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class ResponseAspect {
-    private final HttpServletResponse response;
-
     @Around("""
             (
                 within
@@ -42,10 +38,6 @@ public class ResponseAspect {
         System.out.println("===========================시작===========================");
         Object proceed = proceedingJoinPoint.proceed();
         System.out.println("===========================종료===========================");
-        if (proceed instanceof RsData<?> rsData) {
-            response.setStatus(rsData.getStatusCode());
-        }
-
         return proceed;
     }
 }
