@@ -1,19 +1,23 @@
 package com.meossamos.smore.domain.chat.livekit.controller;
 
-import io.livekit.server.AccessToken;
-import io.livekit.server.RoomJoin;
-import io.livekit.server.RoomName;
+import com.meossamos.smore.domain.chat.livekit.service.LiveKitService;
 import io.livekit.server.WebhookReceiver;
 import livekit.LivekitWebhook;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-//@CrossOrigin("*")
-//@RequestMapping("/api/v1/livekit")
+@RequiredArgsConstructor
 @RestController
 public class ApiV1LiveKitController {
+
+    private final LiveKitService liveKitService;
 
     @Value("${livekit.apiKey}")
     private String apikey;
@@ -21,24 +25,36 @@ public class ApiV1LiveKitController {
     @Value("${livekit.apiSecret}")
     private String apiSecret;
 
-//    @CrossOrigin("*")
+
     @PostMapping("/api/v1/token")
-    public ResponseEntity<Map<String, String>> getToken(@RequestBody Map<String, String> params) {
-        String roomName = params.get("roomName");
-        String participantName = params.get("participantName");
-
-        if (roomName == null || participantName == null) {
-            return ResponseEntity.badRequest().body(Map.of("errorMessage", "roomName and participantName are required"));
+    public ResponseEntity<Map<String, String>> getToken(
+            @RequestHeader(value = "Authorization", required = false) String authHeader
+    ) {
+        // 토큰에서 스터디 이름, 참여자 아이디 가져오기
+        if (authHeader != null && authHeader.startsWith("Bearer")) {
+            System.out.println(authHeader);
+            String token = authHeader.substring(7); // "Bearer " 이후의 부분을 추출
+            // 토큰 복호화해서 유저정보 리턴
+            System.out.println(token);
+            liveKitService.getUserInfo(token);
+            return ResponseEntity.ok(Map.of("token", "token"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("errorMessage", "Authorization token is required"));
         }
-
-        AccessToken token = new AccessToken(apikey, apiSecret);
-        token.setName(participantName);
-        token.setIdentity(participantName);
-        token.addGrants(new RoomJoin(true), new RoomName(roomName));
-
-        System.out.println(token.toString());
-        return ResponseEntity.ok(Map.of("token", token.toJwt()));
     }
+
+//        if (roomName == null || participantName == null) {
+//            return ResponseEntity.badRequest().body(Map.of("errorMessage", "roomName and participantName are required"));
+//        }
+//
+//        AccessToken token = new AccessToken(apikey, apiSecret);
+//        token.setName(participantName);
+//        token.setIdentity(participantName);
+//        token.addGrants(new RoomJoin(true), new RoomName(roomName));
+//
+//        System.out.println(token.toString());
+//        return ResponseEntity.ok(Map.of("token", token.toJwt()));
+//    }
 
     @PostMapping(value = "/webhook", consumes = "application/webhook+json")
     public ResponseEntity<String> receiveWebhook(@RequestHeader("Authorization") String authHeader, @RequestBody String body) {
