@@ -37,12 +37,12 @@ public class TokenProvider {
     /**
      * JWT 토큰을 생성하여 TokenDto로 반환
      */
-    public TokenDto generateTokenDto(Authentication authentication) {
+    public TokenDto generateTokenDto(Long memberId, Authentication authentication) {
         // 사용자 권한을 가져와 문자열로 변환
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-
+        log.info("authentication 생성할 때 id {}", authentication.getName());
         long now = System.currentTimeMillis();
 
         // Access Token 생성
@@ -51,7 +51,7 @@ public class TokenProvider {
                 .subject(authentication.getName())  // "sub": "username"
                 .claim(AUTHORITIES_KEY, authorities)  // "auth": "ROLE_USER"
                 .expiration(accessTokenExpiresIn)  // "exp": timestamp
-                .signWith(key, Jwts.SIG.HS512)  // 최신 버전의 서명 방식
+                .signWith(key, Jwts.SIG.HS256)  // 최신 버전의 서명 방식
                 .compact();
 
         // Refresh Token 생성
@@ -59,7 +59,7 @@ public class TokenProvider {
                 .subject(authentication.getName())  // "sub": "username"
                 .claim(AUTHORITIES_KEY, authorities)  // "auth": "ROLE_USER"
                 .expiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
-                .signWith(key, Jwts.SIG.HS512)
+                .signWith(key, Jwts.SIG.HS256)
                 .compact();
 
         return TokenDto.builder()
@@ -117,7 +117,7 @@ public class TokenProvider {
     /**
      * JWT 클레임을 파싱하여 반환
      */
-    private Claims parseClaims(String token) {
+    public Claims parseClaims(String token) {
         try {
             return Jwts.parser()
                     .verifyWith(key)  // 서명 키 검증

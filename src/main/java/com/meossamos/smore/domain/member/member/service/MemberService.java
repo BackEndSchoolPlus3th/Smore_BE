@@ -60,12 +60,13 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // JWT 토큰 생성
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        // SSE Emitter (필요한 경우에만 사용)
+        Long memberId = memberRepository.findByEmail(loginDto.getEmail()).get().getId();
+        TokenDto tokenDto = tokenProvider.generateTokenDto(memberId,authentication);
         SseEmitter emitter = new SseEmitter();
-        sseEmitters.add(emitter);
+
+        // 생성된 emitter를 컬렉션에 추가하여 관리
+        sseEmitters.add(tokenDto.getAccessToken(),emitter);
+
         try {
             emitter.send(SseEmitter.event().name("connect").data("connected!"));
         } catch (IOException e) {
@@ -90,10 +91,11 @@ public class MemberService {
     public TokenDto refresh(HttpServletRequest request){
 
         String requestToken = extractRefreshTokenFromCookies(request);
+         Long memberId=tokenProvider.parseClaims(requestToken).get("memberId", Long.class);
 
         Authentication authentication = tokenProvider.getAuthentication(requestToken);
 
-        return tokenProvider.generateTokenDto(authentication);
+        return tokenProvider.generateTokenDto(memberId,authentication);
     }
     private String extractRefreshTokenFromCookies(HttpServletRequest request) {
         if (request.getCookies() != null) {

@@ -10,15 +10,20 @@ import com.meossamos.smore.domain.article.recruitmentArticleComment.service.Recr
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
+
+import com.meossamos.smore.global.sse.SseEmitters;
+import jakarta.servlet.http.HttpServletRequest;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
+import java.util.*;
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -28,7 +33,7 @@ public class ApiV1RecruitmentArticleController {
     private final MemberService memberService;
     private final RecruitmentArticleClipService recruitmentArticleClipService;
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
-
+    private final SseEmitters sseEmitters;
     @GetMapping("/recruitmentArticles")
     public ResponseEntity<?> getRecruitmentArticles(
             RecruitmentArticleSearchDto searchDto
@@ -92,6 +97,24 @@ public class ApiV1RecruitmentArticleController {
         return ResponseEntity.ok(responseData);
     }
 
+    @PostMapping("/recruitmentArticles/{recruitmentId}/apply")
+    public String createRecruitmentArticle( // 임시 생성. 후에 수정 필요
+                                            @PathVariable("recruitmentId") Long recruitmentId,
+                                            HttpServletRequest request) {
+        String token = request.getHeader("authorization");
+        SseEmitter emitter = sseEmitters.get(token);
+        Map<String, String> map = new HashMap<>();
+        map.put("sender",token.substring(7));
+        log.info("모집글 id {}",recruitmentId);
+        Long receiverId = 1011L;
+        map.put("receiver",receiverId+"");
+        map.put("recruitmentId",recruitmentId+"");
+        //지원할 때랑 지원을 받는거는 지원받는 당사자만 알림을 받으면 되니까
+        //emitter 중에서 해당 user만 찾아서 send해주면 된다.
+
+        sseEmitters.notiApplication("application__reached",map,recruitmentId);
+     return "지원 완료";
+    }
 
     @PostMapping("/study/{studyId}/recruitmentArticle")
     public ResponseEntity<?> createRecruitmentArticle(
