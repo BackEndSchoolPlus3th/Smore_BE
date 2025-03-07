@@ -59,6 +59,10 @@ public class SecurityConfig {
                         .requestMatchers("/sse/connect").permitAll()
                         .requestMatchers("/api/current-user").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
+
+
+                        .requestMatchers("/add").permitAll()
+                        .requestMatchers("/api/study/my-studies").permitAll()
                         .requestMatchers("/sse/connect/**").permitAll()
                         .anyRequest().authenticated()
                 )
