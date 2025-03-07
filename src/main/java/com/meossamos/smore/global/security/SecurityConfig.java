@@ -1,9 +1,8 @@
 package com.meossamos.smore.global.security;
 
-import com.meossamos.smore.global.jwt.JwtAccessDeniedHandler;
-import com.meossamos.smore.global.jwt.JwtAuthenticationEntryPoint;
-import com.meossamos.smore.global.jwt.JwtSecurityConfigBean;
-import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
+import com.meossamos.smore.global.filter.StudyAccessCheckFilter;
+import com.meossamos.smore.global.jwt.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +31,7 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, StudyMemberService studyMemberService) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
@@ -64,9 +63,14 @@ public class SecurityConfig {
                         .requestMatchers("/add").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
                         .requestMatchers("/sse/connect/**").permitAll()
+
+
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
                 )
-                .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http));
+                .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http))
+                .addFilterAfter(new StudyAccessCheckFilter(studyMemberService), JwtFilter.class);
+        ;
 
         return http.build();
     }

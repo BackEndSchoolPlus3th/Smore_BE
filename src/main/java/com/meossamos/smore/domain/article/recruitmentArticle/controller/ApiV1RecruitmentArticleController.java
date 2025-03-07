@@ -12,11 +12,13 @@ import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
 
 import com.meossamos.smore.global.sse.SseEmitters;
+import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +38,13 @@ public class ApiV1RecruitmentArticleController {
     private final SseEmitters sseEmitters;
     @GetMapping("/recruitmentArticles")
     public ResponseEntity<?> getRecruitmentArticles(
-            RecruitmentArticleSearchDto searchDto
+            RecruitmentArticleSearchDto searchDto,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
+        if (userDetails != null) {
+            System.out.println("user id: " + userDetails.getUsername());
+        }
+
         List<String> titleList = searchDto.getTitleList();
         List<String> contentList = searchDto.getContentList();
         List<String> introductionList = searchDto.getIntroductionList();
