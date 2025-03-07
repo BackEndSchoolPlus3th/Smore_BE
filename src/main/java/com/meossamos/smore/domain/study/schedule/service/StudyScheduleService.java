@@ -8,11 +8,16 @@ import com.meossamos.smore.domain.study.schedule.entity.StudySchedule;
 import com.meossamos.smore.domain.study.schedule.repository.StudyScheduleRepository;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
+import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import com.meossamos.smore.global.exception.MemberNotFoundException;
 import com.meossamos.smore.global.exception.StudyNotFoundException;
 import com.meossamos.smore.global.exception.StudyScheduleNotFoundException;
+import com.meossamos.smore.global.jwt.TokenProvider;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,8 +27,10 @@ import java.time.LocalDateTime;
 public class StudyScheduleService {
     
     private final StudyScheduleRepository studyScheduleRepository;
+    private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
+    private final TokenProvider tokenProvider;
 
 
     // 테스트용 일정 저장
@@ -68,7 +75,7 @@ public class StudyScheduleService {
         if (studySchedule == null) {
             throw new RuntimeException("Schedule creation failed.");
         }
-//        System.out.println(studySchedule.toString());
+        System.out.println(studySchedule.toString());
         return studyScheduleRepository.save(studySchedule);
     }
 
@@ -95,5 +102,28 @@ public class StudyScheduleService {
 
 
         studyScheduleRepository.save(target_schedule);
+    }
+
+    // 이용자 권한 확인
+    public boolean checkManager(String accessToken, Long study_id) {
+        Authentication authentication =tokenProvider.getAuthentication(accessToken);
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        Long userID = Long.valueOf(Integer.parseInt(principal.getUsername()));
+
+        Study targetStudy = studyRepository.findById(study_id)
+                .orElseThrow(()-> new RuntimeException("해당 ID의 스터디를 찾을 수 없습니다." + study_id));
+
+
+        Member targetMember = memberRepository.findById(userID)
+                .orElseThrow(() -> new RuntimeException("해당 ID의 회원을 찾을 수 없습니다." + userID));
+
+        StudyMember studyMember = studyMemberRepository.findByMemberAndStudy(targetMember, targetStudy)
+                .orElseThrow(()->new RuntimeException("해당 ID의 스터디회원을 찾을 수 없습니다." + study_id + userID));
+
+
+//        System.out.println(studyMember.toString());
+        System.out.println(studyMember.getPermissionCalendarManage());
+        boolean permission = studyMember.getPermissionCalendarManage();
+        return permission;
     }
 }
