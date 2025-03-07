@@ -27,9 +27,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
-        // 채팅 관련 엔드포인트는 JWT 검증 건너뜀
+        // 채팅 API와 WebSocket, SSE 엔드포인트는 JWT 검증 건너뛰기
         String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/api/chatrooms/")) {
+        if (requestURI.startsWith("/api/chatrooms/") || requestURI.startsWith("/ws/") || requestURI.startsWith("/sse/")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -43,6 +43,10 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            logger.debug("JWT 토큰이 유효합니다.");
+        } else {
+            logger.warn("JWT 토큰이 유효하지 않습니다." + jwt);
         }
         filterChain.doFilter(request, response);
     }

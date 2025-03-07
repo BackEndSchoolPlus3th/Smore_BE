@@ -54,12 +54,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/study/**").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/chatrooms/**").permitAll()
-                        .requestMatchers("/ws/**").permitAll()
+//                        .requestMatchers("/api/chatrooms/**").permitAll()
+//                        .requestMatchers("/ws/info/**").permitAll()
                         .requestMatchers("/api/member/refresh").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/sse/connect").permitAll()
-
+//                        .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 추가 허용
                         .anyRequest().authenticated()
                 )
                 .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http));

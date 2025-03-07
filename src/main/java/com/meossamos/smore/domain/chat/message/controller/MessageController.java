@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chatrooms")
+@RequestMapping("/api/v1/chatrooms")
 @RequiredArgsConstructor
 public class MessageController {
 

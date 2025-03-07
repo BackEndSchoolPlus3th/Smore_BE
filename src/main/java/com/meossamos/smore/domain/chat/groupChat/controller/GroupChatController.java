@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/chatrooms/group")
+@RequestMapping("/api/v1/chatrooms/group")
 @RequiredArgsConstructor
 @Slf4j
 public class GroupChatController {
