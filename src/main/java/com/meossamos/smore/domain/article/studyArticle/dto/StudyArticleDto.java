@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.studyArticle.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import lombok.*;
@@ -20,5 +21,6 @@ public class StudyArticleDto {
     private List<String> attachments;
     private String hashTags;
     private Study study;
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Member member;
 }
