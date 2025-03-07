@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,5 +126,23 @@ public class MemberService {
     // 이메일 중복 체크
     public boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+
+    public MyPageDto getUserInfo(String jwttoken) {
+        Authentication authentication = tokenProvider.getAuthentication(jwttoken);
+        UserDetails principal =(UserDetails) authentication.getPrincipal();
+        Long userID = Long.valueOf(Integer.parseInt(principal.getUsername()));
+        Member targetMember = memberRepository.findById(userID)
+                .orElseThrow(()->new RuntimeException("해당하는 회원을 찾을 수 없습니다."));
+        System.out.println(targetMember.toString());
+        MyPageDto targetMyPage = MyPageDto.builder()
+                .email(targetMember.getEmail())
+                .nickName(targetMember.getNickname())
+                .birthdate(targetMember.getBirthdate())
+                .region(targetMember.getRegion())
+                .hashTags(targetMember.getHashTags())
+                .profileImageUrl(targetMember.getProfileImageUrl())
+                .build();
+        return targetMyPage;
     }
 }
