@@ -1,9 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.NewRecruitmentArticleDto;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleSearchDto;
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.*;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
@@ -12,6 +9,7 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +45,18 @@ public class ApiV1RecruitmentArticleController {
         System.out.println("Regions: " + regionList);
         System.out.println("HashTags: " + hashTagList);
 
-        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, searchDto.getPage(), searchDto.getSize());
-        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
+        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
+                recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
+                        titleList, contentList, introductionList, regionList, hashTagList,
+                        searchDto.getPage(), searchDto.getSize());
 
-        return ResponseEntity.ok(recruitmentArticleResponseDataList);
+        List<RecruitmentArticleResponseData> responseData  = recruitmentArticleDocService.convertToResponseData(searchResult.getDocs());
+
+        PagedResponse<RecruitmentArticleResponseData> pagedResponse =
+                new PagedResponse<>(responseData, searchResult.getTotalHits(), searchDto.getPage(), searchDto.getSize());
+
+
+        return ResponseEntity.ok(pagedResponse);
     }
 
     @GetMapping("/recruitmentArticles/detail")
@@ -64,7 +70,7 @@ public class ApiV1RecruitmentArticleController {
 
         boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId);
 
-        RecruitmentArticleDetailResponseData recruitmentArticleResponseData = RecruitmentArticleDetailResponseData.builder()
+        RecruitmentArticleDetailResponseData responseData  = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
                 .title(recruitmentArticle.getTitle())
                 .content(recruitmentArticle.getContent())
@@ -82,7 +88,8 @@ public class ApiV1RecruitmentArticleController {
                 .writerName(writer.getNickname())
                 .writerProfileImageUrl(writer.getProfileImageUrl())
                 .build();
-        return ResponseEntity.ok(recruitmentArticleResponseData);
+
+        return ResponseEntity.ok(responseData);
     }
 
 
@@ -92,16 +99,6 @@ public class ApiV1RecruitmentArticleController {
             @ModelAttribute NewRecruitmentArticleDto dto
     ) {
         Long devMemberId = 1L;
-        // 예시: 전달받은 데이터 출력 (실제 서비스 로직에서는 dto를 바탕으로 저장 처리)
-        System.out.println("Title: " + dto.getTitle());
-        System.out.println("Content: " + dto.getContent());
-        System.out.println("Introduction: " + dto.getIntroduction());
-        System.out.println("Region: " + dto.getRegion());
-        System.out.println("Start Date: " + dto.getStartDate());
-        System.out.println("End Date: " + dto.getEndDate());
-        System.out.println("Hashtags: " + dto.getHashtagList());
-        System.out.println("Thumbnail file name: " + dto.getThumbnailUrl());
-
 
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtagList().toString(), devMemberId, studyId, 0);
 
