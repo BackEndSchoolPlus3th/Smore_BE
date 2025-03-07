@@ -57,6 +57,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/member/refresh").permitAll()
                         .requestMatchers("/api/v1/**").permitAll()
                         .requestMatchers("/sse/connect").permitAll()
+                        .requestMatchers("/api/current-user").permitAll()
+                        .requestMatchers("/api/study/my-studies").permitAll()
+
+
                         .requestMatchers("/add").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
                         .requestMatchers("/sse/connect/**").permitAll()

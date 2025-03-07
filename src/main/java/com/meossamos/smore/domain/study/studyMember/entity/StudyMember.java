@@ -43,5 +43,4 @@ public class StudyMember extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean permissionSettingManage;
-
 }

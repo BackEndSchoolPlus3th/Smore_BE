@@ -25,7 +25,6 @@ public class StudyMemberService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
-
     /**
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 해당 스터디에 가입되어 있는지 확인
      *
@@ -211,8 +210,6 @@ public class StudyMemberService {
             throw new RuntimeException("User is not authenticated or principal is not an instance of User.");
         }
     }
-
-
     /**
      * 멤버 아이디로 해당 멤버가 속한 Study와 position 목록 조회
      * @param memberId 멤버의 ID
@@ -221,6 +218,4 @@ public class StudyMemberService {
     public List<StudyWithPositionDto> getStudiesWithPositionByMemberId(Long memberId) {
         return studyMemberRepository.findStudiesWithPositionByMemberId(memberId);
     }
-
-
 }
