@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,17 +23,30 @@ public class ApiV1StudyScheduleController {
     final StudyScheduleRepository studyScheduleRepository;
     final StudyScheduleService studyScheduleService;
 
-    // 다건 조회
+    // 다건 조회 & 매니저인지 확인
     @GetMapping("/{study_id}/schedules")
-    public ResponseEntity<List<StudyScheduleDto>> getSchedules(@PathVariable Long study_id){
+    public ResponseEntity<Map<String, Object>> getSchedules(
+            @PathVariable Long study_id,
+            @RequestHeader("Authorization") String authorizationHeader
+    ){
+        // 일정 다건 조회
         List<StudySchedule> StudyScheduleList =  studyScheduleRepository.findByStudy_Id(study_id);
         List<StudyScheduleDto> studyScheduleDtoList = StudyScheduleList.stream()
                 .map(StudyScheduleDto::new).toList();
         studyScheduleDtoList.forEach(studyScheduleDto ->
                 System.out.println(studyScheduleDto.getContent())
+//                System.out.println;
+
                 );
-//        System.out.println();
-        return ResponseEntity.ok(studyScheduleDtoList);
+
+        // 매니저인지 여부
+        String accessToken = authorizationHeader.replace("Bearer ", "");
+        System.out.println("pathVariable study_id = " + study_id);
+        boolean userPermission = studyScheduleService.checkManager(accessToken, study_id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("userPermission", userPermission);
+        response.put("studyScheduleList", studyScheduleDtoList);
+        return ResponseEntity.ok(response);
     }
 
     // 생성

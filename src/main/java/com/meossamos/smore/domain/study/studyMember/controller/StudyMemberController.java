@@ -24,13 +24,13 @@ public class StudyMemberController {
     private final StudyService studyService;
 
     // 유저 탈퇴
-    @DeleteMapping("/api/study/{study_Id}/delete")
+    @DeleteMapping("/api/v1/study/{study_Id}/delete")
     public ResponseEntity<String> leaveStudy(@AuthenticationPrincipal Member member, @PathVariable("study_Id") Long studyId) {
             studyMemberService.leaveStudy(member, studyId);
             return new ResponseEntity<>("스터디에서 탈퇴했습니다.", HttpStatus.OK);
     }
 
-    @GetMapping("/api/current-user")
+    @GetMapping("/api/v1/current-user")
     public ResponseEntity<Long> getCurrentUserId() {
         Long userId = studyMemberService.getAuthenticatedMemberId();
         return ResponseEntity.ok(userId);

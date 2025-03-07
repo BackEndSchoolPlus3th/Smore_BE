@@ -18,20 +18,20 @@ public class StudyArticleController {
     private final StudyMemberService studyMemberService;
 
     // 게시글 조회
-    @GetMapping("/api/study/{studyId}/articles")
+    @GetMapping("/api/v1/study/{studyId}/articles")
     public List<StudyArticleDto> getArticlesByStudyId(@PathVariable("studyId") Long studyId) {
         return studyArticleService.getArticlesByStudyId(studyId);
     }
 
     // 게시글 상세 조회
-    @GetMapping("/api/study/{studyId}/articles/{articleId}")
+    @GetMapping("/api/v1/study/{studyId}/articles/{articleId}")
     public ResponseEntity<StudyArticleDto> getStudyDetail(@PathVariable("articleId") Long articleId) {
         StudyArticleDto articleDto = studyArticleService.getStudyArticleById(articleId);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     // 게시물 검색
-    @GetMapping("/api/study/{studyId}/articles/search")
+    @GetMapping("/api/v1/study/{studyId}/articles/search")
     public ResponseEntity<List<StudyArticleDto>> searchArticles(
             @PathVariable("studyId") Long studyId,
             @RequestParam(value = "title", required = false) String title,
@@ -42,7 +42,7 @@ public class StudyArticleController {
     }
 
     // 게시글 작성
-    @PostMapping("/api/study/{studyId}/articles")
+    @PostMapping("/api/v1/study/{studyId}/articles")
     public ResponseEntity<StudyArticleDto> createStudyArticle(
             @PathVariable Long studyId,
             @RequestParam String title,
@@ -61,29 +61,21 @@ public class StudyArticleController {
     }
 
     // 게시글 수정
-    @PutMapping("/api/study/{studyId}/articles/{articleId}")
+    @PutMapping("/api/v1/study/{studyId}/articles/{articleId}")
     public ResponseEntity<StudyArticleDto> updateStudyArticle(
-            @PathVariable("studyId") Long studyId,
-            @PathVariable("articleId") Long articleId,
+            @PathVariable Long articleId,
             @RequestBody StudyArticleDto updateRequest) {
 
-        // 현재 로그인한 사용자 정보 가져오기
-        Long currentUserId = studyMemberService.getAuthenticatedMemberId();
-
-        StudyArticleDto updatedArticle = studyArticleService.updateStudyArticle(articleId, updateRequest, currentUserId);
+        StudyArticleDto updatedArticle = studyArticleService.updateStudyArticle(articleId, updateRequest);
         return new ResponseEntity<>(updatedArticle, HttpStatus.OK);
     }
 
     // 게시글 삭제
-    @DeleteMapping("/api/study/{studyId}/articles/{articleId}")
-    public ResponseEntity<Void> deleteStudyArticle(
-            @PathVariable("studyId") Long studyId,
-            @PathVariable("articleId") Long articleId) {
+    @DeleteMapping("/api/v1/study/{studyId}/articles/{articleId}")
+    public ResponseEntity<String> deleteStudyArticle(
+            @PathVariable Long articleId) {
 
-        // 현재 로그인한 사용자 정보 가져오기
-        Long currentUserId = studyMemberService.getAuthenticatedMemberId();
-
-        studyArticleService.deleteStudyArticle(articleId,currentUserId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+        studyArticleService.deleteStudyArticle(articleId);
+        return new ResponseEntity<>("게시글이 삭제되었습니다.", HttpStatus.OK);
     }
 }

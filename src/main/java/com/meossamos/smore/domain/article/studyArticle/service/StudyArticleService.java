@@ -81,12 +81,17 @@ public class StudyArticleService {
 
     // 게시글 수정
     @Transactional
-    public StudyArticleDto updateStudyArticle(Long articleId, StudyArticleDto updateRequest, Long currentUserId) {
+    public StudyArticleDto updateStudyArticle(Long articleId, StudyArticleDto updateRequest) {
+        Long memberId = studyMemberService.getAuthenticatedMemberId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("인증된 사용자가 없습니다."));
+
+
         StudyArticle studyArticle = studyArticleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
         // 작성자와 현재 로그인한 사용자의 id 비교
-        if (!studyArticle.getMember().getId().equals(currentUserId)) {
+        if (!studyArticle.getMember().equals(member)) {
             throw new RuntimeException("작성자만 수정할 수 있습니다.");
         }
 
@@ -100,11 +105,15 @@ public class StudyArticleService {
 
     // 게시글 삭제
     @Transactional
-    public void deleteStudyArticle(Long articleId, Long currentUserId) {
+    public void deleteStudyArticle(Long articleId) {
+        Long memberId = studyMemberService.getAuthenticatedMemberId();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("인증된 사용자가 없습니다."));
+
         StudyArticle studyArticle = studyArticleRepository.findById(articleId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
 
-        if (!studyArticle.getMember().getId().equals(currentUserId)) {
+        if (!studyArticle.getMember().equals(member)) {
             throw new RuntimeException("작성자만 삭제할 수 있습니다.");
         }
 

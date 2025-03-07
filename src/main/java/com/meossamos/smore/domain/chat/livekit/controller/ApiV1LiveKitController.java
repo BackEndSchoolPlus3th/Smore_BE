@@ -1,6 +1,9 @@
 package com.meossamos.smore.domain.chat.livekit.controller;
 
 import com.meossamos.smore.domain.chat.livekit.service.LiveKitService;
+import io.livekit.server.AccessToken;
+import io.livekit.server.RoomJoin;
+import io.livekit.server.RoomName;
 import io.livekit.server.WebhookReceiver;
 import livekit.LivekitWebhook;
 import lombok.RequiredArgsConstructor;
@@ -33,11 +36,27 @@ public class ApiV1LiveKitController {
         // 토큰에서 스터디 이름, 참여자 아이디 가져오기
         if (authHeader != null && authHeader.startsWith("Bearer")) {
             System.out.println(authHeader);
-            String token = authHeader.substring(7); // "Bearer " 이후의 부분을 추출
+            String jwttoken = authHeader.substring(7); // "Bearer " 이후의 부분을 추출
             // 토큰 복호화해서 유저정보 리턴
-            System.out.println(token);
-            liveKitService.getUserInfo(token);
-            return ResponseEntity.ok(Map.of("token", "token"));
+//            System.out.println(token);
+            Map<String, String> userInfo =liveKitService.getUserInfo(jwttoken);
+            String studyTitle = userInfo.get("studyTitle");
+//            String userId = userInfo.get("userId");
+            String userEmail = userInfo.get("userEmail");
+
+
+            AccessToken token = new AccessToken(apikey, apiSecret);
+            token.setName(userEmail);
+            token.setIdentity(userEmail);
+            token.addGrants(new RoomJoin(true), new RoomName(studyTitle));
+
+            System.out.println(token.toString());
+            System.out.println(studyTitle + userEmail);
+            return ResponseEntity.ok(Map.of(
+                    "token", token.toJwt(),
+                    "StudyTitle", studyTitle,
+//                    "UserId", userId,
+                    "UserEmail", userEmail));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("errorMessage", "Authorization token is required"));
         }
