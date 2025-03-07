@@ -80,4 +80,9 @@ public class HashTagUtil {
                 .map(HashTagUtil::normalizeHashTags)
                 .collect(Collectors.joining(","));
     }
+
+    public static String convertHashTagsToString(List<String> hashTags) {
+        return hashTags.stream()
+                .collect(Collectors.joining(","));
+    }
 }
