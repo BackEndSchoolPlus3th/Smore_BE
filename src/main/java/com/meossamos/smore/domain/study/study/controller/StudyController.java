@@ -17,19 +17,19 @@ public class StudyController {
     private final StudyMemberService studyMemberService;
 
     // 유저 스터디 목록 조회
-    @GetMapping("/api/study/my-studies")
+    @GetMapping("/api/v1/user/studies")
     public List<StudyDto> getUserStudies() {
         return studyMemberService.getStudiesByAuthenticatedUser();  // 서비스에서 스터디 목록 조회
     }
 
     // 스터디 정보 조회
-    @GetMapping("/api/study/{study_Id}")
+    @GetMapping("/api/v1/study/{study_Id}")
     public StudyDto getStudyById(@PathVariable("study_Id") Long studyId) {
         return studyService.getStudyById(studyId);
     }
 
     // 스터디 정보 수정
-    @PutMapping("/api/study/{study_Id}/introduction")
+    @PutMapping("/api/v1/study/{study_Id}/introduction")
     public ResponseEntity<StudyDto> updateStudyIntroductions(
             @PathVariable("study_Id") Long studyId,
             @RequestBody StudyDto studyDto) {
