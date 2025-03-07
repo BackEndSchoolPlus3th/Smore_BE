@@ -47,10 +47,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/api/v1/recruitmentArticles").permitAll()
                         .requestMatchers("/api/v1/recruitmentArticles/detail").permitAll()
                         .requestMatchers("/api/v1/recruitmentArticle/clip").permitAll()
-                        .requestMatchers("/api/v1/recruitmentArticles/**").permitAll()
+                    //    .requestMatchers("/api/v1/recruitmentArticles/**").permitAll()
                         .requestMatchers("/api/v1/study/**").permitAll()
                         .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/api/member/signup").permitAll()
@@ -60,8 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/sse/connect").permitAll()
                         .requestMatchers("/api/current-user").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
-
-
+                        .requestMatchers("/sse/connect/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http));

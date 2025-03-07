@@ -73,7 +73,9 @@ public class RecruitmentArticleDocService {
     }
 
     // 제목, 내용, 소개, 지역, 해시태그로 검색하여 RecruitmentArticleDoc 리스트를 반환하는 메서드
-    public List<RecruitmentArticleDoc> findByTitleOrContentOrIntroductionOrRegionOrHashTags(List<String> titleList, List<String> contentList, List<String> introductionList, List<String> regionList, List<String> hashTagList, int page, int size) {
+    public  ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> findByTitleOrContentOrIntroductionOrRegionOrHashTags(
+            List<String> titleList, List<String> contentList, List<String> introductionList,
+            List<String> regionList, List<String> hashTagList, int page, int size) {
         // 1. 1-indexed 페이지 번호를 0-indexed로 변환
         int adjustedPageNum = page - 1;
 
@@ -106,11 +108,14 @@ public class RecruitmentArticleDocService {
             blockCache.put(cacheKey, searchResult);
         }
 
-        return searchResult.getDocs();
+        return searchResult;
     }
 
     // Elasticsearch에서 제목, 내용, 소개, 지역, 해시태그로 검색하는 메서드
-    private ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchByTitleOrContentOrIntroductionOrRegionOrHashTags(List<String> titleList, List<String> contentList, List<String> introductionList, List<String> regionList, List<String> hashTagList, int pageStart, int searchSize) {
+    private  ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchByTitleOrContentOrIntroductionOrRegionOrHashTags(
+            List<String> titleList, List<String> contentList, List<String> introductionList,
+            List<String> regionList, List<String> hashTagList, int pageStart, int searchSize) {
+
         // bool 쿼리 생성
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 

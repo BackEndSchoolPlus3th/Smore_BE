@@ -1,5 +1,8 @@
 server:
   port: 8090
+  servlet:
+    encoding:
+      charset: UTF-8
 spring:
   profiles:
     active: dev
@@ -16,7 +19,7 @@ spring:
   thymeleaf:
     cache: false
 jwt:
-  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwKc3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmct
 
 livekit:
   websocketURL: wss://chat-app-y0a5829d.livekit.cloud
