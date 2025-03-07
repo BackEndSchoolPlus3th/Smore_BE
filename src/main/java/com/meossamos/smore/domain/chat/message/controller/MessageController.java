@@ -35,6 +35,7 @@ public class MessageController {
 
         ChatMessage savedMessage = chatMessageService.saveChatMessage(
                 roomId,
+                "dm",
                 messageRequestDto.getSenderId(),
                 messageRequestDto.getMessage(),
                 messageRequestDto.getAttachment()
@@ -60,6 +61,7 @@ public class MessageController {
 
         ChatMessage savedMessage = chatMessageService.saveChatMessage(
                 roomId,
+                "group",
                 messageRequestDto.getSenderId(),
                 messageRequestDto.getMessage(),
                 messageRequestDto.getAttachment()

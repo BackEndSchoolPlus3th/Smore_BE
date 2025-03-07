@@ -13,14 +13,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("*") // 실제 운영환경에서는 도메인 제한 필요
+                .setAllowedOrigins("*") // 실제 운영환경에서는 도메인 제한 필요(보안)
                 .withSockJS();
     }
 
     // 메세지 브로커 설정
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // 클라이언트가 메시지 전송 시 사용하는 prefix
+        // 클라이언트
+        // 가 메시지 전송 시 사용하는 prefix
         registry.setApplicationDestinationPrefixes("/app");
         // 클라이언트가 구독하는 메시지의 prefix
         registry.enableSimpleBroker("/topic");

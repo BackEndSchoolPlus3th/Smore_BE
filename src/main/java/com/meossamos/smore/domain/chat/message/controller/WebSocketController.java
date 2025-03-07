@@ -6,7 +6,7 @@ import com.meossamos.smore.domain.chat.message.entity.ChatMessage;
 import com.meossamos.smore.domain.chat.message.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+//import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
@@ -27,6 +27,7 @@ public class WebSocketController {
         // 1. 메시지 저장
         ChatMessage savedMessage = chatMessageService.saveChatMessage(
                 messageDto.getRoomId(),
+                messageDto.getChatType(),
                 messageDto.getSenderId(),
                 messageDto.getMessage(),
                 messageDto.getAttachment()

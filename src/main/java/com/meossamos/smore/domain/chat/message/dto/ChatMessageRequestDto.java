@@ -11,9 +11,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatMessageRequestDto {
     private String roomId;
+    private String chatType;
     private String senderId;
     private String message;
-//    private LocalDateTime timestamp;
+    private LocalDateTime timestamp;
     private String attachment;
 
 }

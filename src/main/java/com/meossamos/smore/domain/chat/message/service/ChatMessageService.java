@@ -13,10 +13,11 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
 
     // 채팅 메세지 저장
-    public ChatMessage saveChatMessage(String roomId, String senderId, String message, String attachment) {
+    public ChatMessage saveChatMessage(String roomId, String chatType, String senderId, String message, String attachment) {
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .roomId(roomId)
+                .chatType(chatType)
                 .senderId(senderId)
                 .message(message)
                 .attachment(attachment)
