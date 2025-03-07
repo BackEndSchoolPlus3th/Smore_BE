@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-<<<<<<< HEAD
-=======
 import org.springframework.web.bind.annotation.*;
->>>>>>> 9e91b4adbefcc022ea0d7328aac7e64b8a57d108
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,10 +37,6 @@ public class StudyMemberController {
         return ResponseEntity.ok(userId);
     }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9e91b4adbefcc022ea0d7328aac7e64b8a57d108
     // 한 멤버의 모든 스터디 조회
     @GetMapping("/v1/my-study")
     public ResponseEntity<?> getStudyList () {
