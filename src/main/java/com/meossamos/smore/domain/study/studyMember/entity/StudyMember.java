@@ -30,6 +30,9 @@ public class StudyMember extends BaseEntity {
     private Study study;
 
     @Column(nullable = false)
+    private StudyPosition position;
+
+    @Column(nullable = false)
     private Boolean permissionRecruitManage;
 
     @Column(nullable = false)

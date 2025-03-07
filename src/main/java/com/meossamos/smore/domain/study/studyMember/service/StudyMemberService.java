@@ -6,6 +6,8 @@ import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.dto.MyStudyListResponse;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,82 @@ public class StudyMemberService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 회원이 해당 스터디에 가입되어 있는지 확인
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 가입되어 있으면 true, 아니면 false
+     */
+    public boolean isUserMemberOfStudy(Long memberId, Long studyId) {
+        return studyMemberRepository.findByMemberIdAndStudyId(memberId, studyId).isPresent();
+    }
+
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 모집 관리 권한(permissionRecruitManage)을 가지고 있는지 확인
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 모집 관리 권한이 true이면 true, 아니면 false
+     * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
+     */
+    public boolean hasRecruitManagePermission(Long memberId, Long studyId) {
+        StudyMember studyMember = getStudyMemberByMemberIdAndStudyId(memberId, studyId);
+        return Boolean.TRUE.equals(studyMember.getPermissionRecruitManage());
+    }
+
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 게시글 관리 권한(permissionArticleManage)을 가지고 있는지 확인
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 게시글 관리 권한이 true이면 true, 아니면 false
+     * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
+     */
+    public boolean hasArticleManagePermission(Long memberId, Long studyId) {
+        StudyMember studyMember = getStudyMemberByMemberIdAndStudyId(memberId, studyId);
+        return Boolean.TRUE.equals(studyMember.getPermissionArticleManage());
+    }
+
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 캘린더 관리 권한(permissionCalendarManage)을 가지고 있는지 확인
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 캘린더 관리 권한이 true이면 true, 아니면 false
+     * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
+     */
+    public boolean hasCalendarManagePermission(Long memberId, Long studyId) {
+        StudyMember studyMember = getStudyMemberByMemberIdAndStudyId(memberId, studyId);
+        return Boolean.TRUE.equals(studyMember.getPermissionCalendarManage());
+    }
+
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 설정 관리 권한(permissionSettingManage)을 가지고 있는지 확인
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 설정 관리 권한이 true이면 true, 아니면 false
+     * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
+     */
+    public boolean hasSettingManagePermission(Long memberId, Long studyId) {
+        StudyMember studyMember = getStudyMemberByMemberIdAndStudyId(memberId, studyId);
+        return Boolean.TRUE.equals(studyMember.getPermissionSettingManage());
+    }
+
+    /**
+     * 회원 아이디와 스터디 아이디를 받아 해당 StudyMember 엔티티를 조회
+     *
+     * @param memberId 회원의 ID
+     * @param studyId 스터디의 ID
+     * @return 조회된 StudyMember 엔티티
+     * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
+     */
+    private StudyMember getStudyMemberByMemberIdAndStudyId(Long memberId, Long studyId) {
+        return studyMemberRepository.findByMemberIdAndStudyId(memberId, studyId)
+                .orElseThrow(() -> new IllegalArgumentException("Member with id " + memberId +
+                        " is not registered in study with id " + studyId));
+    }
 
     public StudyMember saveStudyMember(Member member, Study study, Boolean permissionRecruitManage, Boolean permissionArticleManage, Boolean permissionCalendarManage, Boolean permissionSettingManage) {
         StudyMember studyMember = StudyMember.builder()
@@ -131,5 +209,13 @@ public class StudyMemberService {
         } else {
             throw new RuntimeException("User is not authenticated or principal is not an instance of User.");
         }
+    }
+    /**
+     * 멤버 아이디로 해당 멤버가 속한 Study와 position 목록 조회
+     * @param memberId 멤버의 ID
+     * @return Study와 position을 담은 DTO 리스트
+     */
+    public List<StudyWithPositionDto> getStudiesWithPositionByMemberId(Long memberId) {
+        return studyMemberRepository.findStudiesWithPositionByMemberId(memberId);
     }
 }
