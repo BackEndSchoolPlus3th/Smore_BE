@@ -66,6 +66,8 @@ public class SecurityConfig {
 
 
                         .requestMatchers("/error").permitAll()
+
+                        .requestMatchers("/test/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .with(jwtSecurityConfigBean.getJwtSecurityConfig(),(config) -> config.configure(http))

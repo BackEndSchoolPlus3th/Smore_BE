@@ -42,8 +42,3 @@ logging:
 custom:
   elasticsearch:
     uri: http://localhost:9200
-
-aws:
-  s3:
-    bucket-name: smore-bucket-smore-s3-1
-    region: ap-northeast-2

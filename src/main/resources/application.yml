@@ -27,3 +27,9 @@ livekit:
   apiSecret: jluVNjpRIrf5EVlVPlDkY2y5pEAQdzf9tAfV3RrftVIB
 
 
+aws:
+  s3:
+    region: ap-northeast-2
+    bucket-name:
+      public: smore-dev-bucket-public-1
+      private: smore-dev-bucket-private-1
