@@ -9,22 +9,20 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-import com.meossamos.smore.global.util.ElasticSearchUtil;
-
 import com.meossamos.smore.global.sse.SseEmitters;
-import jakarta.annotation.Nullable;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
 import jakarta.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -129,6 +127,21 @@ public class ApiV1RecruitmentArticleController {
             @RequestBody NewRecruitmentArticleDto dto
     ) {
         Long devMemberId = 1L;
+
+        // dev 환경 로그 확인
+        System.out.println("studyId: " + studyId);
+        System.out.println("dto: " + dto);
+        System.out.println("title: " + dto.getTitle());
+        System.out.println("content: " + dto.getContent());
+        System.out.println("introduction: " + dto.getIntroduction());
+        System.out.println("region: " + dto.getRegion());
+        System.out.println("thumbnailUrl: " + dto.getThumbnailUrl());
+        System.out.println("imageUrls: " + dto.getImageUrls());
+        System.out.println("startDate: " + dto.getStartDate());
+        System.out.println("endDate: " + dto.getEndDate());
+        System.out.println("maxMember: " + dto.getMaxMember());
+        System.out.println("hashtags: " + dto.getHashtags());
+
 
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
 
