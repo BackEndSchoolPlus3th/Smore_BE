@@ -9,6 +9,7 @@ import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.domain.study.studyMember.dto.MyStudyListResponse;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
+import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -100,6 +101,44 @@ public class StudyMemberService {
         return studyMemberRepository.findByMemberIdAndStudyId(memberId, studyId)
                 .orElseThrow(() -> new IllegalArgumentException("Member with id " + memberId +
                         " is not registered in study with id " + studyId));
+    }
+
+    /**
+     * 스터디에 새로운 멤버를 추가하는 메서드.
+     *
+     * @param studyId                   가입할 스터디의 식별자
+     * @param memberId                  가입할 멤버의 식별자
+     * @param position                  스터디 내에서의 포지션
+     * @param permissionRecruitManage   모집글 관리 권한 여부
+     * @param permissionArticleManage   게시글 관리 권한 여부
+     * @param permissionCalendarManage  캘린더 관리 권한 여부
+     * @param permissionSettingManage   스터디 설정 관리 권한 여부
+     * @return 생성된 StudyMember 엔티티
+     */
+    public StudyMember addMemberToStudy(Long studyId,
+                                        Long memberId,
+                                        StudyPosition position,
+                                        boolean permissionRecruitManage,
+                                        boolean permissionArticleManage,
+                                        boolean permissionCalendarManage,
+                                        boolean permissionSettingManage) {
+        // getReferenceById를 사용하여 실제 데이터를 조회하지 않고 proxy 객체만 획득
+        Member member = memberRepository.getReferenceById(memberId);
+        Study study = studyRepository.getReferenceById(studyId);
+
+        // StudyMember 엔티티 생성
+        StudyMember studyMember = StudyMember.builder()
+                .member(member)
+                .study(study)
+                .position(position)
+                .permissionRecruitManage(permissionRecruitManage)
+                .permissionArticleManage(permissionArticleManage)
+                .permissionCalendarManage(permissionCalendarManage)
+                .permissionSettingManage(permissionSettingManage)
+                .build();
+
+        // 새 StudyMember 저장
+        return studyMemberRepository.save(studyMember);
     }
 
     public StudyMember saveStudyMember(Member member, Study study, Boolean permissionRecruitManage, Boolean permissionArticleManage, Boolean permissionCalendarManage, Boolean permissionSettingManage) {
