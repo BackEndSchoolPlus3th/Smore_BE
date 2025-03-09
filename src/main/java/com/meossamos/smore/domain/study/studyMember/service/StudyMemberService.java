@@ -6,8 +6,7 @@ import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
-import com.meossamos.smore.domain.study.studyMember.dto.MyStudyListResponse;
-import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
@@ -254,7 +253,7 @@ public class StudyMemberService {
      * @param memberId 멤버의 ID
      * @return Study와 position을 담은 DTO 리스트
      */
-    public List<StudyWithPositionDto> getStudiesWithPositionByMemberId(Long memberId) {
-        return studyMemberRepository.findStudiesWithPositionByMemberId(memberId);
+    public List<StudyWithPositionSimpleDto> getStudiesWithPositionByMemberId(Long memberId) {
+        return studyMemberRepository.findStudiesWithPositionSimpleByMemberId(memberId);
     }
 }

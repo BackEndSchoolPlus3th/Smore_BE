@@ -105,17 +105,21 @@ public class S3Service {
     }
 
     /**
-     * S3에서 파일 삭제
-     * @param directory 파일이 있는 디렉터리
-     * @param fileName 삭제할 파일 이름
+     * S3에서 지정된 디렉터리 내의 파일을 삭제
+     *
+     * @param directory 삭제할 파일이 있는 디렉터리 (예: "studies/123/images")
+     * @param fileName  삭제할 파일의 고유 이름 (예: "uniqueFileName-원본파일명.jpg")
      */
     public void deleteFile(String directory, String fileName) {
-        DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+        // 디렉터리가 "/"로 끝나지 않으면 "/"를 추가하여 파일 키를 구성
+        String key = directory.endsWith("/") ? directory + fileName : directory + "/" + fileName;
+
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)
-                .key(directory + "/" + fileName)
+                .key(key)
                 .build();
 
-        s3Client.deleteObject(deleteObjectRequest);
+        s3Client.deleteObject(deleteRequest);
     }
 
     /**

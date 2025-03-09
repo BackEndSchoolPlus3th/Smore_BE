@@ -2,7 +2,7 @@ package com.meossamos.smore.domain.study.studyMember.repository;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.entity.Study;
-import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,10 +21,13 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
     @Query("select sm.study from StudyMember sm where sm.member.id = :memberId")
     List<Study> findStudiesByMemberId(@Param("memberId") Long memberId);
 
-    // 멤버 아이디로 Study, Position, 그리고 CreateDate 함께 조회
-    @Query("select new com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionDto(sm.study, sm.position, sm.createdDate) " +
-            "from StudyMember sm where sm.member.id = :memberId")
-    List<StudyWithPositionDto> findStudiesWithPositionByMemberId(@Param("memberId") Long memberId);
+    // 회원 아이디로 Study의 필요한 정보와 포지션, 가입일자만 조회하는 최적화 쿼리
+    @Query("select new com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto(" +
+            "new com.meossamos.smore.domain.study.studyMember.dto.StudySimpleDto(s.id, s.title, s.introduction, s.thumbnailUrl, s.hashTags, s.memberCnt), " +
+            "sm.position, sm.createdDate) " +
+            "from StudyMember sm join sm.study s where sm.member.id = :memberId")
+    List<StudyWithPositionSimpleDto> findStudiesWithPositionSimpleByMemberId(@Param("memberId") Long memberId);
+
 
     // memberId와 studyId로 StudyMember 단건 조회
     @Query("select sm from StudyMember sm where sm.member.id = :memberId and sm.study.id = :studyId")

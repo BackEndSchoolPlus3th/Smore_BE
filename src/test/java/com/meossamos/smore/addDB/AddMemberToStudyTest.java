@@ -29,7 +29,7 @@ public class AddMemberToStudyTest {
             boolean permissionCalendarManage = random.nextBoolean();
             boolean permissionSettingManage = random.nextBoolean();
 
-            studyMemberService.addMemberToStudy(memberId, studyId, position,
+            studyMemberService.addMemberToStudy(studyId, memberId, position,
                     permissionRecruitManage, permissionArticleManage, permissionCalendarManage, permissionSettingManage);
         }
     }
