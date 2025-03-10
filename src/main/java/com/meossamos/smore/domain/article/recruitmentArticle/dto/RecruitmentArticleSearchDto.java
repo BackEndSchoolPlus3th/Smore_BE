@@ -1,6 +1,7 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.dto;
 
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,6 +16,7 @@ public class RecruitmentArticleSearchDto {
     private String introduction;
     private String hashTags;
     private String region;
+    private boolean isCustomSearch;
 
     public List<String> getTitleList() {
         return title == null || title.trim().isEmpty()

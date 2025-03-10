@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +40,20 @@ public class ApiV1RecruitmentArticleController {
             RecruitmentArticleSearchDto searchDto,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        if (userDetails != null) {
-            System.out.println("user id: " + userDetails.getUsername());
-        }
-
         List<String> titleList = searchDto.getTitleList();
         List<String> contentList = searchDto.getContentList();
         List<String> introductionList = searchDto.getIntroductionList();
         List<String> regionList = searchDto.getRegionList();
-        List<String> hashTagList = searchDto.getHashTagsList();
+        List<String> hashTagList = new ArrayList<>(searchDto.getHashTagsList());
+
+        if (userDetails != null && searchDto.isCustomSearch()) {
+            System.out.println("user id: " + userDetails.getUsername());
+            String memberHashTags = memberService.getHashTagsByMemberId(Long.parseLong(userDetails.getUsername()));
+            List<String> memberHashTagList = List.of(memberHashTags.split(","));
+            hashTagList.addAll(memberHashTagList);
+            // 중복 제거
+            hashTagList = hashTagList.stream().distinct().toList();
+        }
 
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
                 recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
