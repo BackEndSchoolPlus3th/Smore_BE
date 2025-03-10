@@ -1,5 +1,11 @@
 package com.meossamos.smore.global.sse;
 
+import com.meossamos.smore.domain.alarm.alarm.dto.SaveAlarmDto;
+import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
+import com.meossamos.smore.domain.member.member.entity.Member;
+import com.meossamos.smore.domain.member.member.service.MemberService;
+import com.meossamos.smore.domain.study.study.entity.Study;
+import com.meossamos.smore.domain.study.study.service.StudyService;
 import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.util.Ut;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +29,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @Slf4j
 @RequiredArgsConstructor
 public class SseEmitters {
+    private final AlarmService alarmService;
+    private final StudyService studyService;
 
     private final TokenProvider tokenProvider;
+
     // Thread-safe한 List를 사용하여 다중 클라이언트의 SSE 연결들을 관리
     private final List<SseEmitter> emitters = new CopyOnWriteArrayList<>();
     private final ConcurrentHashMap<String,SseEmitter> emitterMap = new ConcurrentHashMap<String, SseEmitter>();
@@ -87,15 +96,16 @@ public class SseEmitters {
 
     public void notiApplication(String eventName, Map<String,String> map,Long recruitmentId){
         String receiverId = map.get("receiver");
-        String senderToken = map.get("sender");// 토큰
+        String senderToken = map.get("senderToken");// 토큰
 
         Authentication authentication = tokenProvider.getAuthentication(senderToken);
+
         Long senderId = Long.valueOf(authentication.getName());
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         log.info("실제 아이디 인지 확인 {}",userDetails.getUsername());
         //받아서 receiverId를 포함한 토큰을 찾기
         //여러개면 여러개 전송
-        log.info("notiApplication 함수 ",recruitmentId);
+        log.info("notiApplication 함수 {}",recruitmentId);
 
         List<String> receiverIdList = new ArrayList<>();
         for(String token : emitterMap.keySet()){
@@ -104,14 +114,27 @@ public class SseEmitters {
             if(tokenProvider.getAuthentication(token).getName().equals(receiverId)){
                 receiverIdList.add(token);
             }
-            log.info("map 에 있는 토큰들 {} ",token);
-
         }
-
-        Map<String,Long> dataMap = new HashMap<>();
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("eventName","application__reached");
         dataMap.put("senderId",senderId);
-        dataMap.put("studyId",10814L);
+        dataMap.put("receiverId",receiverId);
+        dataMap.put("studyId",map.get("studyId"));
         dataMap.put("recruitmentId",recruitmentId);
+
+        Study study = studyService.getStudyEntityById(Long.valueOf(map.get("studyId")));
+        String message = map.get("sender")+"님이 "+study.getTitle()+"에 지원하였습니다.";
+
+        //엔티티 생성
+        alarmService.saveAlarm(SaveAlarmDto.builder()
+                        .senderId(senderId)
+                        .receiverId(Long.valueOf(receiverId))
+                        .studyId(Long.valueOf(map.get("studyId")))
+                        .recruitmentId(recruitmentId)
+                        .message(message)
+                        .eventName(eventName)
+                        .build());
+
         for(String token: receiverIdList){
             SseEmitter emitter = emitterMap.get(token);
             log.info("emitter에서 요청한 토큰에 맞게 emitter를 찾아내는지 {} ",token);
@@ -127,10 +150,6 @@ public class SseEmitters {
                 throw new RuntimeException(e);
             }
         }
-
-        //토큰으로 emitter 찾기
-        //찾은 emitter에 send 하기
-
 
     }
 }

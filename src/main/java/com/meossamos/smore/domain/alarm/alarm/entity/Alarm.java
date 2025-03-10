@@ -23,10 +23,19 @@ public class Alarm extends BaseEntity {
     @Column(nullable = true)
     private Long senderId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String message;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Member receiver;
+
+    @Column
+    private Long studyId;
+
+    @Column
+    private String eventName;
+
+    @Column
+    private Long recruitmentId;
 
 }

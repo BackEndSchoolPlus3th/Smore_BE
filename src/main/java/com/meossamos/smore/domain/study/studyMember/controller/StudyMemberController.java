@@ -58,4 +58,6 @@ public class StudyMemberController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(myStudyListResponseList);
     }
+
+
 }

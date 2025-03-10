@@ -9,6 +9,10 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
+
+import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
+
 import com.meossamos.smore.global.sse.SseEmitters;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +38,7 @@ public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleClipService recruitmentArticleClipService;
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
     private final SseEmitters sseEmitters;
+    private final TokenProvider tokenProvider;
     @GetMapping("/recruitmentArticles")
     public ResponseEntity<?> getRecruitmentArticles(
             RecruitmentArticleSearchDto searchDto,
@@ -101,18 +106,27 @@ public class ApiV1RecruitmentArticleController {
                                             @PathVariable("recruitmentId") Long recruitmentId,
                                             HttpServletRequest request) {
         String token = request.getHeader("authorization");
-        SseEmitter emitter = sseEmitters.get(token);
+//결론적으로 해당 게시물 작성자를 찾아야 그 유저에게 알림을 보낼 수 있다.
+
         Map<String, String> map = new HashMap<>();
-        map.put("sender",token.substring(7));
-        log.info("모집글 id {}",recruitmentId);
-        Long receiverId = 1011L;
-        map.put("receiver",receiverId+"");
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentId);
+
+        Long receiver = recruitmentArticle.getMember().getId();
+        Long studyId = recruitmentArticle.getStudy().getId();
+        Long senderId = Long.valueOf(tokenProvider.getAuthentication(token.substring(7)).getName());
+        map.put("sender",memberService.findById(senderId).getNickname());
+        map.put("senderToken",token.substring(7));
+        map.put("receiver",receiver+"");
         map.put("recruitmentId",recruitmentId+"");
+        map.put("studyId",studyId+"");
+
         //지원할 때랑 지원을 받는거는 지원받는 당사자만 알림을 받으면 되니까
         //emitter 중에서 해당 user만 찾아서 send해주면 된다.
 
+        //서비스 부분에서 map을 리턴을 하고 바로 notiApplication 호출해주는 식으로 가면 될듯
+
         sseEmitters.notiApplication("application__reached",map,recruitmentId);
-     return "지원 완료";
+     return "지원 완료"+recruitmentId;
     }
 
     @PostMapping("/study/{studyId}/recruitmentArticle")
