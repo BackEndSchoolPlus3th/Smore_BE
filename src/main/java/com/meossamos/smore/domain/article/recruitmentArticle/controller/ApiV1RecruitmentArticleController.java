@@ -49,12 +49,6 @@ public class ApiV1RecruitmentArticleController {
         List<String> regionList = searchDto.getRegionList();
         List<String> hashTagList = searchDto.getHashTagsList();
 
-        System.out.println("Titles: " + titleList);
-        System.out.println("Contents: " + contentList);
-        System.out.println("Introductions: " + introductionList);
-        System.out.println("Regions: " + regionList);
-        System.out.println("HashTags: " + hashTagList);
-
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
                 recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
                         titleList, contentList, introductionList, regionList, hashTagList,
@@ -128,22 +122,9 @@ public class ApiV1RecruitmentArticleController {
     ) {
         Long devMemberId = 1L;
 
-        // dev 환경 로그 확인
-        System.out.println("studyId: " + studyId);
-        System.out.println("dto: " + dto);
-        System.out.println("title: " + dto.getTitle());
-        System.out.println("content: " + dto.getContent());
-        System.out.println("introduction: " + dto.getIntroduction());
-        System.out.println("region: " + dto.getRegion());
-        System.out.println("thumbnailUrl: " + dto.getThumbnailUrl());
-        System.out.println("imageUrls: " + dto.getImageUrls());
-        System.out.println("startDate: " + dto.getStartDate());
-        System.out.println("endDate: " + dto.getEndDate());
-        System.out.println("maxMember: " + dto.getMaxMember());
-        System.out.println("hashtags: " + dto.getHashtags());
+        String imageUrls = String.join(",", dto.getImageUrls());
 
-
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
 
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);

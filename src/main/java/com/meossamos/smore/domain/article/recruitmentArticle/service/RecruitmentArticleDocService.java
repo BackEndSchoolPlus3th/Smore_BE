@@ -88,22 +88,15 @@ public class RecruitmentArticleDocService {
         // 블록 내 총 도큐먼트 개수
         int searchSize = size * BLOCK_SIZE;
 
-        System.out.println("blockNumber: " + blockNumber);
-        System.out.println("blockStartPage: " + blockStartPage);
-        System.out.println("pageStart: " + pageStart);
-        System.out.println("searchSize: " + searchSize);
-
         // 캐시 키 구성 (간단하게 해시태그 리스트와 blockNumber 결합)
-        String cacheKey = titleList.toString() + contentList.toString() + introductionList.toString() + regionList.toString() + hashTagList.toString() + "_block_" + blockNumber + "_size_" + searchSize;
+        String cacheKey = "Recruitment_Article" + titleList.toString() + contentList.toString() + introductionList.toString() + regionList.toString() + hashTagList.toString() + "_block_" + blockNumber + "_size_" + searchSize;
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult;
 
         if (blockCache.containsKey(cacheKey)) {
             // 캐시된 결과 사용
-            System.out.println("Using cache");
             searchResult = blockCache.get(cacheKey);
         } else {
             // Elasticsearch에서 해당 블록 검색 후 캐시 저장
-            System.out.println("Searching from Elasticsearch");
             searchResult = searchByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, pageStart, searchSize);
             blockCache.put(cacheKey, searchResult);
         }
