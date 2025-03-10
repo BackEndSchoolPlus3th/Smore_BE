@@ -20,8 +20,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ApiV1RecruitmentArticleCommentController {
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
-    private final RecruitmentArticleService recruitmentArticleService;
-    private final MemberService memberService;
 
     // 댓글 조회
     @GetMapping
@@ -72,9 +70,8 @@ public class ApiV1RecruitmentArticleCommentController {
     }
 
     // 댓글 수정
-    @PatchMapping("/{commentId}")
+    @PutMapping("/{commentId}/edit")
     public ResponseEntity<?> updateRecruitmentArticleComment(
-            @PathVariable Long recruitmentArticleId,
             @PathVariable Long commentId,
             @RequestBody NewRecruitmentArticleCommentDto newRecruitmentArticleCommentDto,
             @AuthenticationPrincipal UserDetails userDetails

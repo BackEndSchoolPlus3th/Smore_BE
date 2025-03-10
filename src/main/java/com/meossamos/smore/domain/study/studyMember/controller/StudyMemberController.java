@@ -88,7 +88,7 @@ public class StudyMemberController {
      * 권한 변경: 스터디 리더가 특정 멤버의 권한을 변경
      * PUT /api/v1/study/{studyId}/members/{memberId}/permissions
      */
-    @PatchMapping("/study/{studyId}/members/{memberId}/permissions")
+    @PutMapping("/study/{studyId}/members/{memberId}/permissions")
     public ResponseEntity<?> updatePermissions(@PathVariable Long studyId,
                                                @PathVariable Long memberId,
                                                @RequestBody UpdateStudyMemberPermissionDto dto,
