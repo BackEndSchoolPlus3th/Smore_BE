@@ -24,38 +24,38 @@ public class StudyAccessCheckFilter extends OncePerRequestFilter {
             throws ServletException, java.io.IOException {
 
         String uri = request.getRequestURI();
-        System.out.println("uri: " + uri);
-
-        // URL이 /api/study/{studyId}/... 형태인지 확인 (필요에 따라 정규표현식을 조정)
-        if (uri.matches(".*/api/*/study/\\d+.*")) {
-            System.out.println("uri matches");
-            try {
-                Long studyId = extractStudyId(uri);
-                System.out.println("studyId: " + studyId);
-
-                // SecurityContext에서 인증된 사용자 정보 가져오기
-                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-                if (principal instanceof User userDetails) {
-                    Long memberId = Long.parseLong(userDetails.getUsername());
-                    System.out.println("memberId: " + memberId);
-
-                    // 해당 사용자가 studyId에 속해있는지 확인
-                    if (!studyMemberService.isUserMemberOfStudy(memberId, studyId)) {
-                        System.out.println("해당 스터디에 소속되어 있지 않습니다.");
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "해당 스터디에 소속되어 있지 않습니다.");
-                        return;
-                    }
-                } else {
-                    System.out.println("인증되지 않은 사용자입니다.");
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "인증되지 않은 사용자입니다.");
-                    return;
-                }
-            } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "요청 URL에 문제가 있습니다: " + e.getMessage());
-                return;
-            }
-        }
+//        System.out.println("uri: " + uri);
+//
+//        // URL이 /api/study/{studyId}/... 형태인지 확인 (필요에 따라 정규표현식을 조정)
+//        if (uri.matches(".*/api/*/study/\\d+.*")) {
+//            System.out.println("uri matches");
+//            try {
+//                Long studyId = extractStudyId(uri);
+//                System.out.println("studyId: " + studyId);
+//
+//                // SecurityContext에서 인증된 사용자 정보 가져오기
+//                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//                if (principal instanceof User userDetails) {
+//                    Long memberId = Long.parseLong(userDetails.getUsername());
+//                    System.out.println("memberId: " + memberId);
+//
+//                    // 해당 사용자가 studyId에 속해있는지 확인
+//                    if (!studyMemberService.isUserMemberOfStudy(memberId, studyId)) {
+//                        System.out.println("해당 스터디에 소속되어 있지 않습니다.");
+//                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "해당 스터디에 소속되어 있지 않습니다.");
+//                        return;
+//                    }
+//                } else {
+//                    System.out.println("인증되지 않은 사용자입니다.");
+//                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "인증되지 않은 사용자입니다.");
+//                    return;
+//                }
+//            } catch (Exception e) {
+//                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "요청 URL에 문제가 있습니다: " + e.getMessage());
+//                return;
+//            }
+//        }
         filterChain.doFilter(request, response);
     }
 
