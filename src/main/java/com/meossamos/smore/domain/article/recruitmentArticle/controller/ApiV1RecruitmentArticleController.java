@@ -20,10 +20,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -46,7 +45,7 @@ public class ApiV1RecruitmentArticleController {
         List<String> regionList = searchDto.getRegionList();
         List<String> hashTagList = new ArrayList<>(searchDto.getHashTagsList());
 
-        if (userDetails != null && searchDto.isCustomSearch()) {
+        if (userDetails != null && searchDto.isCustomRecommended()) {
             System.out.println("user id: " + userDetails.getUsername());
             String memberHashTags = memberService.getHashTagsByMemberId(Long.parseLong(userDetails.getUsername()));
             List<String> memberHashTagList = List.of(memberHashTags.split(","));
@@ -55,10 +54,14 @@ public class ApiV1RecruitmentArticleController {
             hashTagList = hashTagList.stream().distinct().toList();
         }
 
+        hashTagList = hashTagList.stream()
+                .sorted()
+                .collect(Collectors.toList());
+
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
                 recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
                         titleList, contentList, introductionList, regionList, hashTagList,
-                        searchDto.getPage(), searchDto.getSize());
+                        searchDto.getPage(), searchDto.getSize(), searchDto.isCustomRecommended());
 
         List<RecruitmentArticleResponseData> responseData  = recruitmentArticleDocService.convertToResponseData(searchResult.getDocs());
 

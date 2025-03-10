@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Data
+@Getter
 public class RecruitmentArticleSearchDto {
     private int page = 1;
     private int size = 12;
@@ -16,7 +17,7 @@ public class RecruitmentArticleSearchDto {
     private String introduction;
     private String hashTags;
     private String region;
-    private boolean isCustomSearch;
+    private boolean customRecommended;
 
     public List<String> getTitleList() {
         return title == null || title.trim().isEmpty()
