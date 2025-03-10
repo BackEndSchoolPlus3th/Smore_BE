@@ -71,16 +71,17 @@ public class ApiV1RecruitmentArticleController {
 
     @GetMapping("/recruitmentArticles/detail")
     public ResponseEntity<?> getRecruitmentArticleDetail(
-            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
+            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        long devMemberId = 1L;
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentArticleId);
-        Member writer = memberService.findById(recruitmentArticle.getMember().getId());
-        Member user = memberService.findById(devMemberId);
+        Long memberId = userDetails != null ? Long.parseLong(userDetails.getUsername()) : null;
 
-        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId);
+        // RecruitmentArticle과 연관된 Member를 함께 조회
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findByIdWithMember(recruitmentArticleId);
 
-        RecruitmentArticleDetailResponseData responseData  = RecruitmentArticleDetailResponseData.builder()
+        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, memberId);
+
+        RecruitmentArticleDetailResponseData responseData = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
                 .title(recruitmentArticle.getTitle())
                 .content(recruitmentArticle.getContent())
@@ -95,12 +96,13 @@ public class ApiV1RecruitmentArticleController {
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())
                 .isClipped(isClipped)
-                .writerName(writer.getNickname())
-                .writerProfileImageUrl(writer.getProfileImageUrl())
+                .writerName(recruitmentArticle.getMember().getNickname())
+                .writerProfileImageUrl(recruitmentArticle.getMember().getProfileImageUrl())
                 .build();
 
         return ResponseEntity.ok(responseData);
     }
+
 
     @PostMapping("/recruitmentArticles/{recruitmentId}/apply")
     public String createRecruitmentArticle( // 임시 생성. 후에 수정 필요
