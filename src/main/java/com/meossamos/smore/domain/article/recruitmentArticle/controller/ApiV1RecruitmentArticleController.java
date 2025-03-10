@@ -126,13 +126,14 @@ public class ApiV1RecruitmentArticleController {
     @PostMapping("/study/{studyId}/recruitmentArticle")
     public ResponseEntity<?> createRecruitmentArticle(
             @PathVariable("studyId") Long studyId,
-            @RequestBody NewRecruitmentArticleDto dto
+            @RequestBody NewRecruitmentArticleDto dto,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Long devMemberId = 1L;
+        Long memberId = Long.parseLong(userDetails.getUsername());
 
         String imageUrls = String.join(",", dto.getImageUrls());
 
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), memberId, studyId, 0);
 
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);
