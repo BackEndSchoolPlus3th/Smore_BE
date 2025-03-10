@@ -43,7 +43,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // s3 의존성
-    implementation(platform("software.amazon.awssdk:bom:2.24.0"))
+    implementation(platform("software.amazon.awssdk:bom:2.30.35"))
     implementation("software.amazon.awssdk:s3")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")

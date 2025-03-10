@@ -20,6 +20,6 @@ public class NewRecruitmentArticleDto {
     private LocalDate endDate;
     private List<String> hashtags;
     private String thumbnailUrl;
-    private String imageUrls;
+    private List<String> imageUrls;
 
 }

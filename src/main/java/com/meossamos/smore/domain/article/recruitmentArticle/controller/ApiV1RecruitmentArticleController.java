@@ -9,22 +9,20 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-import com.meossamos.smore.global.util.ElasticSearchUtil;
-
 import com.meossamos.smore.global.sse.SseEmitters;
-import jakarta.annotation.Nullable;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
 import jakarta.servlet.http.HttpServletRequest;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
@@ -50,12 +48,6 @@ public class ApiV1RecruitmentArticleController {
         List<String> introductionList = searchDto.getIntroductionList();
         List<String> regionList = searchDto.getRegionList();
         List<String> hashTagList = searchDto.getHashTagsList();
-
-        System.out.println("Titles: " + titleList);
-        System.out.println("Contents: " + contentList);
-        System.out.println("Introductions: " + introductionList);
-        System.out.println("Regions: " + regionList);
-        System.out.println("HashTags: " + hashTagList);
 
         ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
                 recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
@@ -130,7 +122,9 @@ public class ApiV1RecruitmentArticleController {
     ) {
         Long devMemberId = 1L;
 
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
+        String imageUrls = String.join(",", dto.getImageUrls());
+
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), devMemberId, studyId, 0);
 
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);
