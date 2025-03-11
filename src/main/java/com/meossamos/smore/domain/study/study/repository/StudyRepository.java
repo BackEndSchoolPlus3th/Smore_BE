@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface StudyRepository extends JpaRepository<Study, Long> {
     Optional<Study> findById(Long id);
     List<Study> findByIdIn(List<Long> ids);
+
+    Optional<Study> findByTitle(String title);
+
 }

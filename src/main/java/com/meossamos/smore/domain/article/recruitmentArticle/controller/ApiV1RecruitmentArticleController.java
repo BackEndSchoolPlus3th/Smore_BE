@@ -102,11 +102,11 @@ public class ApiV1RecruitmentArticleController {
     }
 
     @PostMapping("/recruitmentArticles/{recruitmentId}/apply")
-    public String createRecruitmentArticle( // 임시 생성. 후에 수정 필요
+    public ResponseEntity<?> createRecruitmentArticle( // 임시 생성. 후에 수정 필요
                                             @PathVariable("recruitmentId") Long recruitmentId,
                                             HttpServletRequest request) {
         String token = request.getHeader("authorization");
-//결론적으로 해당 게시물 작성자를 찾아야 그 유저에게 알림을 보낼 수 있다.
+        //결론적으로 해당 게시물 작성자를 찾아야 그 유저에게 알림을 보낼 수 있다.
 
         Map<String, String> map = new HashMap<>();
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentId);
@@ -123,10 +123,10 @@ public class ApiV1RecruitmentArticleController {
         //지원할 때랑 지원을 받는거는 지원받는 당사자만 알림을 받으면 되니까
         //emitter 중에서 해당 user만 찾아서 send해주면 된다.
 
-        //서비스 부분에서 map을 리턴을 하고 바로 notiApplication 호출해주는 식으로 가면 될듯
+        //서비스 부분에서 map을 리턴을 하고 바로 notiApplication 호출해주는 식으로 진행
 
         sseEmitters.notiApplication("application__reached",map,recruitmentId);
-     return "지원 완료"+recruitmentId;
+     return ResponseEntity.ok("지원 완료 "+recruitmentId);
     }
 
     @PostMapping("/study/{studyId}/recruitmentArticle")
