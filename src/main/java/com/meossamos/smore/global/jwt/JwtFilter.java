@@ -92,7 +92,7 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
 
-        // JWT 검증을 건너뛰어야 하는 엔드포인트 (예: 채팅, WebSocket, SSE)
+        // JWT 검증을 건너뛰어야 하는 엔드포인트 (채팅, WebSocket, SSE)
         String requestURI = request.getRequestURI();
         if (requestURI.startsWith("/api/chatrooms/") ||
                 requestURI.startsWith("/ws/") ||

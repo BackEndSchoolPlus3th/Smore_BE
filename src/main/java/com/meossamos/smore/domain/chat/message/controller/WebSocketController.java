@@ -29,6 +29,7 @@ public class WebSocketController {
 
         if (principal != null && !"anonymousUser".equals(principal.getName())) {
             senderId = principal.getName();
+            log.debug("senderId는 " + senderId+ "입니다!!!");
         } else {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null && authentication.isAuthenticated() &&
@@ -37,17 +38,12 @@ public class WebSocketController {
             }
         }
 
-        if (senderId == null) {
-            log.warn("⚠️ 인증 정보를 찾을 수 없음! 기본 senderId 설정");
-            senderId = "anonymous";
-        }
-
         messageDto.setSenderId(senderId);
 
         ChatMessage savedMessage = chatMessageService.saveChatMessage(
                 messageDto.getRoomId(),
                 messageDto.getChatType(),
-                senderId,
+                messageDto.getSenderId(),
                 messageDto.getMessage(),
                 messageDto.getAttachment()
         );
