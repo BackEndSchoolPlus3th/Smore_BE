@@ -42,6 +42,12 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(nullable = true)
+    private String bio;
+
+    @Column(nullable = true)
+    private String description;
+
+    @Column(nullable = true)
     private LocalDate birthdate;
 
     @Column(nullable = true)
