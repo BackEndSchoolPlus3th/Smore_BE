@@ -15,7 +15,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,6 +32,7 @@ public class TokenProvider {
     private final SecretKey key;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+        System.out.println("서버에서 사용하는 jwt.secret: " + secretKey);
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -100,6 +103,7 @@ public class TokenProvider {
                     .verifyWith(key)  // 서명 키 검증 (최신 버전 방식)
                     .build()
                     .parseSignedClaims(token); // JWT 파싱
+            System.out.println(key);
 
             return true;
         } catch (SecurityException | MalformedJwtException e) {
@@ -128,4 +132,6 @@ public class TokenProvider {
             return e.getClaims(); // 만료된 토큰의 경우에도 클레임 반환
         }
     }
+
+
 }
