@@ -32,6 +32,9 @@ public class Study extends BaseEntity {
     private Integer memberCnt;
 
     @Column(nullable = true)
+    private String thumbnailUrl;
+
+    @Column(nullable = true)
     private String imageUrls;
 
     @Column(nullable = true)

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +24,10 @@ public class RecruitmentArticleService {
     private final MemberService memberService;
     private final StudyService studyService;
 
-    public RecruitmentArticle save(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl, @Nullable String imageUrls, LocalDate startDate, LocalDate endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Long memberId, Long studyId, Integer clipCount) {
+    public RecruitmentArticle save(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl, @Nullable String imageUrls, LocalDate startDate, LocalDate endDate, Boolean isRecruiting, Integer maxMember, List<String> hashTags, Long memberId, Long studyId, Integer clipCount) {
         Member member = memberService.getReferenceById(memberId);
         Study study = studyService.getReferenceById(studyId);
+        String hashTagsString = HashTagUtil.convertHashTagsToString(hashTags);
 
         RecruitmentArticle recruitmentArticle = RecruitmentArticle.builder()
                 .title(title)
@@ -38,7 +40,7 @@ public class RecruitmentArticleService {
                 .endDate(endDate)
                 .isRecruiting(isRecruiting)
                 .maxMember(maxMember)
-                .hashTags(hashTags)
+                .hashTags(hashTagsString)
                 .member(member)
                 .study(study)
                 .clipCount(clipCount)
@@ -72,5 +74,10 @@ public class RecruitmentArticleService {
             clipCount--;
         }
         recruitmentArticle.setClipCount(clipCount);
+    }
+
+    public RecruitmentArticle findByIdWithMember(Long id) {
+        return recruitmentArticleRepository.findByIdWithMember(id)
+                .orElseThrow(() -> new EntityNotFoundException("RecruitmentArticle not found"));
     }
 }

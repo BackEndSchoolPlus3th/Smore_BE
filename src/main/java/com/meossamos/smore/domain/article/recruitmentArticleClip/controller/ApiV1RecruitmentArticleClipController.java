@@ -7,6 +7,8 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,17 +24,17 @@ public class ApiV1RecruitmentArticleClipController {
     // 모집글 클립
     @PostMapping("/clip")
     public ResponseEntity<?> clipRecruitmentArticle(
-            @RequestBody Map<String, Long> body
+            @RequestBody Map<String, Long> body,
+            @AuthenticationPrincipal UserDetails userDetails
             ) {
-        System.out.println(body);
-        long devMemberId = 1L; // 테스트용 devMemberId
+        Long memberId = Long.parseLong(userDetails.getUsername());
 //        long recruitmentArticleId = Long.parseLong(body.get("recruitmentArticleId"));
-        if (recruitmentArticleClipService.isClipped(body.get("recruitmentArticleId"), devMemberId)) {
+        if (recruitmentArticleClipService.isClipped(body.get("recruitmentArticleId"), memberId)) {
             // 이미 클립한 모집글 409 error
             return ResponseEntity.badRequest().build();
         }
         RecruitmentArticleClip recruitmentArticleClip =
-                recruitmentArticleClipService.save(body.get("recruitmentArticleId"),devMemberId);
+                recruitmentArticleClipService.save(body.get("recruitmentArticleId"),memberId);
         if (recruitmentArticleClip == null) {
             // 클립 실패
             return ResponseEntity.badRequest().build();
@@ -46,14 +48,15 @@ public class ApiV1RecruitmentArticleClipController {
     // 모집글 클립 취소
     @DeleteMapping("/clip")
     public ResponseEntity<?> unClipRecruitmentArticle(
-            @RequestParam(value = "recruitmentArticleId") long recruitmentArticleId
+            @RequestParam(value = "recruitmentArticleId") long recruitmentArticleId,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        long devMemberId = 1L; // 테스트용 devMemberId
-        if (!recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId)) {
+        Long memberId = Long.parseLong(userDetails.getUsername());
+        if (!recruitmentArticleClipService.isClipped(recruitmentArticleId, memberId)) {
             // 클립하지 않은 모집글 409 error
             return ResponseEntity.badRequest().build();
         }
-        boolean result = recruitmentArticleClipService.delete(recruitmentArticleId, devMemberId);
+        boolean result = recruitmentArticleClipService.delete(recruitmentArticleId, memberId);
         if (result) {
             // 클립 취소 성공
             return ResponseEntity.ok().build();

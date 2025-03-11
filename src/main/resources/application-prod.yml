@@ -1,7 +1,3 @@
 jpa:
   hibernate:
     ddl-auto: none
-aws:
-  s3:
-    bucket-name: smore-bucket-smore-s3-1
-    region: ap-northeast-2

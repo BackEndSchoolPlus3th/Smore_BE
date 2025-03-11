@@ -10,10 +10,8 @@ import com.meossamos.smore.global.jpa.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +38,7 @@ public class RecruitmentArticle extends BaseEntity {
     @Column(nullable = true)
     private String thumbnailUrl;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String imageUrls;
 
     @Column(nullable = false)

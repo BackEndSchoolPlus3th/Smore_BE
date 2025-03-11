@@ -3,13 +3,10 @@ package com.meossamos.smore.domain.article.studyArticle.controller;
 import com.meossamos.smore.domain.article.studyArticle.dto.StudyArticleDto;
 import com.meossamos.smore.domain.article.studyArticle.dto.request.StudyArticleCreateRequest;
 import com.meossamos.smore.domain.article.studyArticle.service.StudyArticleService;
-import com.meossamos.smore.domain.member.member.entity.Member;
-import com.meossamos.smore.domain.study.study.dto.StudyDto;
-import com.meossamos.smore.domain.study.study.service.StudyService;
+import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,24 +15,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudyArticleController {
     private final StudyArticleService studyArticleService;
+    private final StudyMemberService studyMemberService;
 
     // 게시글 조회
-    @GetMapping("/api/study/{study_Id}/articles")
-    public List<StudyArticleDto> getArticlesByStudyId(@PathVariable("study_Id") Long studyId) {
+    @GetMapping("/api/v1/study/{studyId}/articles")
+    public List<StudyArticleDto> getArticlesByStudyId(@PathVariable("studyId") Long studyId) {
         return studyArticleService.getArticlesByStudyId(studyId);
     }
 
     // 게시글 상세 조회
-    @GetMapping("/api/study/{study_Id}/articles/{article_Id}")
-    public ResponseEntity<StudyArticleDto> getStudyDetail(@PathVariable("article_Id") Long articleId) {
+    @GetMapping("/api/v1/study/{studyId}/articles/{articleId}")
+    public ResponseEntity<StudyArticleDto> getStudyDetail(@PathVariable("articleId") Long articleId) {
         StudyArticleDto articleDto = studyArticleService.getStudyArticleById(articleId);
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
 
     // 게시물 검색
-    @GetMapping("/api/study/{study_Id}/articles/search")
+    @GetMapping("/api/v1/study/{studyId}/articles/search")
     public ResponseEntity<List<StudyArticleDto>> searchArticles(
-            @PathVariable("study_Id") Long studyId,
+            @PathVariable("studyId") Long studyId,
             @RequestParam(value = "title", required = false) String title,
             @RequestParam(value = "content", required = false) String content) {
 
@@ -44,22 +42,28 @@ public class StudyArticleController {
     }
 
     // 게시글 작성
-    @PostMapping("/api/study/{study_Id}/articles")
+    @PostMapping("/api/v1/study/{studyId}/articles")
     public ResponseEntity<StudyArticleDto> createStudyArticle(
-            @PathVariable("study_Id") Long studyId,
-            @RequestBody StudyArticleCreateRequest createRequest,
-            @AuthenticationPrincipal Member member) {
+            @PathVariable Long studyId,
+            @RequestParam String title,
+            @RequestParam String content
+    ) {
+        // StudyArticleCreateRequest 객체 생성
+        StudyArticleCreateRequest createRequest = StudyArticleCreateRequest.builder()
+                .title(title)
+                .content(content)
+                .build();
 
-        StudyArticleDto createdArticle = studyArticleService.createStudyArticle(studyId, createRequest, member);
+        // 게시글 작성
+        StudyArticleDto createdArticle = studyArticleService.createStudyArticle(studyId, createRequest);
 
         return new ResponseEntity<>(createdArticle, HttpStatus.CREATED);
     }
 
     // 게시글 수정
-    @PutMapping("/api/study/{study_Id}/articles/{article_Id}")
+    @PutMapping("/api/v1/study/{studyId}/articles/{articleId}")
     public ResponseEntity<StudyArticleDto> updateStudyArticle(
-            @PathVariable("study_Id") Long studyId,
-            @PathVariable("article_Id") Long articleId,
+            @PathVariable Long articleId,
             @RequestBody StudyArticleDto updateRequest) {
 
         StudyArticleDto updatedArticle = studyArticleService.updateStudyArticle(articleId, updateRequest);
@@ -67,12 +71,11 @@ public class StudyArticleController {
     }
 
     // 게시글 삭제
-    @DeleteMapping("/api/study/{study_Id}/articles/{article_Id}")
-    public ResponseEntity<Void> deleteStudyArticle(
-            @PathVariable("study_Id") Long studyId,
-            @PathVariable("article_Id") Long articleId) {
+    @DeleteMapping("/api/v1/study/{studyId}/articles/{articleId}")
+    public ResponseEntity<String> deleteStudyArticle(
+            @PathVariable Long articleId) {
 
         studyArticleService.deleteStudyArticle(articleId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content
+        return new ResponseEntity<>("게시글이 삭제되었습니다.", HttpStatus.OK);
     }
 }

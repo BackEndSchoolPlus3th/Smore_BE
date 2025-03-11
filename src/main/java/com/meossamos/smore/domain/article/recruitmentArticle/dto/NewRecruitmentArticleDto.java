@@ -18,21 +18,8 @@ public class NewRecruitmentArticleDto {
     private int maxMember;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String hashtags;
+    private List<String> hashtags;
     private String thumbnailUrl;
-    private String imageUrls;
+    private List<String> imageUrls;
 
-    // JSON 문자열로 받은 hashtags를 List<String>으로 변환하는 헬퍼 메서드
-    public List<String> getHashtagList() {
-        if (hashtags == null || hashtags.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(hashtags, new TypeReference<List<String>>() {});
-        } catch (Exception e) {
-            // 변환 실패 시 빈 리스트 반환 또는 로그 처리
-            return new ArrayList<>();
-        }
-    }
 }

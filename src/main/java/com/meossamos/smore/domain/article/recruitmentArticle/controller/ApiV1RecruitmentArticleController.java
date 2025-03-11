@@ -1,9 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.controller;
 
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.NewRecruitmentArticleDto;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleDetailResponseData;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
-import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleSearchDto;
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.*;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleDocService;
@@ -12,15 +9,25 @@ import com.meossamos.smore.domain.article.recruitmentArticleClip.service.Recruit
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
+
+import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
+
+import com.meossamos.smore.global.sse.SseEmitters;
+import com.meossamos.smore.global.util.ElasticSearchUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -30,41 +37,59 @@ public class ApiV1RecruitmentArticleController {
     private final MemberService memberService;
     private final RecruitmentArticleClipService recruitmentArticleClipService;
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
-
+    private final SseEmitters sseEmitters;
+    private final TokenProvider tokenProvider;
     @GetMapping("/recruitmentArticles")
     public ResponseEntity<?> getRecruitmentArticles(
-            RecruitmentArticleSearchDto searchDto
+            RecruitmentArticleSearchDto searchDto,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         List<String> titleList = searchDto.getTitleList();
         List<String> contentList = searchDto.getContentList();
         List<String> introductionList = searchDto.getIntroductionList();
         List<String> regionList = searchDto.getRegionList();
-        List<String> hashTagList = searchDto.getHashTagsList();
+        List<String> hashTagList = new ArrayList<>(searchDto.getHashTagsList());
 
-        System.out.println("Titles: " + titleList);
-        System.out.println("Contents: " + contentList);
-        System.out.println("Introductions: " + introductionList);
-        System.out.println("Regions: " + regionList);
-        System.out.println("HashTags: " + hashTagList);
+        if (userDetails != null && searchDto.isCustomRecommended()) {
+            System.out.println("user id: " + userDetails.getUsername());
+            String memberHashTags = memberService.getHashTagsByMemberId(Long.parseLong(userDetails.getUsername()));
+            List<String> memberHashTagList = List.of(memberHashTags.split(","));
+            hashTagList.addAll(memberHashTagList);
+            // 중복 제거
+            hashTagList = hashTagList.stream().distinct().toList();
+        }
 
-        List<RecruitmentArticleDoc> resultPage = recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, searchDto.getPage(), searchDto.getSize());
-        List<RecruitmentArticleResponseData> recruitmentArticleResponseDataList = recruitmentArticleDocService.convertToResponseData(resultPage);
+        hashTagList = hashTagList.stream()
+                .sorted()
+                .collect(Collectors.toList());
 
-        return ResponseEntity.ok(recruitmentArticleResponseDataList);
+        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult =
+                recruitmentArticleDocService.findByTitleOrContentOrIntroductionOrRegionOrHashTags(
+                        titleList, contentList, introductionList, regionList, hashTagList,
+                        searchDto.getPage(), searchDto.getSize(), searchDto.isCustomRecommended());
+
+        List<RecruitmentArticleResponseData> responseData  = recruitmentArticleDocService.convertToResponseData(searchResult.getDocs());
+
+        PagedResponse<RecruitmentArticleResponseData> pagedResponse =
+                new PagedResponse<>(responseData, searchResult.getTotalHits(), searchDto.getPage(), searchDto.getSize());
+
+
+        return ResponseEntity.ok(pagedResponse);
     }
 
     @GetMapping("/recruitmentArticles/detail")
     public ResponseEntity<?> getRecruitmentArticleDetail(
-            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId
+            @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        long devMemberId = 1L;
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentArticleId);
-        Member writer = memberService.findById(recruitmentArticle.getMember().getId());
-        Member user = memberService.findById(devMemberId);
+        Long memberId = userDetails != null ? Long.parseLong(userDetails.getUsername()) : null;
 
-        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, devMemberId);
+        // RecruitmentArticle과 연관된 Member를 함께 조회
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findByIdWithMember(recruitmentArticleId);
 
-        RecruitmentArticleDetailResponseData recruitmentArticleResponseData = RecruitmentArticleDetailResponseData.builder()
+        boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, memberId);
+
+        RecruitmentArticleDetailResponseData responseData = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
                 .title(recruitmentArticle.getTitle())
                 .content(recruitmentArticle.getContent())
@@ -79,31 +104,53 @@ public class ApiV1RecruitmentArticleController {
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())
                 .isClipped(isClipped)
-                .writerName(writer.getNickname())
-                .writerProfileImageUrl(writer.getProfileImageUrl())
+                .writerName(recruitmentArticle.getMember().getNickname())
+                .writerProfileImageUrl(recruitmentArticle.getMember().getProfileImageUrl())
                 .build();
-        return ResponseEntity.ok(recruitmentArticleResponseData);
+
+        return ResponseEntity.ok(responseData);
     }
 
+
+    @PostMapping("/recruitmentArticles/{recruitmentId}/apply")
+    public String createRecruitmentArticle( // 임시 생성. 후에 수정 필요
+                                            @PathVariable("recruitmentId") Long recruitmentId,
+                                            HttpServletRequest request) {
+        String token = request.getHeader("authorization");
+//결론적으로 해당 게시물 작성자를 찾아야 그 유저에게 알림을 보낼 수 있다.
+
+        Map<String, String> map = new HashMap<>();
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.findById(recruitmentId);
+
+        Long receiver = recruitmentArticle.getMember().getId();
+        Long studyId = recruitmentArticle.getStudy().getId();
+        Long senderId = Long.valueOf(tokenProvider.getAuthentication(token.substring(7)).getName());
+        map.put("sender",memberService.findById(senderId).getNickname());
+        map.put("senderToken",token.substring(7));
+        map.put("receiver",receiver+"");
+        map.put("recruitmentId",recruitmentId+"");
+        map.put("studyId",studyId+"");
+
+        //지원할 때랑 지원을 받는거는 지원받는 당사자만 알림을 받으면 되니까
+        //emitter 중에서 해당 user만 찾아서 send해주면 된다.
+
+        //서비스 부분에서 map을 리턴을 하고 바로 notiApplication 호출해주는 식으로 가면 될듯
+
+        sseEmitters.notiApplication("application__reached",map,recruitmentId);
+     return "지원 완료"+recruitmentId;
+    }
 
     @PostMapping("/study/{studyId}/recruitmentArticle")
     public ResponseEntity<?> createRecruitmentArticle(
             @PathVariable("studyId") Long studyId,
-            @ModelAttribute NewRecruitmentArticleDto dto
+            @RequestBody NewRecruitmentArticleDto dto,
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Long devMemberId = 1L;
-        // 예시: 전달받은 데이터 출력 (실제 서비스 로직에서는 dto를 바탕으로 저장 처리)
-        System.out.println("Title: " + dto.getTitle());
-        System.out.println("Content: " + dto.getContent());
-        System.out.println("Introduction: " + dto.getIntroduction());
-        System.out.println("Region: " + dto.getRegion());
-        System.out.println("Start Date: " + dto.getStartDate());
-        System.out.println("End Date: " + dto.getEndDate());
-        System.out.println("Hashtags: " + dto.getHashtagList());
-        System.out.println("Thumbnail file name: " + dto.getThumbnailUrl());
+        Long memberId = Long.parseLong(userDetails.getUsername());
 
+        String imageUrls = String.join(",", dto.getImageUrls());
 
-        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), dto.getImageUrls(), dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtagList().toString(), devMemberId, studyId, 0);
+        RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), memberId, studyId, 0);
 
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);
