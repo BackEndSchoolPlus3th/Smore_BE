@@ -345,11 +345,11 @@ yum install -y git
 
 # Swap 파일 생성 및 활성화
 dd if=/dev/zero of=/swapfile bs=128M count=32
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-swapon -s
-sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+sudo swapon -s
+sudo sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
 
 END_OF_FILE
 }
@@ -378,22 +378,22 @@ ${local.ec2_user_data_base}
 EOF
 }
 
-# DocumentDB Elastic 클러스터 (사설 서브넷: AZ a의 서브넷 b와 AZ b의 서브넷 d 사용)
-resource "aws_docdbelastic_cluster" "docdbelastic_cluster" {
-  name                = "${var.prefix}-docdbelastic-cluster"
-  admin_user_name     = var.DBUser
-  admin_user_password = var.DBPassword
-  auth_type           = "PLAIN_TEXT"
-  shard_capacity      = 2
-  shard_count         = 1
-
-  subnet_ids             = [aws_subnet.subnet_b.id, aws_subnet.subnet_d.id]
-  vpc_security_group_ids = [aws_security_group.docdb_sg.id]
-
-  tags = {
-    Name = "${var.prefix}-docdbelastic-cluster"
-  }
-}
+# # DocumentDB Elastic 클러스터 (사설 서브넷: AZ a의 서브넷 b와 AZ b의 서브넷 d 사용)
+# resource "aws_docdbelastic_cluster" "docdbelastic_cluster" {
+#   name                = "${var.prefix}-docdbelastic-cluster"
+#   admin_user_name     = var.DBUser
+#   admin_user_password = var.DBPassword
+#   auth_type           = "PLAIN_TEXT"
+#   shard_capacity      = 2
+#   shard_count         = 1
+#
+#   subnet_ids             = [aws_subnet.subnet_b.id, aws_subnet.subnet_d.id]
+#   vpc_security_group_ids = [aws_security_group.docdb_sg.id]
+#
+#   tags = {
+#     Name = "${var.prefix}-docdbelastic-cluster"
+#   }
+# }
 
 # RDS를 위한 DB 서브넷 그룹 (사설 서브넷: 서브넷 b와 d)
 resource "aws_db_subnet_group" "rds_subnet_group" {
@@ -500,22 +500,70 @@ output "redis_port" {
   value       = aws_elasticache_cluster.redis_cluster.port
 }
 
-
-# S3 버킷 생성 예제
-resource "aws_s3_bucket" "profile_images_bucket" {
-  bucket        = "${var.prefix}-profile-images"
-  force_destroy = true
+# S3 설정 시작
+resource "aws_s3_bucket" "bucket_1" {
+  bucket = "${var.prefix}-bucket-public-1"
 
   tags = {
-    Name = "${var.prefix}-profile-images"
+    Name = "${var.prefix}-bucket-public-1"
   }
 }
 
-resource "aws_s3_bucket" "article_images_bucket" {
-  bucket        = "${var.prefix}-article-images"
-  force_destroy = true
+data "aws_iam_policy_document" "bucket_1_policy_1_statement" {
+  statement {
+    sid    = "PublicReadGetObject"
+    effect = "Allow"
 
-  tags = {
-    Name = "${var.prefix}-article-images"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.bucket_1.arn}/*"]
   }
 }
+
+resource "aws_s3_bucket_policy" "bucket_1_policy_1" {
+  bucket = aws_s3_bucket.bucket_1.id
+
+  policy = data.aws_iam_policy_document.bucket_1_policy_1_statement.json
+
+  depends_on = [aws_s3_bucket_public_access_block.bucket_1_public_access_block_1]
+}
+
+resource "aws_s3_bucket_public_access_block" "bucket_1_public_access_block_1" {
+  bucket = aws_s3_bucket.bucket_1.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket" "bucket_2" {
+  bucket = "${var.prefix}-bucket-private-1"
+
+  tags = {
+    Name = "${var.prefix}-bucket-private-1"
+  }
+}
+
+resource "aws_s3_object" "object_1" {
+  bucket       = aws_s3_bucket.bucket_1.id
+  key          = "/index.html"
+  content      = "Hello"  # 직접 문자열 사용
+  content_type = "text/html"
+  etag       = md5("Hello")
+  depends_on = [aws_s3_bucket.bucket_2]
+}
+
+resource "aws_s3_object" "object_2" {
+  bucket       = aws_s3_bucket.bucket_2.id
+  key          = "/index.html"
+  content      = "Hello"  # 직접 문자열 사용
+  content_type = "text/html"
+  etag       = md5("Hello")
+  depends_on = [aws_s3_bucket.bucket_2]
+}
+# S3 설정 끝

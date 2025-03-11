@@ -16,7 +16,8 @@ import java.time.LocalDateTime;
 public class RecruitmentArticleDetailCommentResponseData {
     private Long id;
     private String comment;
-    private Long writerId;
     private String writerName;
+    private String writerProfileImageUrl;
     private LocalDateTime createdDate;
+    private boolean editable;
 }

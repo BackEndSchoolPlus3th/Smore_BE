@@ -1,4 +1,4 @@
-package com.meossamos.smore;
+package com.meossamos.smore.addDB;
 
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -62,20 +61,17 @@ public class AddDataTest {
         }
 
         List<String> hashTags = HashTagUtil.getRandomHashTags();
-        String hashTag = HashTagUtil.mergeHashTagList(hashTags);
 
         String memberName = RandomUtil.getRandomMemberName();
         String memberEmail = RandomUtil.getRandomEmail();
         String memberPassword = RandomUtil.getRandomPassword(random.nextInt(10) + 3);
         LocalDate memberBirthDate = RandomUtil.getRandomBirthday();
         String memberRigion = RandomUtil.getRandomRegion();
-        List<String> memberHashTags = HashTagUtil.getRandomHashTags();
-        String memberHashTag = HashTagUtil.mergeHashTagList(memberHashTags);
 
         Member savedMember = memberService.saveInitMember(memberPassword + memberEmail, memberPassword, memberName, memberBirthDate, memberRigion, profileImageUrl);
         Study savedStudy = studyService.saveStudy(title, currentMember, imageUrls.toString(), introduction, savedMember);
 
-        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDate.now(), endDate, true, maxMember, hashTag, savedMember, savedStudy, ClipCount);
+        RecruitmentArticle savedRecruitmentArticle = recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls.toString(), LocalDate.now(), endDate, true, maxMember, hashTags, savedMember.getId(), savedStudy.getId(), ClipCount);
 
     }
 }

@@ -19,4 +19,11 @@ public class StudyDto {
     private Integer memberCnt;
     private String imageUrls;
     private Member leader;
+
+    public StudyDto(Long id, String title, String introduction, List<String> hashTags) {
+        this.id = id;
+        this.title = title;
+        this.introduction = introduction;
+        this.hashTags = hashTags;
+    }
 }

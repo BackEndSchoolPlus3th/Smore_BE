@@ -1,6 +1,6 @@
 variable "prefix" {
   description = "Prefix for all resources (프로젝트명)"
-  default     = "smore"
+  default     = "smore-dev"
 }
 
 variable "region" {

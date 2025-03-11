@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/study/{studyId}")
+@RequestMapping("/api/v1/study/{studyId}")
 public class StudyDocumentController {
     private final S3Service s3Service;
     private final StudyDocumentRepository studyDocumentRepository;

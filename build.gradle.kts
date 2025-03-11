@@ -32,6 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     testImplementation("io.projectreactor:reactor-test")
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("com.mysql:mysql-connector-j")
@@ -42,12 +43,13 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // s3 의존성
-    implementation(platform("software.amazon.awssdk:bom:2.24.0"))
+    implementation(platform("software.amazon.awssdk:bom:2.30.35"))
     implementation("software.amazon.awssdk:s3")
 
     implementation("io.jsonwebtoken:jjwt-api:0.12.3")
     implementation("io.jsonwebtoken:jjwt-impl:0.12.3")
     implementation("io.jsonwebtoken:jjwt-jackson:0.12.3")
+
 
     // livekit
     implementation("io.livekit:livekit-server:0.8.2")
@@ -60,3 +62,9 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+// 메서드의 실제 파라미터 이름을 클래스 파일에 포함시키기 위함
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-parameters")
+}
+
