@@ -1,8 +1,8 @@
 package com.meossamos.smore.domain.article.recruitmentArticleClip.controller;
 
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
+import com.meossamos.smore.domain.article.recruitmentArticleClip.dto.RecruitmentArticleClipResponseDTO;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.entity.RecruitmentArticleClip;
-import com.meossamos.smore.domain.article.recruitmentArticleClip.dto.RecruitmentArticleClipRequestDTO;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -18,8 +19,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ApiV1RecruitmentArticleClipController {
     private final RecruitmentArticleClipService recruitmentArticleClipService;
-    private final RecruitmentArticleService recruitmentArticleService;
-    private final MemberService memberService;
 
     // 모집글 클립
     @PostMapping("/clip")
@@ -27,8 +26,10 @@ public class ApiV1RecruitmentArticleClipController {
             @RequestBody Map<String, Long> body,
             @AuthenticationPrincipal UserDetails userDetails
             ) {
+        if (userDetails == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Long memberId = Long.parseLong(userDetails.getUsername());
-//        long recruitmentArticleId = Long.parseLong(body.get("recruitmentArticleId"));
         if (recruitmentArticleClipService.isClipped(body.get("recruitmentArticleId"), memberId)) {
             // 이미 클립한 모집글 409 error
             return ResponseEntity.badRequest().build();
@@ -51,6 +52,9 @@ public class ApiV1RecruitmentArticleClipController {
             @RequestParam(value = "recruitmentArticleId") long recruitmentArticleId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
+        if (userDetails == null) {
+            return ResponseEntity.badRequest().build();
+        }
         Long memberId = Long.parseLong(userDetails.getUsername());
         if (!recruitmentArticleClipService.isClipped(recruitmentArticleId, memberId)) {
             // 클립하지 않은 모집글 409 error
@@ -64,5 +68,18 @@ public class ApiV1RecruitmentArticleClipController {
             // 클립 취소 실패
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/clips")
+    public ResponseEntity<List<RecruitmentArticleClipResponseDTO>> getClippedRecruitmentArticles(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        if (userDetails == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Long memberId = Long.parseLong(userDetails.getUsername());
+        List<RecruitmentArticleClipResponseDTO> response = recruitmentArticleClipService.getClippedRecruitmentArticlesWithClipInfo(memberId);
+        return ResponseEntity.ok(response);
     }
 }

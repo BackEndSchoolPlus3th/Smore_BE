@@ -205,4 +205,15 @@ public class MemberService {
         // 새 비밀번호 암호화 후 업데이트
         member.setPassword(passwordEncoder.encode(newPassword));
     }
+
+    @Transactional
+    public void updateBio(Long memberId, String bio) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setBio(bio);
+    }
+
+    public String getBio(Long memberId) {
+        return memberRepository.findBioByMemberId(memberId)
+                .orElse(null);
+}
 }
