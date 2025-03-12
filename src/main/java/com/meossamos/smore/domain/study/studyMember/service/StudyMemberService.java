@@ -12,7 +12,7 @@ import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import com.meossamos.smore.global.sse.SseEmitters;
-import jakarta.transaction.Transactional;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -139,7 +139,7 @@ public class StudyMemberService {
                 .permissionSettingManage(false)
                 .build();
 
-        emitters.notiAddStudyMember(member.getId(),study.getId());
+        emitters.notiAddStudyMember(newMember.getId(),study.getId());
         // 새 StudyMember 저장
         return studyMemberRepository.save(studyMember);
     }
@@ -199,7 +199,9 @@ public class StudyMemberService {
                 .permissionCalendarManage(permissionCalendarManage)
                 .permissionSettingManage(permissionSettingManage)
                 .build();
+        return studyMemberRepository.save(studyMember);
     }
+    /**
      * 강퇴: 스터디 리더가 특정 멤버를 강퇴함 (자기 자신은 제외)
      * @param studyId 스터디 ID
      * @param leaderMemberId 요청자(리더)의 ID
