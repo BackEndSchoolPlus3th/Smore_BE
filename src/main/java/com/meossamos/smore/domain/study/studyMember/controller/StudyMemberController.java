@@ -124,10 +124,15 @@ public class StudyMemberController {
     }
 
     // 유저 탈퇴
-    @DeleteMapping("/study/{study_Id}/delete")
-    public ResponseEntity<String> leaveStudy(@AuthenticationPrincipal Member member, @PathVariable("study_Id") Long studyId) {
+    @DeleteMapping("/study/{studyId}/delete")
+    public ResponseEntity<String> leaveStudy(@AuthenticationPrincipal Member member, @PathVariable("studyId") Long studyId) {
+        try {
+            // 스터디 탈퇴 처리
             studyMemberService.leaveStudy(member, studyId);
-            return new ResponseEntity<>("스터디에서 탈퇴했습니다.", HttpStatus.OK);
+            return ResponseEntity.ok("스터디에서 탈퇴되었습니다.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     // 로그인 유저 id 조회

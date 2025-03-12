@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -249,15 +250,17 @@ public class StudyMemberService {
     }
 
     // 유저 탈퇴
+    @Transactional
     public void leaveStudy(Member member, Long studyId) {
-        Study study = studyRepository.findById(studyId)
-                .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));
+        Long memberId = getAuthenticatedMemberId();
+        Optional<StudyMember> studyMemberOptional = studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId);
 
-        StudyMember studyMember = studyMemberRepository.findByMemberAndStudy(member, study)
-                .orElseThrow(() -> new RuntimeException("해당 스터디에 가입되어 있지 않습니다."));
+        if (studyMemberOptional.isEmpty()) {
+            throw new RuntimeException("해당 스터디에 가입되어 있지 않습니다.");
+        }
 
+        StudyMember studyMember = studyMemberOptional.get();
         studyMemberRepository.delete(studyMember);
-
     }
 
     // 유저의 스터디 목록 조회 (스터디 이름, 소개, 해시태그 포함)
