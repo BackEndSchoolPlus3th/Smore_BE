@@ -42,7 +42,10 @@ public class AlarmService {
 
         return alarmRepository.save(alarm);
     }
-
+    public void deleteById(Long alarmId){
+        
+        alarmRepository.deleteById(alarmId);
+    }
     public List<Alarm> findAllByMemberId(Long alarmId){
         return alarmRepository.findAllByMemberId(alarmId);
     }
