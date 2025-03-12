@@ -42,7 +42,7 @@ public class GroupChatController {
     }
 
     // 현재 로그인한 사용자가 가입한 스터디의 그룹 채팅방 목록 조회
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<GroupChatRoomDto>> getGroupChatRooms(Principal principal) {
         Member currentMember;
         if (principal == null) {
