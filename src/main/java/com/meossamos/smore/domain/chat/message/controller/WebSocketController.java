@@ -5,44 +5,59 @@ import com.meossamos.smore.domain.chat.message.dto.ChatMessageResponseDto;
 import com.meossamos.smore.domain.chat.message.entity.ChatMessage;
 import com.meossamos.smore.domain.chat.message.service.ChatMessageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class WebSocketController {
 
     private final ChatMessageService chatMessageService;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    /**
-     * 클라이언트가 "/app/chat.sendMessage"로 메시지를 전송하면
-     * 이 메서드가 실행되어 메시지를 저장한 후 "/topic/chatroom"로 브로드캐스트함.
-     */
-    @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/chatroom")
-    public ChatMessageResponseDto sendMessage(ChatMessageRequestDto messageDto) {
-        // 1. 메시지 저장
+    @MessageMapping("/chat/sendMessage")
+    public void sendMessage(ChatMessageRequestDto messageDto, Principal principal) {
+        String senderId = null;
+
+        if (principal != null && !"anonymousUser".equals(principal.getName())) {
+            senderId = principal.getName();
+            log.debug("senderId는 " + senderId+ "입니다!!!");
+        } else {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated() &&
+                    !"anonymousUser".equals(authentication.getName())) {
+                senderId = authentication.getName();
+            }
+        }
+
+        messageDto.setSenderId(senderId);
+
         ChatMessage savedMessage = chatMessageService.saveChatMessage(
                 messageDto.getRoomId(),
+                messageDto.getChatType(),
                 messageDto.getSenderId(),
                 messageDto.getMessage(),
                 messageDto.getAttachment()
         );
 
-        // 2. 저장된 엔티티를 Response DTO로 변환하여 응답
         ChatMessageResponseDto response = ChatMessageResponseDto.builder()
                 .messageId(savedMessage.getId())
                 .roomId(savedMessage.getRoomId())
                 .senderId(savedMessage.getSenderId())
                 .message(savedMessage.getMessage())
                 .attachment(savedMessage.getAttachment())
-                // 저장된 생성일이 있다면 사용하고, 없으면 현재 시간을 사용
                 .timestamp(savedMessage.getCreatedDate() != null ? savedMessage.getCreatedDate() : LocalDateTime.now())
                 .build();
 
-        return response;
+        messagingTemplate.convertAndSend("/topic/chatroom/" + messageDto.getRoomId(), response);
+        log.debug("📤 메시지 전송 완료: senderId={}, 대상={}", response.getSenderId(), "/topic/chatroom/" + messageDto.getRoomId());
     }
 }

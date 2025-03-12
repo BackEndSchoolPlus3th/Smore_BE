@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chatrooms/dm")
+@RequestMapping("/api/v1/chatrooms/dm")
 @RequiredArgsConstructor
 public class DmController {
     private final DmRoomService dmRoomService;

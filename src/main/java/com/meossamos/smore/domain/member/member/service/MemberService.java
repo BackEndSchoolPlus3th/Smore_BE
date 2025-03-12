@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.member.member.entity.Authority;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.global.s3.S3Service;
 import com.meossamos.smore.global.sse.SseEmitters;
 import jakarta.annotation.Nullable;
 import jakarta.servlet.http.Cookie;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,10 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -33,6 +38,8 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final SseEmitters sseEmitters;
+    private final S3Service s3Service;
+
     public Member saveInitMember(String email, String password, String nickname, @Nullable LocalDate birthdate, @Nullable String region, @Nullable String profileImageUrl) {
 
         Member member = Member.builder()
@@ -128,5 +135,74 @@ public class MemberService {
     // 이메일 중복 체크
     public boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+
+    /**
+     * memberId를 이용해 해당 회원의 hashTags를 조회
+     * DB에서는 hashTags 컬럼만 조회하여 불필요한 데이터를 로딩하지 안함
+     * 만약 회원은 존재하지만 hashTags가 null이면 빈 문자열("")을 반환
+     *
+     * @param memberId 조회할 회원의 id
+     * @return 해당 회원의 hashTags (null인 경우는 빈 문자열)
+     * @throws NoSuchElementException 회원이 존재하지 않을 경우
+     */
+    @Transactional(readOnly = true)
+    public String getHashTagsByMemberId(Long memberId) {
+        return memberRepository.findHashTagsByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchElementException("Member not found with id: " + memberId));
+    }
+
+    @Transactional
+    public void updateNickname(Long memberId, String nickname) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setNickname(nickname);
+    }
+
+    @Transactional
+    public void updateDescription(Long memberId, String description) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setDescription(description);
+    }
+
+    @Transactional
+    public void updateProfileImageUrl(Long memberId, String profileImageUrl) {
+        Member member = memberRepository.getReferenceById(memberId);
+        String oldProfileImageUrl = member.getProfileImageUrl();
+        member.setProfileImageUrl(profileImageUrl);
+        if (oldProfileImageUrl != null) {
+            s3Service.deleteFile("profile", oldProfileImageUrl);
+        }
+    }
+
+    @Transactional
+    public void updateBirthdate(Long memberId, LocalDate birthdate) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setBirthdate(birthdate);
+    }
+
+    @Transactional
+    public void updateRegion(Long memberId, String region) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setRegion(region);
+    }
+
+    @Transactional
+    public void updateHashTags(Long memberId, String hashTags) {
+        Member member = memberRepository.getReferenceById(memberId);
+        member.setHashTags(hashTags);
+    }
+
+    @Transactional
+    public void updatePassword(Long memberId, String currentPassword, String newPassword) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("해당 회원이 존재하지 않습니다."));
+
+        // 현재 비밀번호가 일치하는지 검증 (암호화된 비밀번호 비교)
+        if (!passwordEncoder.matches(currentPassword, member.getPassword())) {
+            throw new RuntimeException("현재 비밀번호가 올바르지 않습니다.");
+        }
+
+        // 새 비밀번호 암호화 후 업데이트
+        member.setPassword(passwordEncoder.encode(newPassword));
     }
 }

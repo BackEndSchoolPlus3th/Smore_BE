@@ -22,6 +22,7 @@ public class ChatMessage {
     private String id;  // MongoDB는 기본적으로 ObjectId 사용 (String)
 
     private String roomId;
+    private String chatType;
     private String senderId;
     private String message;
     private String attachment;

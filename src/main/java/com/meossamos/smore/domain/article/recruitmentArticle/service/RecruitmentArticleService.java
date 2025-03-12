@@ -75,4 +75,9 @@ public class RecruitmentArticleService {
         }
         recruitmentArticle.setClipCount(clipCount);
     }
+
+    public RecruitmentArticle findByIdWithMember(Long id) {
+        return recruitmentArticleRepository.findByIdWithMember(id)
+                .orElseThrow(() -> new EntityNotFoundException("RecruitmentArticle not found"));
+    }
 }
