@@ -25,12 +25,12 @@ public class AlarmController {
     private final AlarmService alarmService;
     private final MemberService memberService;
 
-    @PostMapping()
-    public String saveAlarm(@RequestBody SaveAlarmDto saveAlarmDto){
+    @PostMapping
+    public ResponseEntity<?> saveAlarm(@RequestBody SaveAlarmDto saveAlarmDto){
         alarmService.saveAlarm(saveAlarmDto);
-        return "save completed";
+        return ResponseEntity.ok("저장 완료");
     }
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<AlarmDto>> getAlarms (@AuthenticationPrincipal UserDetails userDetails
     ){
 
@@ -41,6 +41,7 @@ public class AlarmController {
         List<AlarmDto> alarmDtos = alarms.stream().map(i->{
             try{
                 return AlarmDto.builder()
+                        .id(i.getId())
                         .eventName(i.getEventName())
                         .senderId(i.getSenderId())
                         .receiverId(i.getReceiver().getId())
@@ -55,5 +56,11 @@ public class AlarmController {
         }).toList();
 
         return new ResponseEntity<>(alarmDtos, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{alarmId}")
+    public ResponseEntity<?> delete(@PathVariable("alarmId") Long alarmId){
+        alarmService.deleteById(alarmId);
+        return ResponseEntity.ok("삭제 완료");
     }
 }
