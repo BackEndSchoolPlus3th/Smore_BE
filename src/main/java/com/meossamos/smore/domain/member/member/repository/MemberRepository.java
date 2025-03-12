@@ -13,6 +13,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select max(m.id) from Member m")
     Long findMaxMemberId();
 
+    Optional<Member> findByNickname(String nickname);
+
     Optional<Member> findByEmail(String email);
     boolean existsByEmail(String email);
 

@@ -16,7 +16,6 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-
 public class StudyMember extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,7 +29,7 @@ public class StudyMember extends BaseEntity {
     private Study study;
 
     @Column(nullable = false)
-    private StudyPosition position;
+    private StudyPosition position; // LEADER,  MEMBER
 
     @Column(nullable = false)
     private Boolean permissionRecruitManage;

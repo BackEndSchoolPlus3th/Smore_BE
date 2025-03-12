@@ -9,12 +9,14 @@ import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
+import com.meossamos.smore.global.s3.S3Service;
 import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +27,7 @@ public class StudyArticleService {
     private final StudyRepository studyRepository;
     private final StudyMemberService studyMemberService;
     private final MemberRepository memberRepository;
+    private final S3Service s3Service;
 
     public StudyArticle saveStudyArticle(String title, String content, @Nullable String imageUrls, @Nullable List<String> attachments, @Nullable String hashTags,  Member member, Study study) {
         StudyArticle studyArticle = StudyArticle.builder()
@@ -57,7 +60,8 @@ public class StudyArticleService {
     }
 
     // 게시글 작성
-    public StudyArticleDto createStudyArticle(Long studyId, StudyArticleCreateRequest createRequest) {
+    @Transactional
+    public StudyArticleDto createStudyArticle(Long studyId, StudyArticleCreateRequest createRequest, String fileUrl) throws IOException {
         Long memberId = studyMemberService.getAuthenticatedMemberId();
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("인증된 사용자가 없습니다."));
@@ -74,6 +78,11 @@ public class StudyArticleService {
 
         // 게시글 저장
         StudyArticle savedArticle = studyArticleRepository.save(studyArticle);
+
+        if (fileUrl != null && !fileUrl.isEmpty()) {
+            savedArticle.setImageUrls(fileUrl);  // 전달받은 S3 URL을 게시글에 저장
+            studyArticleRepository.save(savedArticle);  // 게시글 업데이트
+        }
 
         // DTO 변환 후 반환
         return convertToStudyArticleDto(savedArticle);
@@ -139,6 +148,7 @@ public class StudyArticleService {
                 .id(studyArticle.getId())
                 .title(studyArticle.getTitle())
                 .content(studyArticle.getContent())
+                .imageUrls(studyArticle.getImageUrls())
                 .member(studyArticle.getMember())
                 .build();
     }

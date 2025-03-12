@@ -2,10 +2,10 @@ package com.meossamos.smore.domain.study.studyMember.service;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
-import com.meossamos.smore.domain.study.hashTag.entity.StudyHashTag;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyMemberDto;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,11 +26,12 @@ public class StudyMemberService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
+
     /**
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 해당 스터디에 가입되어 있는지 확인
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 가입되어 있으면 true, 아니면 false
      */
     public boolean isUserMemberOfStudy(Long memberId, Long studyId) {
@@ -40,7 +42,7 @@ public class StudyMemberService {
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 모집 관리 권한(permissionRecruitManage)을 가지고 있는지 확인
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 모집 관리 권한이 true이면 true, 아니면 false
      * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
      */
@@ -53,7 +55,7 @@ public class StudyMemberService {
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 게시글 관리 권한(permissionArticleManage)을 가지고 있는지 확인
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 게시글 관리 권한이 true이면 true, 아니면 false
      * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
      */
@@ -66,7 +68,7 @@ public class StudyMemberService {
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 캘린더 관리 권한(permissionCalendarManage)을 가지고 있는지 확인
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 캘린더 관리 권한이 true이면 true, 아니면 false
      * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
      */
@@ -79,7 +81,7 @@ public class StudyMemberService {
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 설정 관리 권한(permissionSettingManage)을 가지고 있는지 확인
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 설정 관리 권한이 true이면 true, 아니면 false
      * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
      */
@@ -92,7 +94,7 @@ public class StudyMemberService {
      * 회원 아이디와 스터디 아이디를 받아 해당 StudyMember 엔티티를 조회
      *
      * @param memberId 회원의 ID
-     * @param studyId 스터디의 ID
+     * @param studyId  스터디의 ID
      * @return 조회된 StudyMember 엔티티
      * @throws IllegalArgumentException 해당 회원이 스터디에 가입되어 있지 않은 경우
      */
@@ -105,13 +107,13 @@ public class StudyMemberService {
     /**
      * 스터디에 새로운 멤버를 추가하는 메서드.
      *
-     * @param studyId                   가입할 스터디의 식별자
-     * @param memberId                  가입할 멤버의 식별자
-     * @param position                  스터디 내에서의 포지션
-     * @param permissionRecruitManage   모집글 관리 권한 여부
-     * @param permissionArticleManage   게시글 관리 권한 여부
-     * @param permissionCalendarManage  캘린더 관리 권한 여부
-     * @param permissionSettingManage   스터디 설정 관리 권한 여부
+     * @param studyId                  가입할 스터디의 식별자
+     * @param memberId                 가입할 멤버의 식별자
+     * @param position                 스터디 내에서의 포지션
+     * @param permissionRecruitManage  모집글 관리 권한 여부
+     * @param permissionArticleManage  게시글 관리 권한 여부
+     * @param permissionCalendarManage 캘린더 관리 권한 여부
+     * @param permissionSettingManage  스터디 설정 관리 권한 여부
      * @return 생성된 StudyMember 엔티티
      */
     public StudyMember addMemberToStudy(Long studyId,
@@ -203,16 +205,20 @@ public class StudyMemberService {
         // Study 정보 조회
         List<Study> studies = studyRepository.findByIdIn(studyIds);
 
-        // StudyDto로 변환
+        // StudyDto로 변환 (해시태그 포함)
         return studies.stream()
-                .map(study -> new StudyDto(
-                        study.getId(),  // ID 포함
-                        study.getTitle(),
-                        study.getIntroduction(),
-                        study.getStudyHashTagList().stream()
-                                .map(StudyHashTag::getHashTag)
-                                .collect(Collectors.toList())
-                ))
+                .map(study -> {
+                    // Get the hashtags as a List of Strings
+                    String studyHashTags = study.getHashTags();
+
+                    // Return a StudyDto with study details and list of hashtags
+                    return new StudyDto(
+                            study.getId(),             // Study ID
+                            study.getTitle(),          // Study title
+                            study.getIntroduction(),   // Study introduction
+                            studyHashTags                   // List of hashtags as Strings
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
@@ -248,12 +254,150 @@ public class StudyMemberService {
             throw new RuntimeException("User is not authenticated or principal is not an instance of User.");
         }
     }
+
     /**
      * 멤버 아이디로 해당 멤버가 속한 Study와 position 목록 조회
+     *
      * @param memberId 멤버의 ID
      * @return Study와 position을 담은 DTO 리스트
      */
     public List<StudyWithPositionSimpleDto> getStudiesWithPositionByMemberId(Long memberId) {
         return studyMemberRepository.findStudiesWithPositionSimpleByMemberId(memberId);
+    }
+
+    // 유저 추가 및 권한 설정
+    public void addMemberToStudy(Long studyId, Long memberId, StudyPosition role, Boolean recruitManage, Boolean articleManage, Boolean calendarManage, Boolean settingManage) {
+        // 스터디 유저 조회
+        Study study = studyRepository.findById(studyId).orElseThrow(() -> new IllegalArgumentException("Study not found"));
+        Member member = new Member();
+        member.setId(memberId);
+
+        StudyMember studyMember = new StudyMember();
+        studyMember.setStudy(study);
+        studyMember.setMember(member);
+        studyMember.setPosition(role);
+
+        // LEADER 모든 권한 부여
+        if (role == StudyPosition.LEADER) {
+            studyMember.setPermissionRecruitManage(true);
+            studyMember.setPermissionArticleManage(true);
+            studyMember.setPermissionCalendarManage(true);
+            studyMember.setPermissionSettingManage(true);
+        } else {
+            // MEMBER 모든 권한 X
+            studyMember.setPermissionRecruitManage(false);
+            studyMember.setPermissionArticleManage(false);
+            studyMember.setPermissionCalendarManage(false);
+            studyMember.setPermissionSettingManage(false);
+        }
+
+        studyMemberRepository.save(studyMember);
+    }
+
+    // 유저 권한 조회 메서드
+    public boolean hasPermission(Long studyId, Long memberId, String permission) {
+        StudyMember studyMember = studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found in study"));
+
+        switch (permission) {
+            case "recruitManage":
+                return studyMember.getPermissionRecruitManage();
+            case "articleManage":
+                return studyMember.getPermissionArticleManage();
+            case "calendarManage":
+                return studyMember.getPermissionCalendarManage();
+            case "settingManage":
+                return studyMember.getPermissionSettingManage();
+            default:
+                throw new IllegalArgumentException("Unknown permission");
+        }
+    }
+
+    // 권한 업데이트
+    public void updatePermissions(Long studyId, Map<Long, Map<String, Boolean>> updatedPermissions) {
+        for (Map.Entry<Long, Map<String, Boolean>> entry : updatedPermissions.entrySet()) {
+            Long memberId = entry.getKey();
+            Map<String, Boolean> permissions = entry.getValue();
+
+            // StudyMember 객체 조회
+            StudyMember studyMember = studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found in study"));
+
+            // 권한 업데이트
+            updateMemberPermissions(studyMember, permissions);
+
+            // 저장
+            studyMemberRepository.saveAndFlush(studyMember); // 변경 사항 즉시 반영
+        }
+    }
+
+    // 권한 업데이트 처리
+    private void updateMemberPermissions(StudyMember studyMember, Map<String, Boolean> permissions) {
+        if (permissions.containsKey("permissionRecruitManage")) {
+            studyMember.setPermissionRecruitManage(permissions.get("permissionRecruitManage"));
+        }
+        if (permissions.containsKey("permissionArticleManage")) {
+            studyMember.setPermissionArticleManage(permissions.get("permissionArticleManage"));
+        }
+        if (permissions.containsKey("permissionCalendarManage")) {
+            studyMember.setPermissionCalendarManage(permissions.get("permissionCalendarManage"));
+        }
+        if (permissions.containsKey("permissionSettingManage")) {
+            studyMember.setPermissionSettingManage(permissions.get("permissionSettingManage"));
+        }
+    }
+
+    // 권한 삭제 로직
+    public void deletePermissions(Long studyId, Map<String, List<Long>> permissionsToDelete) {
+        for (Map.Entry<String, List<Long>> entry : permissionsToDelete.entrySet()) {
+            String permissionKey = entry.getKey();
+            List<Long> memberIdsToDelete = entry.getValue();
+
+            // 해당 권한을 가진 StudyMember들을 조회하여 삭제
+            for (Long memberId : memberIdsToDelete) {
+                StudyMember studyMember = studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found in study"));
+
+                // 권한 제거
+                removePermission(studyMember, permissionKey);
+
+                // 저장
+                studyMemberRepository.saveAndFlush(studyMember); // 변경 사항 즉시 반영
+            }
+        }
+    }
+
+    // 권한 삭제 처리
+    private void removePermission(StudyMember studyMember, String permissionKey) {
+        switch (permissionKey) {
+            case "permissionRecruitManage":
+                studyMember.setPermissionRecruitManage(false);
+                break;
+            case "permissionArticleManage":
+                studyMember.setPermissionArticleManage(false);
+                break;
+            case "permissionCalendarManage":
+                studyMember.setPermissionCalendarManage(false);
+                break;
+            case "permissionSettingManage":
+                studyMember.setPermissionSettingManage(false);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid permission key");
+        }
+    }
+
+
+    // 스터디 멤버 권한 조회
+    public List<StudyMemberDto> getStudyMembers(Long studyId) {
+        List<StudyMember> studyMembers = studyMemberRepository.findByStudyId(studyId);
+        return studyMembers.stream()
+                .map(StudyMemberDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    private StudyMember getStudyMember(Long studyId, Long memberId) {
+        return studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("StudyMember not found"));
     }
 }
