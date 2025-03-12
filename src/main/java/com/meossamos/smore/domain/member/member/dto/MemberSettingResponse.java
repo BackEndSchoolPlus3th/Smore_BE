@@ -1,18 +1,21 @@
 package com.meossamos.smore.domain.member.member.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class LoginResponseBodyDto {
+@NoArgsConstructor
+public class MemberSettingResponse {
+    private String email;
     private String nickname;
-    private List<String> hashTags;
     private String profileImageUrl;
+    private String description;
+    private LocalDate birthdate;
+    private String region;
+    private List<String> hashTags;
 }
