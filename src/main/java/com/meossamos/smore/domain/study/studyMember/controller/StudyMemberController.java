@@ -2,8 +2,6 @@ package com.meossamos.smore.domain.study.studyMember.controller;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.service.StudyService;
-import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
-
 import com.meossamos.smore.domain.study.studyMember.dto.*;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
@@ -148,7 +146,7 @@ public class StudyMemberController {
     @GetMapping("/my-study")
     public ResponseEntity<?> getStudyList (
             @AuthenticationPrincipal UserDetails userDetails
-            ) {
+    ) {
         Long memberId = Long.valueOf(userDetails.getUsername());
         List<StudyWithPositionSimpleDto> studyWithPositionSimpleDtoList = studyMemberService.getStudiesWithPositionByMemberId(memberId);
         List<MyStudyListResponse> myStudyListResponseList = studyWithPositionSimpleDtoList.stream()
@@ -167,31 +165,6 @@ public class StudyMemberController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(myStudyListResponseList);
     }
-
-    @PostMapping("/studyMember")
-    public ResponseEntity<?> createStudyMember(@RequestBody CreateStudyMemberDto createStudyMemberDto){
-        StudyMember studyMember =  studyMemberService.addMemberToStudy(
-                createStudyMemberDto.getStudyTitle(),
-                createStudyMemberDto.getNickname(),
-                StudyPosition.valueOf(createStudyMemberDto.getPosition()),
-                createStudyMemberDto.isPermissionRecruitManage(),
-                createStudyMemberDto.isPermissionArticleManage(),
-                createStudyMemberDto.isPermissionCalendarManage(),
-                createStudyMemberDto.isPermissionSettingManage()
-        );
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-    @PostMapping("/studyMember/reject")
-    public ResponseEntity<?> rejectStudyMember(@RequestBody RejectStudyMemberDto rejectStudyMemberDto){
-        studyMemberService.rejectMemberToStudy(
-                rejectStudyMemberDto.getStudyTitle(),
-                rejectStudyMemberDto.getNickname()
-        );
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-
 
     // 유저를 스터디에 추가하고 권한을 설정하는 API
     @PostMapping("/study/{studyId}/addMember")

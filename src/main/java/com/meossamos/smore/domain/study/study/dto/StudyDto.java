@@ -1,7 +1,6 @@
 package com.meossamos.smore.domain.study.study.dto;
 
 import com.meossamos.smore.domain.member.member.dto.MemberResponseDto;
-import com.meossamos.smore.domain.member.member.entity.Member;
 import lombok.*;
 
 import java.util.List;
