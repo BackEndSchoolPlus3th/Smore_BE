@@ -4,11 +4,13 @@ import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.service.StudyService;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +25,13 @@ public class StudyController {
     }
 
     // 스터디 정보 조회
-    @GetMapping("/api/v1/study/{study_Id}")
-    public StudyDto getStudyById(@PathVariable("study_Id") Long studyId) {
-        return studyService.getStudyById(studyId);
+    @GetMapping("/api/v1/study/{studyId}")
+    public ResponseEntity<StudyDto> getStudyById(@PathVariable("studyId") Long studyId) {
+        StudyDto studyDto = studyService.getStudyById(studyId);
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))  // 1시간 동안 캐시
+                .body(studyDto);
     }
 
     // 스터디 정보 수정
