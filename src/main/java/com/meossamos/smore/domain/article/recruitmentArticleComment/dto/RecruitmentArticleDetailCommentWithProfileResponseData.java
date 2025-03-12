@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class RecruitmentArticleDetailCommentResponseData {
+public class RecruitmentArticleDetailCommentWithProfileResponseData {
     private Long id;
     private String comment;
+    private Long writerId;
     private String writerName;
     private String writerProfileImageUrl;
     private LocalDateTime createdDate;
-    private boolean editable;
 }

@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Slf4j
@@ -127,5 +128,20 @@ public class MemberService {
     // 이메일 중복 체크
     public boolean existsByEmail(String email) {
         return memberRepository.existsByEmail(email);
+    }
+
+    /**
+     * memberId를 이용해 해당 회원의 hashTags를 조회
+     * DB에서는 hashTags 컬럼만 조회하여 불필요한 데이터를 로딩하지 안함
+     * 만약 회원은 존재하지만 hashTags가 null이면 빈 문자열("")을 반환
+     *
+     * @param memberId 조회할 회원의 id
+     * @return 해당 회원의 hashTags (null인 경우는 빈 문자열)
+     * @throws NoSuchElementException 회원이 존재하지 않을 경우
+     */
+    @Transactional(readOnly = true)
+    public String getHashTagsByMemberId(Long memberId) {
+        return memberRepository.findHashTagsByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchElementException("Member not found with id: " + memberId));
     }
 }

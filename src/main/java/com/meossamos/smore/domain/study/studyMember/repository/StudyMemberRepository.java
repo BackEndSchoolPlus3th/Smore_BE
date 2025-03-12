@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -35,7 +36,13 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     List<StudyMember> findByMember(Member targetMember);
 
-    List<StudyMember> findByStudyId(Long studyId);
     Optional<StudyMember> findByStudyIdAndMemberId(Long studyId, Long memberId);
+
+    List<StudyMember> findByStudyId(Long studyId);
+
+    @Modifying
+    @Query("DELETE FROM StudyMember sm WHERE sm.study.id = :studyId AND sm.member.id = :memberId")
+    int deleteByStudyIdAndMemberId(@Param("studyId") Long studyId, @Param("memberId") Long memberId);
+
 }
 

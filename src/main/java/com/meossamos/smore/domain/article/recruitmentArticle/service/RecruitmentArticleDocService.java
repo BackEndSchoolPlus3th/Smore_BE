@@ -7,6 +7,8 @@ import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.FieldSort;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticleDoc;
 import com.meossamos.smore.domain.member.member.entity.Member;
@@ -24,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,8 +37,14 @@ public class RecruitmentArticleDocService {
     private final ElasticSearchUtil elasticSearchUtil;
     private static final int BLOCK_SIZE = 10;
     private static final String ES_INDEX_NAME = "es_recruitment_article";
-    private final Map<String, ElasticSearchUtil.SearchResult<RecruitmentArticleDoc>> blockCache = new HashMap<>();
     private final MemberService memberService;
+
+    // TTL 5분 설정: 캐시된 항목은 5분 후 자동 만료됨
+    private final Cache<String, ElasticSearchUtil.SearchResult<RecruitmentArticleDoc>> blockCache =
+            CacheBuilder.newBuilder()
+                    .expireAfterWrite(5, TimeUnit.MINUTES)
+                    .build();
+
 
     // RecruitmentArticleDoc 리스트를 RecruitmentArticleResponseData 리스트로 변환하는 메서드
     public List<RecruitmentArticleResponseData> convertToResponseData(List<RecruitmentArticleDoc> recruitmentArticleDocs) {
@@ -73,9 +82,10 @@ public class RecruitmentArticleDocService {
     }
 
     // 제목, 내용, 소개, 지역, 해시태그로 검색하여 RecruitmentArticleDoc 리스트를 반환하는 메서드
-    public  ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> findByTitleOrContentOrIntroductionOrRegionOrHashTags(
+    public ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> findByTitleOrContentOrIntroductionOrRegionOrHashTags(
             List<String> titleList, List<String> contentList, List<String> introductionList,
-            List<String> regionList, List<String> hashTagList, int page, int size) {
+            List<String> regionList, List<String> hashTagList, int page, int size, boolean isCustomRecommended) {
+
         // 1. 1-indexed 페이지 번호를 0-indexed로 변환
         int adjustedPageNum = page - 1;
 
@@ -89,20 +99,27 @@ public class RecruitmentArticleDocService {
         int searchSize = size * BLOCK_SIZE;
 
         // 캐시 키 구성 (간단하게 해시태그 리스트와 blockNumber 결합)
-        String cacheKey = "Recruitment_Article" + titleList.toString() + contentList.toString() + introductionList.toString() + regionList.toString() + hashTagList.toString() + "_block_" + blockNumber + "_size_" + searchSize;
-        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult;
+        String cacheKey = "Recruitment_Article" + titleList.toString() + contentList.toString() +
+                introductionList.toString() + regionList.toString() + hashTagList.toString() +
+                "_block_" + blockNumber + "_size_" + searchSize + "_custom_" + isCustomRecommended;
 
-        if (blockCache.containsKey(cacheKey)) {
+        // 캐시에서 결과를 조회
+        ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchResult = blockCache.getIfPresent(cacheKey);
+
+        if (searchResult != null) {
             // 캐시된 결과 사용
-            searchResult = blockCache.get(cacheKey);
+            System.out.println("Using cache for " + cacheKey);
         } else {
             // Elasticsearch에서 해당 블록 검색 후 캐시 저장
-            searchResult = searchByTitleOrContentOrIntroductionOrRegionOrHashTags(titleList, contentList, introductionList, regionList, hashTagList, pageStart, searchSize);
+            System.out.println("Searching for " + cacheKey);
+            searchResult = searchByTitleOrContentOrIntroductionOrRegionOrHashTags(
+                    titleList, contentList, introductionList, regionList, hashTagList, pageStart, searchSize);
             blockCache.put(cacheKey, searchResult);
         }
 
         return searchResult;
     }
+
 
     // Elasticsearch에서 제목, 내용, 소개, 지역, 해시태그로 검색하는 메서드
     private  ElasticSearchUtil.SearchResult<RecruitmentArticleDoc> searchByTitleOrContentOrIntroductionOrRegionOrHashTags(
@@ -187,4 +204,5 @@ public class RecruitmentArticleDocService {
             return new ElasticSearchUtil.SearchResult<>(new ArrayList<>(), 0);
         }
     }
+
 }
