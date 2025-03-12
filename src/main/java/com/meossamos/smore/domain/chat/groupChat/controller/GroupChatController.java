@@ -5,9 +5,9 @@ import com.meossamos.smore.domain.chat.groupChat.entity.GroupChatRoom;
 import com.meossamos.smore.domain.chat.groupChat.service.GroupChatRoomService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.service.StudyService;
+import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class GroupChatController {
     private final GroupChatRoomService groupChatRoomService;
     private final StudyService studyService;
+    private final StudyMemberService studyMemberService;
     private final MemberService memberService; // 현재 로그인한 멤버 정보 제공
 
     // 특정 스터디의 그룹 채팅방 생성 또는 기존 채팅방 반환
@@ -51,16 +52,12 @@ public class GroupChatController {
             currentMember = memberService.findById(Long.valueOf(principal.getName()));
         }
 
-//        // 1.  현재 로그인한 멤버 조회
-//        Long memberId = Long.valueOf(principal.getName());
-//        Member currentMember = memberService.findById(memberId);
-
         // 2. 현재 멤버가 참여 중인 스터디 목록 조회
-        List<StudyDto> studyDtos = studyService.getStudiesForMember(currentMember);
+        List<Long> studyDtos = studyMemberService.getStudyListByAuthenticatedUser();
 
         // 3. 각 스터디에 대해 그룹 채팅방(없으면 생성) 조회 및 DTO 변환
         List<GroupChatRoomDto> dtos = studyDtos.stream().map(studyDto -> {
-            Study study = studyService.getStudyEntityById(studyDto.getId());
+            Study study = studyService.getStudyEntityById(studyDto);
             GroupChatRoom room = groupChatRoomService.createOrGetGroupChatRoom(study);
             return new GroupChatRoomDto(
                     room.getId(),

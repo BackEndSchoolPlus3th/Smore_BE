@@ -1,8 +1,7 @@
 package com.meossamos.smore.domain.article.studyArticle.dto.request;
 
+import com.meossamos.smore.domain.member.member.entity.Member;
 import lombok.*;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -13,7 +12,5 @@ public class StudyArticleCreateRequest {
 
     private String title;
     private String content;
-    private String imageUrls;
-    private List<String> attachments;
-    private String hashTags;
+    private Member member;
 }

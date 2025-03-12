@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Map;
 
 @Service
@@ -63,12 +64,13 @@ public class MemberService {
         UsernamePasswordAuthenticationToken authenticationToken = loginDto.toAuthentication();
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // JWT 토큰 생성
-        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-
-        // SSE Emitter (필요한 경우에만 사용)
+        Long memberId = memberRepository.findByEmail(loginDto.getEmail()).get().getId();
+        TokenDto tokenDto = tokenProvider.generateTokenDto(memberId,authentication);
         SseEmitter emitter = new SseEmitter();
-        sseEmitters.add(emitter);
+
+        // 생성된 emitter를 컬렉션에 추가하여 관리
+        sseEmitters.add(tokenDto.getAccessToken(),emitter);
+
         try {
             emitter.send(SseEmitter.event().name("connect").data("connected!"));
         } catch (IOException e) {
@@ -93,10 +95,11 @@ public class MemberService {
     public TokenDto refresh(HttpServletRequest request){
 
         String requestToken = extractRefreshTokenFromCookies(request);
+         Long memberId=tokenProvider.parseClaims(requestToken).get("memberId", Long.class);
 
         Authentication authentication = tokenProvider.getAuthentication(requestToken);
 
-        return tokenProvider.generateTokenDto(authentication);
+        return tokenProvider.generateTokenDto(memberId,authentication);
     }
     private String extractRefreshTokenFromCookies(HttpServletRequest request) {
         if (request.getCookies() != null) {
@@ -130,4 +133,18 @@ public class MemberService {
         return memberRepository.existsByEmail(email);
     }
 
+    /**
+     * memberId를 이용해 해당 회원의 hashTags를 조회
+     * DB에서는 hashTags 컬럼만 조회하여 불필요한 데이터를 로딩하지 안함
+     * 만약 회원은 존재하지만 hashTags가 null이면 빈 문자열("")을 반환
+     *
+     * @param memberId 조회할 회원의 id
+     * @return 해당 회원의 hashTags (null인 경우는 빈 문자열)
+     * @throws NoSuchElementException 회원이 존재하지 않을 경우
+     */
+    @Transactional(readOnly = true)
+    public String getHashTagsByMemberId(Long memberId) {
+        return memberRepository.findHashTagsByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchElementException("Member not found with id: " + memberId));
+    }
 }

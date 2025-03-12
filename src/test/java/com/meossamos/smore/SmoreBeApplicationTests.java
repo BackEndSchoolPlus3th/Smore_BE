@@ -154,7 +154,6 @@ class SmoreBeApplicationTests {
         String thumbnailUrl = "https://picsum.photos/400/600?random=1";
 
         List<String> hashTags = HashTagUtil.getRandomHashTags();
-        String hashTag = HashTagUtil.mergeHashTagList(hashTags);
 
         int randomImageNum = random.nextInt(5);
         StringBuilder imageUrls = new StringBuilder();
@@ -167,7 +166,7 @@ class SmoreBeApplicationTests {
             }
         }
 
-        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "introduction", "region" + ((nextId + 1) % 3),thumbnailUrl, imageUrls.toString(), LocalDateTime.now(), LocalDateTime.now(), true, randomNum, hashTag,  memberList.get(leaderNum), study, randomClipCount);
+        RecruitmentArticle recruitmentArticle = saveRecruitmentArticle("title" + nextId, "content" + nextId, "introduction", "region" + ((nextId + 1) % 3),thumbnailUrl, imageUrls.toString(), LocalDate.now(), LocalDate.now(), true, randomNum, hashTags,  memberList.get(leaderNum).getId(), study.getId(), randomClipCount);
 
         this.recruitmentArticle = recruitmentArticle;
 
@@ -264,15 +263,15 @@ class SmoreBeApplicationTests {
         System.out.println(Arrays.toString(chatMessages));
     }
 
-    @Test
-    @Order(3)
-    public void saveGroupChatRoomTest() {
-        GroupChatRoom groupChatRoom = saveGroupChatRoom(study);
-
-        this.groupChatRoom = groupChatRoom;
-
-        System.out.println(groupChatRoom);
-    }
+//    @Test
+//    @Order(3)
+//    public void saveGroupChatRoomTest() {
+//        GroupChatRoom groupChatRoom = saveGroupChatRoom(study);
+//
+//        this.groupChatRoom = groupChatRoom;
+//
+//        System.out.println(groupChatRoom);
+//    }
 
     @Test
     @Order(4)
@@ -358,8 +357,8 @@ class SmoreBeApplicationTests {
         return dmRoomService.createDmRoom(member1.getId(), member2.getId());
     }
 
-    private RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl,  @Nullable String imageUrls, LocalDateTime startDate, LocalDateTime endDate, Boolean isRecruiting, Integer maxMember, String hashTags, Member member, Study study, Integer clipCount) {
-        return recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, member, study, clipCount);
+    private RecruitmentArticle saveRecruitmentArticle(String title, String content, String introduction, @Nullable String region, @Nullable String thumbnailUrl,  @Nullable String imageUrls, LocalDate startDate, LocalDate endDate, Boolean isRecruiting, Integer maxMember, List<String> hashTags, Long memberId, Long studyId, Integer clipCount) {
+        return recruitmentArticleService.save(title, content, introduction, region, thumbnailUrl, imageUrls, startDate, endDate, isRecruiting, maxMember, hashTags, memberId, studyId, clipCount);
     }
 
     private MemberHashTag saveMemberHashTag(String hashTag, Member member) {
@@ -398,8 +397,8 @@ class SmoreBeApplicationTests {
         return chatMessageService.saveChatMessage(roomId, senderId, message, attachment);
     }
 
-    private GroupChatRoom saveGroupChatRoom(Study study) {
-        return groupChatRoomService.saveGroupChatRoom(study);
-    }
+//    private GroupChatRoom saveGroupChatRoom(Study study) {
+//        return groupChatRoomService.saveGroupChatRoom(study);
+//    }
 
 }

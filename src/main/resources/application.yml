@@ -1,5 +1,8 @@
 server:
   port: 8090
+  servlet:
+    encoding:
+      charset: UTF-8
 spring:
   profiles:
     active: dev
@@ -20,7 +23,7 @@ spring:
     cache: false
 
 jwt:
-  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwKc3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmct
 
 livekit:
   websocketURL: wss://chat-app-y0a5829d.livekit.cloud
@@ -28,3 +31,9 @@ livekit:
   apiSecret: jluVNjpRIrf5EVlVPlDkY2y5pEAQdzf9tAfV3RrftVIB
 
 
+aws:
+  s3:
+    region: ap-northeast-2
+    bucket-name:
+      public: smore-dev-bucket-public-1
+      private: smore-dev-bucket-private-1
