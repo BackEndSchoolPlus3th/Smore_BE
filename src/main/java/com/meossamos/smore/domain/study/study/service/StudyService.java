@@ -9,6 +9,9 @@ import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberReposi
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class StudyService {
     private final StudyRepository studyRepository;
     private final StudyMemberService studyMemberService;
     private final StudyMemberRepository studyMemberRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public Study saveStudy(String title, Integer memberCnt, @Nullable String imageUrls, @Nullable String introduction, Member leader) {
         Study study = Study.builder()
@@ -53,6 +57,7 @@ public class StudyService {
     }
 
     // 스터디 정보 조회
+    @Cacheable(value = "studycache", key = "#studyId")
     public StudyDto getStudyById(Long studyId) {
         Long memberId = studyMemberService.getAuthenticatedMemberId();
 
@@ -71,6 +76,7 @@ public class StudyService {
     }
 
     // 스터디 정보 업데이트
+    @CachePut(value = "study", key = "#studyId")
     public StudyDto updateStudyIntroductions(Long studyId, StudyDto studyDto) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));

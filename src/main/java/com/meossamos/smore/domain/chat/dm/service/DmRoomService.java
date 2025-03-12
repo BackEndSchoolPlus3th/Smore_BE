@@ -6,6 +6,7 @@ import com.meossamos.smore.domain.chat.dm.repository.DmRoomRepository;
 import com.meossamos.smore.domain.chat.message.repository.ChatMessageRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.repository.MemberRepository;
+import com.meossamos.smore.global.sse.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ public class DmRoomService {
     private final DmRoomRepository dmRoomRepository; // 생성자 주입
     private final MemberRepository memberRepository;
     private final ChatMessageRepository chatMessageRepository;
+    private final SseEmitters sseEmitters;
 
     // 1:1 채팅방 생성
     @Transactional
@@ -33,7 +35,7 @@ public class DmRoomService {
                         .member1(member1)
                         .member2(member2)
                         .build()));
-
+        sseEmitters.notiCreateDmRoom(member1,member2);
         // 응답 DTO 생성 및 매핑
         DmRoomResponseDto responseDto = new DmRoomResponseDto();
         responseDto.setRoomId(dmRoom.getId());
