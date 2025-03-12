@@ -18,11 +18,11 @@ public class AddMemberToStudyTest {
 
     @Test
     public void addMemberToStudy() {
-        Long memberId = 1L;
+        Long studyId = 1L;
         ThreadLocalRandom random = ThreadLocalRandom.current();
 
-        for (int i = 1; i < 1000; i++) {
-            Long studyId = (long) i;
+        for (int i = 2; i < 1000; i++) {
+            Long memberId = (long) i;
             StudyPosition position = random.nextBoolean() ? StudyPosition.MEMBER : StudyPosition.LEADER;
             boolean permissionRecruitManage = random.nextBoolean();
             boolean permissionArticleManage = random.nextBoolean();

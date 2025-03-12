@@ -215,4 +215,26 @@ public class MemberController {
         return ResponseEntity.ok(Map.of("message", "Password updated"));
     }
 
+    @GetMapping("/bio")
+    public ResponseEntity<?> getBio(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        String bio = memberService.getBio(memberId);
+        return ResponseEntity.ok(Map.of("bio", bio));
+    }
+
+    @PutMapping("/bio")
+    public ResponseEntity<?> updateBio(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateBioRequest request) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateBio(memberId, request.getBio());
+        return ResponseEntity.ok(Map.of("message", "Bio updated"));
+    }
 }
