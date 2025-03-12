@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 @Builder
 public class AlarmDto {
+
+    private Long id;
     private Long senderId;
 
     private Long receiverId;

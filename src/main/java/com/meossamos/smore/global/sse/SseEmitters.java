@@ -1,6 +1,7 @@
 package com.meossamos.smore.global.sse;
 
 import com.meossamos.smore.domain.alarm.alarm.dto.SaveAlarmDto;
+import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
@@ -212,7 +213,7 @@ public class SseEmitters {
         dataMap.put("receiverId",memberId);
 
         //엔티티 생성
-        alarmService.saveAlarm(SaveAlarmDto.builder()
+        Alarm alarm= alarmService.saveAlarm(SaveAlarmDto.builder()
                 .senderId(null)
                 .receiverId(memberId)
                 .studyId(null)
