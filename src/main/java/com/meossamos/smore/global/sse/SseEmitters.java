@@ -1,10 +1,12 @@
 package com.meossamos.smore.global.sse;
 
 import com.meossamos.smore.domain.alarm.alarm.dto.SaveAlarmDto;
+import com.meossamos.smore.domain.alarm.alarm.entity.Alarm;
 import com.meossamos.smore.domain.alarm.alarm.service.AlarmService;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.domain.study.study.entity.Study;
+import com.meossamos.smore.domain.study.study.repository.StudyRepository;
 import com.meossamos.smore.domain.study.study.service.StudyService;
 import com.meossamos.smore.global.jwt.TokenProvider;
 import com.meossamos.smore.global.util.Ut;
@@ -30,8 +32,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor
 public class SseEmitters {
     private final AlarmService alarmService;
-    private final StudyService studyService;
-
+    //private final StudyService studyService;
+    private final StudyRepository studyRepository;
     private final TokenProvider tokenProvider;
 
     // Thread-safe한 List를 사용하여 다중 클라이언트의 SSE 연결들을 관리
@@ -94,6 +96,7 @@ public class SseEmitters {
         });
     }
 
+    //지원
     public void notiApplication(String eventName, Map<String,String> map,Long recruitmentId){
         String receiverId = map.get("receiver");
         String senderToken = map.get("senderToken");// 토큰
@@ -122,7 +125,7 @@ public class SseEmitters {
         dataMap.put("studyId",map.get("studyId"));
         dataMap.put("recruitmentId",recruitmentId);
 
-        Study study = studyService.getStudyEntityById(Long.valueOf(map.get("studyId")));
+        Study study = studyRepository.findById(Long.valueOf(map.get("studyId"))).get();
         String message = map.get("sender")+"님이 "+study.getTitle()+"에 지원하였습니다.";
 
         //엔티티 생성
@@ -150,6 +153,147 @@ public class SseEmitters {
                 throw new RuntimeException(e);
             }
         }
+
+    }
+    
+    //지원 수락
+    public void notiAddStudyMember(Long memberId,Long studyId){
+
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("eventName","application__permitted");
+        dataMap.put("receiverId",memberId);
+        dataMap.put("studyId",studyId);
+
+        Study study = studyRepository.findById(studyId).get();
+
+        //엔티티 생성
+        alarmService.saveAlarm(SaveAlarmDto.builder()
+                .senderId(null)
+                .receiverId(memberId)
+                .studyId(studyId)
+                .recruitmentId(null)
+                .message(study.getTitle()+" 스터디에 초대되었습니다.")
+                .eventName("application__permitted")
+                .build());
+
+        List<String> receiverIdList = new ArrayList<>();
+        for(String token : emitterMap.keySet()){
+            log.info("보내는 토큰 {}",token);
+            log.info("보내는 토큰 {} ::::: 받는이 아이디",tokenProvider.getAuthentication(token).getName());
+            if(tokenProvider.getAuthentication(token).getName().equals(memberId)){
+                receiverIdList.add(token);
+            }
+        }
+        for(String token: receiverIdList){
+            SseEmitter emitter = emitterMap.get(token);
+            log.info("emitter에서 요청한 토큰에 맞게 emitter를 찾아내는지 {} ",token);
+            try {
+                emitter.send(
+                        SseEmitter.event()
+                                .name("application__permitted")    // 이벤트 이름 설정
+                                .data(dataMap)         // 전송할 데이터 설정
+                );
+            } catch (ClientAbortException e) {
+                // 클라이언트가 연결을 강제로 종료한 경우 무시
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+    //채팅 시작
+    public void notiCreateDmRoom(Member member1,Member member2){
+        //member2 :: receiver
+
+        String message = member1.getNickname()+"님 과의 1:1 채팅이 시작되었습니다.";
+        long memberId = member2.getId();
+
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("eventName","dm__created");
+        dataMap.put("receiverId",memberId);
+
+        //엔티티 생성
+        Alarm alarm= alarmService.saveAlarm(SaveAlarmDto.builder()
+                .senderId(null)
+                .receiverId(memberId)
+                .studyId(null)
+                .recruitmentId(null)
+                .message(message)
+                .eventName("application__rejected")
+                .build());
+
+        List<String> receiverIdList = new ArrayList<>();
+        for(String token : emitterMap.keySet()){
+            log.info("보내는 토큰 {}",token);
+            log.info("보내는 토큰 {} ::::: 받는이 아이디",tokenProvider.getAuthentication(token).getName());
+            if(tokenProvider.getAuthentication(token).getName().equals(memberId)){
+                receiverIdList.add(token);
+            }
+        }
+        for(String token: receiverIdList){
+            SseEmitter emitter = emitterMap.get(token);
+            log.info("emitter에서 요청한 토큰에 맞게 emitter를 찾아내는지 {} ",token);
+            try {
+                emitter.send(
+                        SseEmitter.event()
+                                .name("application__rejected")    // 이벤트 이름 설정
+                                .data(dataMap)         // 전송할 데이터 설정
+                );
+            } catch (ClientAbortException e) {
+                // 클라이언트가 연결을 강제로 종료한 경우 무시
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
+    }
+
+    //지원 거절
+    public void notiRejectStudyMember(Member member,Study study){
+
+        long memberId = member.getId();
+        long studyId = study.getId();
+
+        Map<String,Object> dataMap = new HashMap<>();
+        dataMap.put("eventName","application__rejected");
+        dataMap.put("receiverId",memberId);
+        dataMap.put("studyId",studyId);
+
+        //엔티티 생성
+        alarmService.saveAlarm(SaveAlarmDto.builder()
+                .senderId(null)
+                .receiverId(memberId)
+                .studyId(studyId)
+                .recruitmentId(null)
+                .message(study.getTitle()+" 스터디가 지원을 거절했습니다.")
+                .eventName("application__rejected")
+                .build());
+
+        List<String> receiverIdList = new ArrayList<>();
+        for(String token : emitterMap.keySet()){
+            log.info("보내는 토큰 {}",token);
+            log.info("보내는 토큰 {} ::::: 받는이 아이디",tokenProvider.getAuthentication(token).getName());
+            if(tokenProvider.getAuthentication(token).getName().equals(memberId)){
+                receiverIdList.add(token);
+            }
+        }
+        for(String token: receiverIdList){
+            SseEmitter emitter = emitterMap.get(token);
+            log.info("emitter에서 요청한 토큰에 맞게 emitter를 찾아내는지 {} ",token);
+            try {
+                emitter.send(
+                        SseEmitter.event()
+                                .name("application__rejected")    // 이벤트 이름 설정
+                                .data(dataMap)         // 전송할 데이터 설정
+                );
+            } catch (ClientAbortException e) {
+                // 클라이언트가 연결을 강제로 종료한 경우 무시
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
 
     }
 }

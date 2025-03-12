@@ -7,6 +7,7 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.service.StudyService;
+import com.meossamos.smore.domain.study.studyMember.dto.StudyMemberDto;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,21 +55,38 @@ public class GroupChatController {
         }
 
         // 2. 현재 멤버가 참여 중인 스터디 목록 조회
-        List<Long> studyDtos = studyMemberService.getStudyListByAuthenticatedUser();
+        List<Long> studyIds = studyMemberService.getStudyListByAuthenticatedUser();
+        if (studyIds.isEmpty()) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+
+        // 배치 조회: studyIds에 해당하는 Study와 연관된 groupChatRoom을 한 번에 조회
+        List<Study> studies = studyService.findStudiesWithGroupChatRoom(studyIds);
 
         // 3. 각 스터디에 대해 그룹 채팅방(없으면 생성) 조회 및 DTO 변환
-        List<GroupChatRoomDto> dtos = studyDtos.stream().map(studyDto -> {
-            Study study = studyService.getStudyEntityById(studyDto);
-            GroupChatRoom room = groupChatRoomService.createOrGetGroupChatRoom(study);
-            return new GroupChatRoomDto(
+        List<GroupChatRoomDto> dtos = new ArrayList<>();
+        for (Study study : studies) {
+            GroupChatRoom room = study.getGroupChatRoom();
+            // 만약 스터디에 그룹 채팅방이 없다면 생성
+            if (room == null) {
+                room = groupChatRoomService.createOrGetGroupChatRoom(study);
+            }
+            dtos.add(new GroupChatRoomDto(
                     room.getId(),
                     study.getId(),
                     study.getTitle(),
                     room.getCreatedDate()
-            );
-        }).collect(Collectors.toList());
-
+            ));
+        }
         return ResponseEntity.ok(dtos);
+    }
+
+    // 특정 스터디의 멤버 목록 조회
+    @GetMapping("/{studyId}/users")
+    public ResponseEntity<List<StudyMemberDto>> getGroupChatRoomUsers(@PathVariable("studyId") Long studyId) {
+        // StudyMemberService의 getStudyMembers 메서드를 사용하여 스터디 멤버 조회
+        List<StudyMemberDto> memberList = studyMemberService.getStudyMembers(studyId);
+        return ResponseEntity.ok(memberList);
     }
 
 }
