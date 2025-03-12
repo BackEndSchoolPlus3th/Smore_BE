@@ -11,8 +11,11 @@ import com.meossamos.smore.domain.study.studyMember.dto.UpdateStudyMemberPermiss
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
+import com.meossamos.smore.global.sse.SseEmitters;
+import jakarta.transaction.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -30,6 +33,8 @@ public class StudyMemberService {
     private final StudyMemberRepository studyMemberRepository;
     private final StudyRepository studyRepository;
     private final MemberRepository memberRepository;
+
+    private final SseEmitters emitters;
 
     /**
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 해당 스터디에 가입되어 있는지 확인
@@ -70,7 +75,6 @@ public class StudyMemberService {
 
     @PersistenceContext
     private EntityManager entityManager;
-
     /**
      * 회원 아이디와 스터디 아이디를 받아 해당 회원이 스터디에서 캘린더 관리 권한(permissionCalendarManage)을 가지고 있는지 확인
      *
@@ -101,9 +105,9 @@ public class StudyMemberService {
     /**
      * 스터디에 새로운 멤버를 추가하는 메서드.
      *
-     * @param studyId        가입할 스터디의 식별자
-     * @param leaderMemberId 가입할 멤버의 식별자
-     * @param newMemberId    스터디 내에서의 포지션
+     * @param studyId                  가입할 스터디의 식별자
+     * @param leaderMemberId                 가입할 멤버의 식별자
+     * @param newMemberId         스터디 내에서의 포지션
      * @return 생성된 StudyMember 엔티티
      */
     @Transactional
@@ -135,13 +139,71 @@ public class StudyMemberService {
                 .permissionSettingManage(false)
                 .build();
 
+        emitters.notiAddStudyMember(newMember.getId(),study.getId());
+        // 새 StudyMember 저장
         return studyMemberRepository.save(studyMember);
     }
 
     /**
-     * 강퇴: 스터디 리더가 특정 멤버를 강퇴함 (자기 자신은 제외)
+     * 스터디에 새로운 멤버를 추가하는 메서드.
      *
-     * @param studyId        스터디 ID
+     * @param studyTitle                   가입할 스터디의 식별자
+     * @param nickname                가입할 멤버의 식별자
+     * @param position                  스터디 내에서의 포지션
+     * @param permissionRecruitManage   모집글 관리 권한 여부
+     * @param permissionArticleManage   게시글 관리 권한 여부
+     * @param permissionCalendarManage  캘린더 관리 권한 여부
+     * @param permissionSettingManage   스터디 설정 관리 권한 여부
+     * @return 생성된 StudyMember 엔티티
+     */
+    public StudyMember addMemberToStudy(String studyTitle,
+                                        String nickname,
+                                        StudyPosition position,
+                                        boolean permissionRecruitManage,
+                                        boolean permissionArticleManage,
+                                        boolean permissionCalendarManage,
+                                        boolean permissionSettingManage) {
+        // getReferenceById를 사용하여 실제 데이터를 조회하지 않고 proxy 객체만 획득
+        Member member = memberRepository.findByNickname(nickname).get();
+        Study study = studyRepository.findByTitle(studyTitle).get();
+
+        // StudyMember 엔티티 생성
+        StudyMember studyMember = StudyMember.builder()
+                .member(member)
+                .study(study)
+                .position(position)
+                .permissionRecruitManage(permissionRecruitManage)
+                .permissionArticleManage(permissionArticleManage)
+                .permissionCalendarManage(permissionCalendarManage)
+                .permissionSettingManage(permissionSettingManage)
+                .build();
+
+        emitters.notiAddStudyMember(member.getId(),study.getId());
+        // 새 StudyMember 저장
+        return studyMemberRepository.save(studyMember);
+    }
+
+    public void rejectMemberToStudy(String studyTitle,String nickname){
+        Member member = memberRepository.findByNickname(nickname).get();
+        Study study = studyRepository.findByTitle(studyTitle).get();
+
+        emitters.notiRejectStudyMember(member,study);
+
+    }
+    public StudyMember saveStudyMember(Member member, Study study, Boolean permissionRecruitManage, Boolean permissionArticleManage, Boolean permissionCalendarManage, Boolean permissionSettingManage) {
+        StudyMember studyMember = StudyMember.builder()
+                .member(member)
+                .study(study)
+                .permissionRecruitManage(permissionRecruitManage)
+                .permissionArticleManage(permissionArticleManage)
+                .permissionCalendarManage(permissionCalendarManage)
+                .permissionSettingManage(permissionSettingManage)
+                .build();
+        return studyMemberRepository.save(studyMember);
+    }
+    /**
+     * 강퇴: 스터디 리더가 특정 멤버를 강퇴함 (자기 자신은 제외)
+     * @param studyId 스터디 ID
      * @param leaderMemberId 요청자(리더)의 ID
      * @param targetMemberId 강퇴 대상 멤버의 ID
      */
@@ -158,6 +220,7 @@ public class StudyMemberService {
             throw new IllegalArgumentException("리더는 자기 자신을 강퇴할 수 없습니다.");
         }
 
+
         int deletedCount = studyMemberRepository.deleteByStudyIdAndMemberId(studyId, targetMemberId);
         if (deletedCount == 0) {
             throw new IllegalArgumentException("해당 멤버를 스터디에서 찾을 수 없습니다.");
@@ -167,8 +230,7 @@ public class StudyMemberService {
     /**
      * 탈퇴: 스터디 멤버 본인이 탈퇴
      * 단, 리더는 탈퇴할 수 없으므로 별도의 리더 위임 로직이 필요함.
-     *
-     * @param studyId  스터디 ID
+     * @param studyId 스터디 ID
      * @param memberId 탈퇴 요청 멤버의 ID
      */
     @Transactional
@@ -187,11 +249,10 @@ public class StudyMemberService {
 
     /**
      * 권한 변경: 스터디 리더가 특정 멤버의 권한을 변경
-     *
-     * @param studyId        스터디 ID
+     * @param studyId 스터디 ID
      * @param leaderMemberId 요청자(리더)의 ID
      * @param targetMemberId 권한 변경 대상 멤버의 ID
-     * @param dto            변경할 권한 정보
+     * @param dto 변경할 권한 정보
      * @return 변경된 StudyMember 엔티티
      */
     @Transactional
@@ -221,8 +282,7 @@ public class StudyMemberService {
 
     /**
      * 권한 조회: 특정 멤버의 권한 정보를 조회
-     *
-     * @param studyId  스터디 ID
+     * @param studyId 스터디 ID
      * @param memberId 대상 멤버의 ID
      * @return 해당 StudyMember 엔티티
      */
@@ -333,10 +393,8 @@ public class StudyMemberService {
             throw new RuntimeException("User is not authenticated or principal is not an instance of User.");
         }
     }
-
     /**
      * 멤버 아이디로 해당 멤버가 속한 Study와 position 목록 조회
-     *
      * @param memberId 멤버의 ID
      * @return Study와 position을 담은 DTO 리스트
      */
@@ -465,6 +523,7 @@ public class StudyMemberService {
                 throw new IllegalArgumentException("Invalid permission key");
         }
     }
+
 
     // 스터디 멤버 권한 조회
     public List<StudyMemberDto> getStudyMembers(Long studyId) {
