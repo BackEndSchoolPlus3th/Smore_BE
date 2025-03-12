@@ -1,8 +1,11 @@
 package com.meossamos.smore.domain.member.member.controller;
 
 import com.meossamos.smore.domain.member.member.dto.*;
+import com.meossamos.smore.domain.member.member.dto.update.*;
+import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
+import com.meossamos.smore.global.s3.S3Service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,20 +13,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/member")
+@RequestMapping("/api/v1/member")
 @RequiredArgsConstructor
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
+    private final S3Service s3Service;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
         LoginResponseDto responseDto = memberService.login(loginDto);
@@ -38,7 +46,7 @@ public class MemberController {
 
         LoginResponseBodyDto loginResponseBodyDto = LoginResponseBodyDto.builder()
                 .nickname(responseDto.getNickname())
-                .hashTags(responseDto.getHashTags())
+                .hashTags(Arrays.stream(responseDto.getHashTags().split(",")).toList())
                 .profileImageUrl(responseDto.getProfileImageUrl())
                 .build();
 
@@ -98,4 +106,113 @@ public class MemberController {
     public String check(){
         return "액세스 토큰을 보냈을시 인가 기능이 되는지 확인";
     }
+
+    /**
+     * 마이페이지 회원 정보 수정용 조회
+     * @param userDetails
+     * @return
+     */
+    @GetMapping("/settings")
+    public ResponseEntity<MemberSettingResponse> getMemberSettings(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(401).build();
+        }
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        Member member = memberService.getReferenceById(memberId);
+
+        List<String> hashTagList = (member.getHashTags() != null && !member.getHashTags().isEmpty())
+                ? Arrays.asList(member.getHashTags().split(","))
+                : Collections.emptyList();
+
+        MemberSettingResponse response = new MemberSettingResponse(
+                member.getEmail(),
+                member.getNickname(),
+                member.getProfileImageUrl(),
+                member.getDescription(),
+                member.getBirthdate(),
+                member.getRegion(),
+                hashTagList
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 회원 정보 수정
+     * @param userDetails
+     * @param request
+     * @return
+     */
+    @PutMapping("/nickname")
+    public ResponseEntity<?> updateNickname(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateNicknameRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateNickname(memberId, request.getNickname());
+        return ResponseEntity.ok(Map.of("message", "Nickname updated"));
+    }
+
+    @PutMapping("/description")
+    public ResponseEntity<?> updateDescription(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateDescriptionRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateDescription(memberId, request.getDescription());
+        return ResponseEntity.ok(Map.of("message", "Description updated"));
+    }
+
+    @PutMapping("/profile-image")
+    public ResponseEntity<?> updateProfileImage(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateProfileImageUrlRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateProfileImageUrl(memberId, request.getProfileImageUrl());
+        return ResponseEntity.ok(Map.of("message", "Profile image updated"));
+    }
+
+    @DeleteMapping("/profile-image")
+    public ResponseEntity<?> deleteProfileImage(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(value = "profileImageUrl") String profileImageUrl)
+    {
+        s3Service.deleteFile("profile", profileImageUrl);
+        return ResponseEntity.ok(Map.of("message", "Profile image deleted"));
+    }
+
+    @PutMapping("/birthdate")
+    public ResponseEntity<?> updateBirthdate(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateBirthdateRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateBirthdate(memberId, LocalDate.parse(request.getBirthdate()));
+        return ResponseEntity.ok(Map.of("message", "Birthdate updated"));
+    }
+
+    @PutMapping("/region")
+    public ResponseEntity<?> updateRegion(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateRegionRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateRegion(memberId, request.getRegion());
+        return ResponseEntity.ok(Map.of("message", "Region updated"));
+    }
+
+    @PutMapping("/hashtags")
+    public ResponseEntity<?> updateHashTags(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdateHashTagsRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updateHashTags(memberId, String.join(",", request.getHashTags()));
+        return ResponseEntity.ok(Map.of("message", "HashTags updated"));
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<?> updatePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody UpdatePasswordRequest request) {
+        Long memberId = Long.valueOf(userDetails.getUsername());
+        memberService.updatePassword(memberId, request.getCurrentPassword(), request.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Password updated"));
+    }
+
 }
