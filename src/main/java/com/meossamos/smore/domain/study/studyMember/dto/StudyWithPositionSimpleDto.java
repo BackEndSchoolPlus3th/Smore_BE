@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @SuperBuilder
 public class StudyWithPositionSimpleDto {
-    private StudySimpleDto  study;
+    private StudySimpleDto study;
     private StudyPosition position;
     private LocalDateTime createdDate;
 }

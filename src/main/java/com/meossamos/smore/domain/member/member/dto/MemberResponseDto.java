@@ -10,8 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MemberResponseDto {
     private String email;
+    private String nickname;
+    private String profileImageUrl;
 
     public static MemberResponseDto of(Member member) {
-        return new MemberResponseDto(member.getEmail());
+
+        return new MemberResponseDto(
+                member.getEmail(),
+                member.getNickname(),
+                member.getProfileImageUrl()
+        );
     }
 }

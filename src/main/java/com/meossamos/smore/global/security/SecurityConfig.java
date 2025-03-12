@@ -53,8 +53,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/recruitmentArticle/clip").permitAll()
                     //    .requestMatchers("/api/v1/recruitmentArticles/**").permitAll()
                         .requestMatchers("/api/v1/study/**").permitAll()
-                        .requestMatchers("/api/member/login").permitAll()
-                        .requestMatchers("/api/member/signup").permitAll()
+                        .requestMatchers("/api/v1/member/login").permitAll()
+                        .requestMatchers("/api/v1/member/signup").permitAll()
                         // WebSocket 관련 경로는 모두 허용하고, 인증은 StompChannelInterceptor에서 처리
                         .requestMatchers("/ws/**").permitAll()  // WebSocket 엔드포인트 추가 허용
                         .requestMatchers("/topic/**").permitAll() // 구독 경로 허용

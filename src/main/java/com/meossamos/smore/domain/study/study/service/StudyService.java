@@ -91,6 +91,13 @@ public class StudyService {
     }
 
     public Study getReferenceById(Long studyId) {
+
         return studyRepository.getReferenceById(studyId);
     }
+    public List<Study> findStudiesWithGroupChatRoom(List<Long> studyIds) {
+        return studyRepository.findStudiesWithGroupChatRoom(studyIds);
+    }
+
+
+
 }
