@@ -15,6 +15,9 @@ public interface StudyRepository extends JpaRepository<Study, Long> {
     @Query("select s from Study s left join fetch s.groupChatRoom where s.id in :studyIds")
     List<Study> findStudiesWithGroupChatRoom(@Param("studyIds") List<Long> studyIds);
     List<Study> findByIdIn(List<Long> ids);
+
+    Optional<Study> findByTitle(String title);
+
 }
 
 
