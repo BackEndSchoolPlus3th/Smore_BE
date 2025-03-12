@@ -68,6 +68,7 @@ public class MemberService {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
         Long memberId = memberRepository.findByEmail(loginDto.getEmail()).get().getId();
+
         TokenDto tokenDto = tokenProvider.generateTokenDto(memberId,authentication);
         SseEmitter emitter = new SseEmitter();
 

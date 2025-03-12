@@ -28,7 +28,9 @@ import com.meossamos.smore.domain.study.schedule.service.StudyScheduleService;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.service.StudyService;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
+import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
+import com.meossamos.smore.global.sse.SseEmitters;
 import com.meossamos.smore.global.util.HashTagUtil;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.*;
@@ -89,7 +91,7 @@ class SmoreBeApplicationTests {
     private StudyHashTag[] studyHashTag;
     private RecruitmentArticleHashTag[] recruitmentArticleHashTag;
     private StudySchedule studySchedule;
-
+    private SseEmitters sseEmitters;
     private final Random random = new Random();
     private int leaderNum;
     private int[] memberNums;
@@ -342,6 +344,19 @@ class SmoreBeApplicationTests {
         System.out.print("\nfounded RecruitmentArticles: ");
 
         System.out.println("\n\n\n\n");
+    }
+
+    @Test
+    public void saveNewStudyMember() {
+//        studyMemberService.addMemberToStudy(
+//                1002L,
+//                1003L,
+//                 StudyPosition.MEMBER,
+//        true,
+//         true,
+//         true,
+//         true);
+        sseEmitters.notiAddStudyMember(1003L,1003L);
     }
 
 

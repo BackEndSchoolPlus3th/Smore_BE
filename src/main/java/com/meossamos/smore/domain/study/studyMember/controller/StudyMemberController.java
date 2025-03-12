@@ -2,6 +2,8 @@ package com.meossamos.smore.domain.study.studyMember.controller;
 
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.service.StudyService;
+import com.meossamos.smore.domain.study.studyMember.entity.StudyPosition;
+
 import com.meossamos.smore.domain.study.studyMember.dto.*;
 import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
@@ -159,6 +161,29 @@ public class StudyMemberController {
                 })
                 .collect(Collectors.toList());
         return ResponseEntity.ok(myStudyListResponseList);
+    }
+
+    @PostMapping("/studyMember")
+    public ResponseEntity<?> createStudyMember(@RequestBody CreateStudyMemberDto createStudyMemberDto){
+        StudyMember studyMember =  studyMemberService.addMemberToStudy(
+                createStudyMemberDto.getStudyTitle(),
+                createStudyMemberDto.getNickname(),
+                StudyPosition.valueOf(createStudyMemberDto.getPosition()),
+                createStudyMemberDto.isPermissionRecruitManage(),
+                createStudyMemberDto.isPermissionArticleManage(),
+                createStudyMemberDto.isPermissionCalendarManage(),
+                createStudyMemberDto.isPermissionSettingManage()
+        );
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PostMapping("/studyMember/reject")
+    public ResponseEntity<?> rejectStudyMember(@RequestBody RejectStudyMemberDto rejectStudyMemberDto){
+        studyMemberService.rejectMemberToStudy(
+                rejectStudyMemberDto.getStudyTitle(),
+                rejectStudyMemberDto.getNickname()
+        );
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 
