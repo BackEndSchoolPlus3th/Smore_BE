@@ -10,24 +10,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/member")
+@RequestMapping("/api/member")
 @RequiredArgsConstructor
 @Slf4j
 public class MemberController {
     private final MemberService memberService;
     private final TokenProvider tokenProvider;
-
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto){
         LoginResponseDto responseDto = memberService.login(loginDto);
 
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", responseDto.getToken().getRefreshToken())
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken",responseDto.getToken().getRefreshToken())
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
@@ -59,7 +60,7 @@ public class MemberController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@RequestBody AccessTokenDto accessTokenDto, HttpServletRequest request) {
+    public ResponseEntity<?> refresh(@RequestBody AccessTokenDto accessTokenDto,HttpServletRequest request) {
         TokenDto tokenDto = memberService.refresh(request);
         ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokenDto.getRefreshToken())
                 .httpOnly(true)
@@ -92,24 +93,9 @@ public class MemberController {
     }
 
 
+
     @PostMapping("/check")
-    public String check() {
+    public String check(){
         return "액세스 토큰을 보냈을시 인가 기능이 되는지 확인";
-    }
-
-    @GetMapping("/mypage")
-    public ResponseEntity<Map<String, MyPageDto>> myPage(@RequestHeader("Authorization") String authorizationHeader) {
-        Map<String, MyPageDto> response = new HashMap<>();
-        // jwt 토큰에서 정보 꺼내서 뿌리기
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
-//            System.out.println(authorizationHeader);
-            String jwttoken = authorizationHeader.substring(7); // "Bearer " 이후의 부분을 추출
-            // 토큰 복호화해서 유저정보 리턴
-            MyPageDto targetMypageDto = memberService.getUserInfo(jwttoken);
-
-            response.put("MyPageDto", targetMypageDto);
-
-        }
-        return ResponseEntity.ok(response);
     }
 }
