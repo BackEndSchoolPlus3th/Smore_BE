@@ -46,7 +46,7 @@ public class MemberController {
 
         LoginResponseBodyDto loginResponseBodyDto = LoginResponseBodyDto.builder()
                 .nickname(responseDto.getNickname())
-                .hashTags(Arrays.stream(responseDto.getHashTags().split(",")).toList())
+                .hashTags(null)
                 .profileImageUrl(responseDto.getProfileImageUrl())
                 .build();
 

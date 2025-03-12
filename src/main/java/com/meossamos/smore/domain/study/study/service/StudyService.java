@@ -10,6 +10,8 @@ import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,6 +87,13 @@ public class StudyService {
     }
 
     public Study getReferenceById(Long studyId) {
+
         return studyRepository.getReferenceById(studyId);
     }
+    public List<Study> findStudiesWithGroupChatRoom(List<Long> studyIds) {
+        return studyRepository.findStudiesWithGroupChatRoom(studyIds);
+    }
+
+
+
 }
