@@ -7,12 +7,9 @@ import com.meossamos.smore.domain.article.recruitmentArticle.service.Recruitment
 import com.meossamos.smore.domain.article.recruitmentArticle.service.RecruitmentArticleService;
 import com.meossamos.smore.domain.article.recruitmentArticleClip.service.RecruitmentArticleClipService;
 import com.meossamos.smore.domain.article.recruitmentArticleComment.service.RecruitmentArticleCommentService;
-import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
-
+import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import com.meossamos.smore.global.jwt.TokenProvider;
-import com.meossamos.smore.global.util.ElasticSearchUtil;
-
 import com.meossamos.smore.global.sse.SseEmitters;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,9 +19,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,6 +38,8 @@ public class ApiV1RecruitmentArticleController {
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
     private final SseEmitters sseEmitters;
     private final TokenProvider tokenProvider;
+    private final StudyMemberService studyMemberService;
+
     @GetMapping("/recruitmentArticles")
     public ResponseEntity<?> getRecruitmentArticles(
             RecruitmentArticleSearchDto searchDto,
@@ -140,6 +141,27 @@ public class ApiV1RecruitmentArticleController {
      return ResponseEntity.ok("지원 완료 "+recruitmentId);
     }
 
+    @GetMapping("/study/{studyId}/recruitmentArticles")
+    public ResponseEntity<SimpleRecruitmentResponse> getRecruitmentArticlesByStudyId(
+            @PathVariable("studyId") Long studyId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = Long.parseLong(userDetails.getUsername());
+        if (!studyMemberService.isUserMemberOfStudy(memberId, studyId)) {
+            // 스터디에 속해있지 않은 사용자
+            return ResponseEntity.status(403).build();
+        }
+        List<SimpleRecruitmentDto> recruitmentArticles = recruitmentArticleService.findByStudyId(studyId);
+        boolean hasPermission = studyMemberService.hasRecruitManagePermission(memberId, studyId);
+
+        SimpleRecruitmentResponse responses = SimpleRecruitmentResponse.builder()
+                .recruitments(recruitmentArticles)
+                .isPermission(hasPermission)
+                .build();
+
+        return ResponseEntity.ok(responses);
+    }
+
     @PostMapping("/study/{studyId}/recruitmentArticle")
     public ResponseEntity<?> createRecruitmentArticle(
             @PathVariable("studyId") Long studyId,
@@ -147,8 +169,12 @@ public class ApiV1RecruitmentArticleController {
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Long memberId = Long.parseLong(userDetails.getUsername());
-
         String imageUrls = String.join(",", dto.getImageUrls());
+
+        if (!studyMemberService.hasRecruitManagePermission(memberId, studyId)) {
+            // 권한 없음
+            return ResponseEntity.status(403).build();
+        }
 
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.save(dto.getTitle(), dto.getContent(), dto.getIntroduction(), dto.getRegion(), dto.getThumbnailUrl(), imageUrls, dto.getStartDate(), dto.getEndDate(), true, dto.getMaxMember(), dto.getHashtags(), memberId, studyId, 0);
 

@@ -188,17 +188,6 @@ public class StudyMemberService {
         emitters.notiRejectStudyMember(member,study);
 
     }
-    public StudyMember saveStudyMember(Member member, Study study, Boolean permissionRecruitManage, Boolean permissionArticleManage, Boolean permissionCalendarManage, Boolean permissionSettingManage) {
-        StudyMember studyMember = StudyMember.builder()
-                .member(member)
-                .study(study)
-                .permissionRecruitManage(permissionRecruitManage)
-                .permissionArticleManage(permissionArticleManage)
-                .permissionCalendarManage(permissionCalendarManage)
-                .permissionSettingManage(permissionSettingManage)
-                .build();
-        return studyMemberRepository.save(studyMember);
-    }
     /**
      * 강퇴: 스터디 리더가 특정 멤버를 강퇴함 (자기 자신은 제외)
      * @param studyId 스터디 ID
