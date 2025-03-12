@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/chatrooms/group")
@@ -32,6 +31,7 @@ public class GroupChatController {
     // 특정 스터디의 그룹 채팅방 생성 또는 기존 채팅방 반환
     @PostMapping("/{studyId}")
     public ResponseEntity<GroupChatRoomDto> createGroupChatRoom(@PathVariable("studyId") Long studyId) {
+        System.out.println(studyId + "포스트요청 확인");
         Study study = studyService.getStudyEntityById(studyId);
         GroupChatRoom room = groupChatRoomService.createOrGetGroupChatRoom(study);
         GroupChatRoomDto dto = new GroupChatRoomDto(
@@ -44,7 +44,7 @@ public class GroupChatController {
     }
 
     // 현재 로그인한 사용자가 가입한 스터디의 그룹 채팅방 목록 조회
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<List<GroupChatRoomDto>> getGroupChatRooms(Principal principal) {
         Member currentMember;
         if (principal == null) {
