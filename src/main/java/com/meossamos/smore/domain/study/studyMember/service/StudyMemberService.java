@@ -15,6 +15,7 @@ import com.meossamos.smore.global.sse.SseEmitters;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -315,37 +316,16 @@ public class StudyMemberService {
         studyMemberRepository.delete(studyMember);
     }
 
-    // 유저의 스터디 목록 조회 (스터디 이름, 소개, 해시태그 포함)
+    // 유저의 스터디 상세 조회 (스터디 이름, 소개, 해시태그 포함)
     @Transactional
+    @Cacheable(value = "userStudies", key = "#memberId != null ? #memberId : 'defaultMemberId'")
     public List<StudyDto> getStudiesByAuthenticatedUser() {
         Long memberId = getAuthenticatedMemberId();
 
-        // 사용자 ID로 관련된 Study ID 조회
-        List<StudyMember> studyMembers = studyMemberRepository.findByMemberId(memberId);
+        // 사용자 ID로 관련된 Study 정보와 해시태그를 가져오는 최적화된 쿼리 실행
+        List<StudyDto> studyDtos = studyRepository.findStudyDtosByMemberId(memberId);
 
-        // Study 목록 반환
-        List<Long> studyIds = studyMembers.stream()
-                .map(studyMember -> studyMember.getStudy().getId())  // Study ID 추출
-                .collect(Collectors.toList());
-
-        // Study 정보 조회
-        List<Study> studies = studyRepository.findByIdIn(studyIds);
-
-        // StudyDto로 변환 (해시태그 포함)
-        return studies.stream()
-                .map(study -> {
-                    // Get the hashtags as a List of Strings
-                    String studyHashTags = study.getHashTags();
-
-                    // Return a StudyDto with study details and list of hashtags
-                    return new StudyDto(
-                            study.getId(),             // Study ID
-                            study.getTitle(),          // Study title
-                            study.getIntroduction(),   // Study introduction
-                            studyHashTags                   // List of hashtags as Strings
-                    );
-                })
-                .collect(Collectors.toList());
+        return studyDtos;
     }
 
     // 유저의 스터디 목록 조회
