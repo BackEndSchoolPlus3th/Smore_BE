@@ -4,7 +4,6 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
-import com.meossamos.smore.domain.study.studyMember.entity.StudyMember;
 import com.meossamos.smore.domain.study.studyMember.repository.StudyMemberRepository;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import jakarta.annotation.Nullable;
@@ -15,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,18 +55,11 @@ public class StudyService {
     }
 
     // 스터디 정보 조회
-    @Cacheable(value = "studycache", key = "#studyId")
+    @Cacheable(value = "study", key = "#studyId")
     public StudyDto getStudyById(Long studyId) {
         Long memberId = studyMemberService.getAuthenticatedMemberId();
 
-        List<StudyMember> studyMembers = studyMemberRepository.findByMemberId(memberId);
-
-        // Study ID 목록
-        List<Long> studyIds = studyMembers.stream()
-                .map(studyMember -> studyMember.getStudy().getId())  // Study ID 추출
-                .collect(Collectors.toList());
-
-        Study study = studyRepository.findById(studyId)
+        Study study = studyRepository.findByIdWithMembers(studyId, memberId)
                 .orElseThrow(() -> new RuntimeException("해당 ID에 해당하는 스터디가 존재하지 않습니다."));
 
         // StudyDto 반환
@@ -97,7 +88,4 @@ public class StudyService {
     public List<Study> findStudiesWithGroupChatRoom(List<Long> studyIds) {
         return studyRepository.findStudiesWithGroupChatRoom(studyIds);
     }
-
-
-
 }
