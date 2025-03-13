@@ -13,11 +13,12 @@ import java.util.List;
 
 @Repository
 public interface RecruitmentArticleCommentRepository  extends JpaRepository<RecruitmentArticleComment, Long> {
-    // 댓글 세부 정보를 조회하는 메서드
+    // 댓글 세부 정보를 조회하는 메서드 (댓글 작성자 정보와 모집글의 작성자(publisher) ID 포함)
     @Query("SELECT new com.meossamos.smore.domain.article.recruitmentArticleComment.dto.RecruitmentArticleDetailCommentWithProfileResponseData(" +
-            "c.id, c.comment, m.id, m.nickname, m.profileImageUrl, c.createdDate) " +
+            "c.id, c.comment, m.id, m.nickname, m.profileImageUrl, c.createdDate, ra.member.id) " +
             "FROM RecruitmentArticleComment c " +
             "JOIN c.member m " +
+            "JOIN c.recruitmentArticle ra " +
             "WHERE c.recruitmentArticle.id = :articleId")
     List<RecruitmentArticleDetailCommentWithProfileResponseData> findCommentDetailsWithProfileByArticleId(@Param("articleId") Long articleId);
 

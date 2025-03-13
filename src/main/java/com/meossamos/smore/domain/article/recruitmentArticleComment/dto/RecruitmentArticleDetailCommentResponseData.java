@@ -13,9 +13,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class RecruitmentArticleDetailCommentResponseData {
+public class RecruitmentArticleDetailCommentResponseData  {
     private Long id;
     private String comment;
+    private boolean isPublisher;
     private String writerName;
     private String writerProfileImageUrl;
     private LocalDateTime createdDate;
