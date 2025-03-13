@@ -3,6 +3,7 @@ package com.meossamos.smore.domain.article.recruitmentArticle.service;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.SimpleRecruitmentDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.UpdateRecruitmentArticleDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
+import com.meossamos.smore.domain.article.recruitmentArticle.repository.RecruitmentArticleDocRepository;
 import com.meossamos.smore.domain.article.recruitmentArticle.repository.RecruitmentArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RecruitmentArticleService {
     private final RecruitmentArticleRepository recruitmentArticleRepository;
+    private final RecruitmentArticleDocRepository recruitmentArticleDocRepository;
     private final MemberService memberService;
     private final StudyService studyService;
 
@@ -116,7 +118,11 @@ public class RecruitmentArticleService {
         return recruitmentArticleRepository.save(article);
     }
 
-    // 게시글 삭제
+
+    /**
+     * 게시글 삭제: 요청한 사용자가 게시글 작성자이거나 스터디 리더인 경우 삭제.
+     * MySQL DB에서 삭제 후, Elasticsearch에서도 해당 문서를 삭제함.
+     */
     @Transactional
     public void deleteRecruitmentArticle(Long articleId, Long requestingMemberId) {
         RecruitmentArticle article = recruitmentArticleRepository.findByIdWithMemberAndStudyLeader(articleId)
@@ -129,5 +135,13 @@ public class RecruitmentArticleService {
         }
 
         recruitmentArticleRepository.delete(article);
+        System.out.println("Deleted article from MySQL DB");
+
+        // Elasticsearch에서도 해당 도큐먼트를 삭제
+        try {
+            recruitmentArticleDocRepository.deleteById(String.valueOf(article.getId()));
+        } catch (Exception e) {
+            System.out.println("Failed to delete document from Elasticsearch: " + e.getMessage());
+        }
     }
 }

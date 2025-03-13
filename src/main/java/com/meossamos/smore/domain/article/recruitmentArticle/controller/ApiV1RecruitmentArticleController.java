@@ -185,6 +185,7 @@ public class ApiV1RecruitmentArticleController {
         return  ResponseEntity.ok(recruitmentArticle.getId());
     }
 
+    // 게시글 삭제
     @DeleteMapping("/recruitmentArticles/{id}")
     public ResponseEntity<?> deleteRecruitmentArticle(
             @PathVariable("id") Long recruitmentArticleId,
