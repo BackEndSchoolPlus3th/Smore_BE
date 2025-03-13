@@ -15,6 +15,7 @@ import com.meossamos.smore.global.sse.SseEmitters;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
@@ -315,8 +316,9 @@ public class StudyMemberService {
         studyMemberRepository.delete(studyMember);
     }
 
-    // 유저의 스터디 목록 조회 (스터디 이름, 소개, 해시태그 포함)
+    // 유저의 스터디 상세 조회 (스터디 이름, 소개, 해시태그 포함)
     @Transactional
+    @Cacheable(value = "userStudies", key = "#memberId != null ? #memberId : 'defaultMemberId'")
     public List<StudyDto> getStudiesByAuthenticatedUser() {
         Long memberId = getAuthenticatedMemberId();
 
