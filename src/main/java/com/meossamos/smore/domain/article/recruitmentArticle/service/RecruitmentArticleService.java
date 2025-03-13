@@ -1,5 +1,6 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.service;
 
+import com.meossamos.smore.domain.article.recruitmentArticle.dto.SimpleRecruitmentDto;
 import com.meossamos.smore.domain.article.recruitmentArticle.entity.RecruitmentArticle;
 import com.meossamos.smore.domain.article.recruitmentArticle.repository.RecruitmentArticleRepository;
 import com.meossamos.smore.domain.member.member.entity.Member;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -79,5 +79,9 @@ public class RecruitmentArticleService {
     public RecruitmentArticle findByIdWithMember(Long id) {
         return recruitmentArticleRepository.findByIdWithMember(id)
                 .orElseThrow(() -> new EntityNotFoundException("RecruitmentArticle not found"));
+    }
+
+    public List<SimpleRecruitmentDto> findByStudyId(Long studyId) {
+        return recruitmentArticleRepository.findSimpleRecruitmentsByStudyId(studyId);
     }
 }
