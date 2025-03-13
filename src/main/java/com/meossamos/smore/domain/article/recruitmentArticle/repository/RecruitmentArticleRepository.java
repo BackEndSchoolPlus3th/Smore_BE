@@ -22,4 +22,6 @@ public interface RecruitmentArticleRepository extends JpaRepository<RecruitmentA
             "where ra.study.id = :studyId")
     List<SimpleRecruitmentDto> findSimpleRecruitmentsByStudyId(@Param("studyId") Long studyId);
 
+    @Query("select ra from RecruitmentArticle ra join fetch ra.member join fetch ra.study s join fetch s.leader where ra.id = :id")
+    Optional<RecruitmentArticle> findByIdWithMemberAndStudyLeader(@Param("id") Long id);
 }
