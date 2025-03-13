@@ -79,15 +79,16 @@ public class ApiV1RecruitmentArticleController {
     }
 
     @GetMapping("/recruitmentArticles/detail")
-    public ResponseEntity<?> getRecruitmentArticleDetail(
+    public ResponseEntity<RecruitmentArticleDetailResponseData> getRecruitmentArticleDetail(
             @RequestParam(value = "recruitmentArticleId") Long recruitmentArticleId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         Long memberId = userDetails != null ? Long.parseLong(userDetails.getUsername()) : null;
 
-        // RecruitmentArticle과 연관된 Member를 함께 조회
         RecruitmentArticle recruitmentArticle = recruitmentArticleService.findByIdWithMember(recruitmentArticleId);
 
+        boolean isPermission = recruitmentArticle.getMember().getId().equals(memberId) ||
+                recruitmentArticle.getStudy().getLeader().getId().equals(memberId);
         boolean isClipped = recruitmentArticleClipService.isClipped(recruitmentArticleId, memberId);
 
         RecruitmentArticleDetailResponseData responseData = RecruitmentArticleDetailResponseData.builder()
@@ -105,6 +106,7 @@ public class ApiV1RecruitmentArticleController {
                 .hashTags(recruitmentArticle.getHashTags())
                 .clipCount(recruitmentArticle.getClipCount())
                 .isClipped(isClipped)
+                .isPermission(isPermission)
                 .writerName(recruitmentArticle.getMember().getNickname())
                 .writerProfileImageUrl(recruitmentArticle.getMember().getProfileImageUrl())
                 .build();
@@ -181,5 +183,27 @@ public class ApiV1RecruitmentArticleController {
         // 이후 dto에 담긴 데이터를 기반으로 서비스 호출 및 저장 처리
         // 예: recruitmentArticleService.createArticle(studyId, dto);
         return  ResponseEntity.ok(recruitmentArticle.getId());
+    }
+
+    @DeleteMapping("/recruitmentArticles/{id}")
+    public ResponseEntity<?> deleteRecruitmentArticle(
+            @PathVariable("id") Long recruitmentArticleId,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = Long.parseLong(userDetails.getUsername());
+        recruitmentArticleService.deleteRecruitmentArticle(recruitmentArticleId, memberId);
+        return ResponseEntity.ok("RecruitmentArticle deleted successfully.");
+    }
+
+    // 게시글 수정
+    @PutMapping("/recruitmentArticles/{id}")
+    public ResponseEntity<?> updateRecruitmentArticle(
+            @PathVariable("id") Long recruitmentArticleId,
+            @RequestBody UpdateRecruitmentArticleDto dto,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        Long memberId = Long.parseLong(userDetails.getUsername());
+        RecruitmentArticle updatedArticle = recruitmentArticleService.updateRecruitmentArticle(recruitmentArticleId, memberId, dto);
+        return ResponseEntity.ok(updatedArticle.getId());
     }
 }
