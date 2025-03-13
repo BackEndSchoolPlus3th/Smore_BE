@@ -18,7 +18,7 @@ public class StudyController {
     private final StudyService studyService;
     private final StudyMemberService studyMemberService;
 
-    // 유저 스터디 목록 조회
+    // 스터디 정보 조회
     @GetMapping("/api/v1/user/studies")
     public ResponseEntity<List<StudyDto>> getUserStudies() {
         List<StudyDto> studies = studyMemberService.getStudiesByAuthenticatedUser();  // 서비스에서 스터디 목록 조회
@@ -28,7 +28,7 @@ public class StudyController {
                 .body(studies);
     }
 
-    // 스터디 정보 조회
+    // 스터디 목록 조회
     @GetMapping("/api/v1/study/{studyId}")
     public ResponseEntity<StudyDto> getStudyById(@PathVariable("studyId") Long studyId) {
         StudyDto studyDto = studyService.getStudyById(studyId);
