@@ -55,7 +55,7 @@ public class StudyService {
     }
 
     // 스터디 목록 조회
-    @Cacheable(value = "study", key = "#studyId")
+    @Cacheable(value = "studyCache", key = "#studyId != null ? #studyId : 'defaultStudyId'")
     public StudyDto getStudyById(Long studyId) {
         Long memberId = studyMemberService.getAuthenticatedMemberId();
 
@@ -67,7 +67,7 @@ public class StudyService {
     }
 
     // 스터디 정보 업데이트
-    @CachePut(value = "study", key = "#studyId")
+    @CachePut(value = "studyCache", key = "#studyId != null ? #studyId : 'defaultStudyId'")
     public StudyDto updateStudyIntroductions(Long studyId, StudyDto studyDto) {
         Study study = studyRepository.findById(studyId)
                 .orElseThrow(() -> new RuntimeException("스터디를 찾을 수 없습니다."));

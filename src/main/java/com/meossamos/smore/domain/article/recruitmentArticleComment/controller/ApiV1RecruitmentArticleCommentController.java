@@ -21,28 +21,32 @@ import java.util.stream.Collectors;
 public class ApiV1RecruitmentArticleCommentController {
     private final RecruitmentArticleCommentService recruitmentArticleCommentService;
 
-    // 댓글 조회
     @GetMapping
     public ResponseEntity<?> getRecruitmentArticleComments(
             @PathVariable Long recruitmentArticleId,
             @AuthenticationPrincipal UserDetails userDetails
     ) {
-        Long memberId = userDetails != null ? Long.parseLong(userDetails.getUsername()) : null;
+        // 로그인 사용자 ID (수정 가능 여부 판단용)
+        Long currentMemberId = userDetails != null ? Long.parseLong(userDetails.getUsername()) : null;
 
-        // 프로필 정보를 포함한 댓글 데이터 조회
+        // Repository를 통해 댓글 조회 (댓글 작성자 정보와 모집글의 작성자 ID 포함)
         List<RecruitmentArticleDetailCommentWithProfileResponseData> commentList =
                 recruitmentArticleCommentService.getCommentDetailsWithProfileByArticleId(recruitmentArticleId);
 
-        // 각 댓글을 변환하며, 로그인한 사용자와 작성자 비교 후 editable 필드 설정
+        // 각 댓글에 대해 isPublisher 플래그와 editable 플래그 설정
         List<RecruitmentArticleDetailCommentResponseData> commentListResponseData =
                 commentList.stream()
                         .map(comment -> RecruitmentArticleDetailCommentResponseData.builder()
                                 .id(comment.getId())
                                 .comment(comment.getComment())
+                                // 댓글 작성자(writerId)와 모집글 작성자(publisherId)가 같으면 true
+                                .isPublisher(comment.getWriterId().equals(comment.getPublisherId()))
                                 .writerName(comment.getWriterName())
                                 .writerProfileImageUrl(comment.getWriterProfileImageUrl())
                                 .createdDate(comment.getCreatedDate())
-                                .editable(comment.getWriterId().equals(memberId))
+                                // 로그인 사용자가 댓글 작성자인지 여부
+                                .editable(comment.getWriterId().equals(currentMemberId) ||
+                                        comment.getWriterId().equals(comment.getPublisherId()))
                                 .build())
                         .collect(Collectors.toList());
 

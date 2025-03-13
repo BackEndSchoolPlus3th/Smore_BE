@@ -28,6 +28,7 @@ public class RecruitmentArticleDetailResponseData {
     private Integer maxMember;
     private String hashTags;
     private Integer clipCount;
+    private boolean isPermission;
     private String writerName;
     private String writerProfileImageUrl;
     private LocalDateTime createdDate;
