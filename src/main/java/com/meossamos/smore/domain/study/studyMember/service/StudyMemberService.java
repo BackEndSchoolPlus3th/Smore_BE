@@ -318,7 +318,7 @@ public class StudyMemberService {
 
     // 유저의 스터디 상세 조회 (스터디 이름, 소개, 해시태그 포함)
     @Transactional
-    @Cacheable(value = "userStudies", key = "#memberId != null ? #memberId : 'defaultMemberId'")
+    @Cacheable(value = "userStudiesCache", key = "#memberId != null ? #memberId : 'defaultMemberId'")
     public List<StudyDto> getStudiesByAuthenticatedUser() {
         Long memberId = getAuthenticatedMemberId();
 
