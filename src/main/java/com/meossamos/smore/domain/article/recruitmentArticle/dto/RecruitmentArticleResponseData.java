@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Setter
 @Getter
 @NoArgsConstructor
@@ -15,11 +17,10 @@ public class RecruitmentArticleResponseData {
     private Long id;
     private String title;
     private String introduction;
-    private String region;
     private String thumbnailUrl;
     private Boolean isRecruiting;
     private String writerName;
-    private String writerProfileImageUrl;
-    private Long ClipCount;
-    private String hashTags;
+    private String writerProfile;
+    private Long clipCount;
+    private String hashtagList;
 }
