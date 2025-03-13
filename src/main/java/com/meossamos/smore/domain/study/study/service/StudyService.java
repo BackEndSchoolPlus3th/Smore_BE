@@ -54,7 +54,7 @@ public class StudyService {
                 .build();
     }
 
-    // 스터디 정보 조회
+    // 스터디 목록 조회
     @Cacheable(value = "study", key = "#studyId")
     public StudyDto getStudyById(Long studyId) {
         Long memberId = studyMemberService.getAuthenticatedMemberId();

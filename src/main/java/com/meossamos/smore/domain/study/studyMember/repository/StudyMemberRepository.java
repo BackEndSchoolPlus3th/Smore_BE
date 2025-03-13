@@ -40,6 +40,9 @@ public interface StudyMemberRepository extends JpaRepository<StudyMember, Long> 
 
     List<StudyMember> findByStudyId(Long studyId);
 
+    @Query("SELECT sm FROM StudyMember sm JOIN FETCH sm.study WHERE sm.member.id = :memberId")
+    List<StudyMember> findByMemberIdWithStudies(@Param("memberId") Long memberId);
+
     @Modifying
     @Query("DELETE FROM StudyMember sm WHERE sm.study.id = :studyId AND sm.member.id = :memberId")
     int deleteByStudyIdAndMemberId(@Param("studyId") Long studyId, @Param("memberId") Long memberId);
