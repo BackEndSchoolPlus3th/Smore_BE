@@ -1,12 +1,12 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.service;
 
+import co.elastic.clients.elasticsearch._types.FieldSort;
 import co.elastic.clients.elasticsearch._types.SortOptions;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchAllQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.MatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch._types.FieldSort;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.meossamos.smore.domain.article.recruitmentArticle.dto.RecruitmentArticleResponseData;
@@ -15,15 +15,10 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.global.util.ElasticSearchUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -68,13 +63,12 @@ public class RecruitmentArticleDocService {
                     .id(Long.valueOf(recruitmentArticleDoc.getId()))
                     .title(recruitmentArticleDoc.getTitle())
                     .introduction(recruitmentArticleDoc.getIntroduction())
-                    .hashTags(recruitmentArticleDoc.getHash_tags())
-                    .region(recruitmentArticleDoc.getRegion())
+                    .hashtagList(recruitmentArticleDoc.getHash_tags())
                     .thumbnailUrl(recruitmentArticleDoc.getThumbnail_url())
                     .isRecruiting(recruitmentArticleDoc.getIs_recruiting())
-                    .ClipCount(recruitmentArticleDoc.getClip_count())
+                    .clipCount(recruitmentArticleDoc.getClip_count())
                     .writerName(member.getNickname())
-                    .writerProfileImageUrl(member.getProfileImageUrl())
+                    .writerProfile(member.getProfileImageUrl())
                     .build();
             recruitmentArticleResponseDataList.add(recruitmentArticleResponseData);
         }
