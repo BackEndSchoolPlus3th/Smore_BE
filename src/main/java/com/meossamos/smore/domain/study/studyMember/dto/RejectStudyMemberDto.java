@@ -12,6 +12,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class RejectStudyMemberDto {
-    String studyTitle;
-    String nickname;
+    long memberId;
 }
