@@ -180,6 +180,14 @@ public class StudyMemberController {
         );
         return ResponseEntity.ok("User added to study with role: " + request.getRole());
     }
+    @PostMapping("/study/{studyId}/rejectMember")
+    public ResponseEntity<String> addMemberToStudy(@PathVariable Long studyId,@RequestBody RejectStudyMemberDto request) {
+        studyMemberService.rejectMemberToStudy(
+                studyId,
+                request.getMemberId()
+        );
+        return ResponseEntity.ok("Reject added to study with role: " + request.getMemberId());
+    }
 
     // 유저 권한 조회 API
     @GetMapping("/study/{studyId}/checkPermission")
@@ -231,6 +239,25 @@ public class StudyMemberController {
         try {
             // 각 멤버에 대해 권한을 삭제 처리
             studyMemberService.deletePermissions(studyId, permissionsToDelete);
+
+            return ResponseEntity.ok("Permissions deleted successfully.");
+        } catch (Exception e) {
+            // 예외 발생 시 에러 메시지 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to delete permissions: " + e.getMessage());
+        }
+    }
+
+
+    //지원 거절
+    @PostMapping("/study/{studyId}/reject")
+    public ResponseEntity<String> deletePermissions(
+            @PathVariable Long studyId,
+            @RequestBody RejectStudyMemberDto rejectStudyMemberDto) {
+
+        try {
+            // 스터지 지원 거절
+            studyMemberService.rejectMemberToStudy(studyId, rejectStudyMemberDto.getMemberId());
 
             return ResponseEntity.ok("Permissions deleted successfully.");
         } catch (Exception e) {

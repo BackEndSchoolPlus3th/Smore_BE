@@ -182,9 +182,9 @@ public class StudyMemberService {
         return studyMemberRepository.save(studyMember);
     }
 
-    public void rejectMemberToStudy(String studyTitle,String nickname){
-        Member member = memberRepository.findByNickname(nickname).get();
-        Study study = studyRepository.findByTitle(studyTitle).get();
+    public void rejectMemberToStudy(Long studyId,Long memberId){// memberId 거절당한 멤버
+        Member member = memberRepository.findById(memberId).get();
+        Study study = studyRepository.findById(studyId).get();
 
         emitters.notiRejectStudyMember(member,study);
 
@@ -436,22 +436,28 @@ public class StudyMemberService {
     }
 
     // 권한 업데이트 처리
-    private void updateMemberPermissions(StudyMember studyMember, Map<String, Boolean> permissions) {
+    @Transactional
+    public void updateMemberPermissions(StudyMember studyMember, Map<String, Boolean> permissions) {
         if (permissions.containsKey("permissionRecruitManage")) {
             studyMember.setPermissionRecruitManage(permissions.get("permissionRecruitManage"));
+            emitters.notiAddStudyMemberPermission(studyMember,"permissionRecruitManage");
         }
         if (permissions.containsKey("permissionArticleManage")) {
             studyMember.setPermissionArticleManage(permissions.get("permissionArticleManage"));
+            emitters.notiAddStudyMemberPermission(studyMember,"permissionArticleManage");
         }
         if (permissions.containsKey("permissionCalendarManage")) {
             studyMember.setPermissionCalendarManage(permissions.get("permissionCalendarManage"));
+            emitters.notiAddStudyMemberPermission(studyMember,"permissionCalendarManage");
         }
         if (permissions.containsKey("permissionSettingManage")) {
             studyMember.setPermissionSettingManage(permissions.get("permissionSettingManage"));
+            emitters.notiAddStudyMemberPermission(studyMember,"permissionCalendarManage");
         }
     }
 
     // 권한 삭제 로직
+    @Transactional
     public void deletePermissions(Long studyId, Map<String, List<Long>> permissionsToDelete) {
         for (Map.Entry<String, List<Long>> entry : permissionsToDelete.entrySet()) {
             String permissionKey = entry.getKey();
@@ -471,20 +477,26 @@ public class StudyMemberService {
         }
     }
 
+
     // 권한 삭제 처리
-    private void removePermission(StudyMember studyMember, String permissionKey) {
+    @Transactional
+    public void removePermission(StudyMember studyMember, String permissionKey) {
         switch (permissionKey) {
             case "permissionRecruitManage":
                 studyMember.setPermissionRecruitManage(false);
+                emitters.notiRemoveStudyMemberPermission(studyMember,"permissionRecruitManage");
                 break;
             case "permissionArticleManage":
                 studyMember.setPermissionArticleManage(false);
+                emitters.notiRemoveStudyMemberPermission(studyMember,"permissionArticleManage");
                 break;
             case "permissionCalendarManage":
                 studyMember.setPermissionCalendarManage(false);
+                emitters.notiRemoveStudyMemberPermission(studyMember,"permissionCalendarManage");
                 break;
             case "permissionSettingManage":
                 studyMember.setPermissionSettingManage(false);
+                emitters.notiRemoveStudyMemberPermission(studyMember,"permissionSettingManage");
                 break;
             default:
                 throw new IllegalArgumentException("Invalid permission key");
