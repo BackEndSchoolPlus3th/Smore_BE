@@ -2,6 +2,7 @@ spring:
   datasource:
     #    url: jdbc:mysql://127.0.0.1:3306/smore?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     url: jdbc:mysql://smore-dev-rds-instance.c7cca4g8ujfq.ap-northeast-2.rds.amazonaws.com:3306/smore
+#    url: jdbc:mysql://127.0.0.1:3306/smore
     username: root
     password: "00001234"
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,13 +20,8 @@ spring:
     restclient:
       ssl:
         enabled: true
+        verification-mode: none
       uris:  https://a525-221-149-72-194.ngrok-free.app
-      headers:
-        ngrok-skip-browser-warning: "any-value"
-    rest:
-      uris:   https://a525-221-149-72-194.ngrok-free.app
-      ssl:
-        enabled: true
       headers:
         ngrok-skip-browser-warning: "any-value"
 
@@ -41,6 +37,11 @@ logging:
         data:
           elasticsearch: DEBUG
           jpa: DEBUG
+        elasticsearch:
+          restclient: DEBUG
+          rest: DEBUG
+      elasticsearch:
+        client: DEBUG
 custom:
   elasticsearch:
     uri: https://a525-221-149-72-194.ngrok-free.app
