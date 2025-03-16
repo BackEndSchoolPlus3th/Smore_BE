@@ -5,6 +5,7 @@ import com.meossamos.smore.domain.member.member.repository.MemberRepository;
 import com.meossamos.smore.domain.study.study.dto.StudyDto;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.repository.StudyRepository;
+import com.meossamos.smore.domain.study.studyMember.dto.ParticipantDto;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyMemberDto;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyWithPositionSimpleDto;
 import com.meossamos.smore.domain.study.studyMember.dto.UpdateStudyMemberPermissionDto;
@@ -516,4 +517,20 @@ public class StudyMemberService {
         return studyMemberRepository.findByStudyIdAndMemberId(studyId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("StudyMember not found"));
     }
+
+
+    @Transactional(readOnly = true)
+    public List<ParticipantDto> getParticipantsByStudyId(Long studyId) {
+        // studyMemberRepository에서 studyId에 해당하는 StudyMember 목록 조회
+        List<StudyMember> studyMembers = studyMemberRepository.findByStudyId(studyId);
+
+        // StudyMember 엔티티의 member 정보를 ParticipantDto로 매핑
+        return studyMembers.stream()
+                .map(sm -> {
+                    String profileImageUrl = sm.getMember().getProfileImageUrl();
+                    return new ParticipantDto(sm.getMember().getId(), sm.getMember().getNickname(), profileImageUrl);
+                })
+                .collect(Collectors.toList());
+    }
+
 }
