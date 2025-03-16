@@ -5,7 +5,8 @@ server:
       charset: UTF-8
 spring:
   profiles:
-    active: dev
+#    active: dev
+    active: prod
     include: secret
   logging:
     level:
