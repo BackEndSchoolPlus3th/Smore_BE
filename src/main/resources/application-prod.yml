@@ -20,10 +20,14 @@ spring:
       ssl:
         enabled: true
       uris:  https://a525-221-149-72-194.ngrok-free.app
+      headers:
+        ngrok-skip-browser-warning: "any-value"
     rest:
       uris:   https://a525-221-149-72-194.ngrok-free.app
       ssl:
         enabled: true
+      headers:
+        ngrok-skip-browser-warning: "any-value"
 
   jpa:
     hibernate:
