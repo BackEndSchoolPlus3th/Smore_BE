@@ -93,6 +93,7 @@ public class ApiV1RecruitmentArticleController {
 
         RecruitmentArticleDetailResponseData responseData = RecruitmentArticleDetailResponseData.builder()
                 .id(recruitmentArticle.getId())
+                .studyId(recruitmentArticle.getStudy().getId())
                 .title(recruitmentArticle.getTitle())
                 .content(recruitmentArticle.getContent())
                 .introduction(recruitmentArticle.getIntroduction())
