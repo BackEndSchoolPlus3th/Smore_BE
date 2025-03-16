@@ -17,9 +17,9 @@ spring:
       enabled: false
   elasticsearch:
     restclient:
-      uris: https://23ef-221-149-72-194.ngrok-free.app
+      uris:  https://a525-221-149-72-194.ngrok-free.app
     rest:
-      uris:  https://23ef-221-149-72-194.ngrok-free.app
+      uris:   https://a525-221-149-72-194.ngrok-free.app
 
   jpa:
     hibernate:
