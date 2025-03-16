@@ -17,9 +17,13 @@ spring:
       enabled: false
   elasticsearch:
     restclient:
+      ssl:
+        enabled: true
       uris:  https://a525-221-149-72-194.ngrok-free.app
     rest:
       uris:   https://a525-221-149-72-194.ngrok-free.app
+      ssl:
+        enabled: true
 
   jpa:
     hibernate:
@@ -36,7 +40,3 @@ logging:
 custom:
   elasticsearch:
     uri: https://a525-221-149-72-194.ngrok-free.app
-
-jpa:
-  hibernate:
-    ddl-auto: none
