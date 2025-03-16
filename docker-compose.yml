@@ -56,20 +56,20 @@ services:
     networks:
       - elastic
 
-  mongodb:
-    image: mongo:latest
-    container_name: smore_mongodb
-    restart: always
-    command:
-      - --auth
-    ports:
-      - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: smore_chat_db
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "00001234"
-    volumes:
-      - mongo-data:/data/db
+#  mongodb:
+#    image: mongo:latest
+#    container_name: smore_mongodb
+#    restart: always
+#    command:
+#      - --auth
+#    ports:
+#      - "27017:27017"
+#    environment:
+#      MONGO_INITDB_DATABASE: smore_chat_db
+#      MONGO_INITDB_ROOT_USERNAME: "root"
+#      MONGO_INITDB_ROOT_PASSWORD: "00001234"
+#    volumes:
+#      - mongo-data:/data/db
 
 networks:
   elastic:
