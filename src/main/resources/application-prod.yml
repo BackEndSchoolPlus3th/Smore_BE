@@ -21,7 +21,7 @@ spring:
       ssl:
         enabled: true
         verification-mode: none
-      uris:  https://a525-221-149-72-194.ngrok-free.app
+      uris:  https://b514-221-149-72-194.ngrok-free.app
       headers:
         ngrok-skip-browser-warning: "any-value"
 
@@ -44,4 +44,4 @@ logging:
         client: DEBUG
 custom:
   elasticsearch:
-    uri: https://a525-221-149-72-194.ngrok-free.app
+    uri: https://b514-221-149-72-194.ngrok-free.app

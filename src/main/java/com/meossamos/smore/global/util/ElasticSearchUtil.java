@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Component
 public class ElasticSearchUtil {
 
-    @Value("${custom.elasticsearch.uri}")
-    private String elasticsearchUri;
+//    @Value("${custom.elasticsearch.uri}")
+    private String elasticsearchUri = "https://b514-221-149-72-194.ngrok-free.app ";
 
     // ElasticsearchClient를 생성하는 메서드
     private ElasticsearchClient createClient() {
