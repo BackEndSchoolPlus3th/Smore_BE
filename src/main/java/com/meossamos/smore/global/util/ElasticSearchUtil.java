@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class ElasticSearchUtil {
 
 //    @Value("${custom.elasticsearch.uri}")
-    private String elasticsearchUri = "https://b514-221-149-72-194.ngrok-free.app";
+    private String elasticsearchUri = "https://72e5-221-149-72-194.ngrok-free.app";
 
     // ElasticsearchClient를 생성하는 메서드
     private ElasticsearchClient createClient() {
