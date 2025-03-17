@@ -13,22 +13,46 @@ import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
 public class ElasticSearchUtil {
 
-//    @Value("${custom.elasticsearch.uri}")
     private String elasticsearchUri = "https://72e5-221-149-72-194.ngrok-free.app";
 
-    // ElasticsearchClient를 생성하는 메서드
     private ElasticsearchClient createClient() {
-        RestClient restClient = RestClient.builder(HttpHost.create(elasticsearchUri)).build();
+        RestClient restClient = RestClient.builder(HttpHost.create(elasticsearchUri))
+                .setHttpClientConfigCallback(httpClientBuilder ->
+                        httpClientBuilder.setSSLContext(createInsecureSslContext()))
+                .build();
+
         ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
         return new ElasticsearchClient(transport);
     }
+
+    // 별도 메서드로 SSLContext 생성 (신뢰되지 않은 SSLContext 허용)
+    private SSLContext createInsecureSslContext() {
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, new TrustManager[]{
+                    new X509TrustManager() {
+                        @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                        @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                        @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                    }}, null);
+            return sslContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize SSL context", e);
+        }
+    }
+
+
 
     /**
      * 기본 from=0, size=10, sortOptions=null을 사용하는 검색 메서드.

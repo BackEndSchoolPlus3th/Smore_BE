@@ -25,19 +25,16 @@ public class ElasticClientConfig extends ElasticsearchConfiguration {
         try {
             sslContext = SSLContext.getInstance("TLS");
             sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {}
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) {}
-                @Override
-                public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                @Override public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                @Override public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                @Override public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
             }}, null);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize SSL context", e);
         }
 
         return ClientConfiguration.builder()
-                .connectedTo("72e5-221-149-72-194.ngrok-free.app")
+                .connectedTo("72e5-221-149-72-194.ngrok-free.app:443") // 명시적으로 포트 443 지정
                 .usingSsl(sslContext, (hostname, session) -> true)
                 .withDefaultHeaders(defaultHeaders)
                 .withConnectTimeout(Duration.ofSeconds(10))
