@@ -10,4 +10,7 @@ import java.util.Optional;
 public interface GroupChatRoomRepository extends JpaRepository<GroupChatRoom, Long> {
     // 특정 스터디에 해당하는 그룹 채팅방 조회
     Optional<GroupChatRoom> findByStudy(Study study);
+    //
+
+
 }

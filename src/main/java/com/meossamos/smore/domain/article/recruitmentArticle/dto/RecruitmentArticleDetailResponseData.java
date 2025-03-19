@@ -1,6 +1,5 @@
 package com.meossamos.smore.domain.article.recruitmentArticle.dto;
 
-import com.meossamos.smore.domain.article.recruitmentArticleComment.dto.RecruitmentArticleDetailCommentResponseData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,6 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Setter
 @Getter
@@ -17,6 +15,7 @@ import java.util.List;
 @SuperBuilder
 public class RecruitmentArticleDetailResponseData {
     private Long id;
+    private Long studyId;
     private String title;
     private String content;
     private String introduction;
