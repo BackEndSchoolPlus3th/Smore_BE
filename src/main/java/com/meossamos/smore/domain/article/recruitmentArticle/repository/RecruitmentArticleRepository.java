@@ -24,4 +24,19 @@ public interface RecruitmentArticleRepository extends JpaRepository<RecruitmentA
 
     @Query("select ra from RecruitmentArticle ra join fetch ra.member join fetch ra.study s join fetch s.leader where ra.id = :id")
     Optional<RecruitmentArticle> findByIdWithMemberAndStudyLeader(@Param("id") Long id);
+
+    // 추가
+    @Query("select ra from RecruitmentArticle ra " +
+            "where ra.title like %:title% " +
+            "or ra.content like %:content% " +
+            "or ra.introduction like %:introduction% " +
+            "or ra.region like %:region% " +
+            "or ra.hashTags like %:hashTags%")
+    List<RecruitmentArticle> findByTitleContainingOrContentContainingOrIntroductionContainingOrRegionContainingOrHashTagsContaining(
+            @Param("title") String title,
+            @Param("content") String content,
+            @Param("introduction") String introduction,
+            @Param("region") String region,
+            @Param("hashTags") String hashTags);
+
 }

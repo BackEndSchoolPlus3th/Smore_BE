@@ -7,6 +7,7 @@ import com.meossamos.smore.domain.member.member.entity.Member;
 import com.meossamos.smore.domain.member.member.service.MemberService;
 import com.meossamos.smore.domain.study.study.entity.Study;
 import com.meossamos.smore.domain.study.study.service.StudyService;
+import com.meossamos.smore.domain.study.studyMember.dto.ParticipantDto;
 import com.meossamos.smore.domain.study.studyMember.dto.StudyMemberDto;
 import com.meossamos.smore.domain.study.studyMember.service.StudyMemberService;
 import lombok.RequiredArgsConstructor;
@@ -83,10 +84,9 @@ public class GroupChatController {
 
     // 특정 스터디의 멤버 목록 조회
     @GetMapping("/{studyId}/users")
-    public ResponseEntity<List<StudyMemberDto>> getGroupChatRoomUsers(@PathVariable("studyId") Long studyId) {
-        // StudyMemberService의 getStudyMembers 메서드를 사용하여 스터디 멤버 조회
-        List<StudyMemberDto> memberList = studyMemberService.getStudyMembers(studyId);
-        return ResponseEntity.ok(memberList);
+    public ResponseEntity<List<ParticipantDto>> getGroupChatRoomUsers(@PathVariable("studyId") Long studyId) {
+        List<ParticipantDto> participantList = studyMemberService.getParticipantsByStudyId(studyId);
+        return ResponseEntity.ok(participantList);
     }
 
 }
