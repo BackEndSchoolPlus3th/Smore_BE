@@ -67,4 +67,4 @@ terraform.rc
 #
 .terraform.lock.hcl
 **/.terraform.lock.hcl/*
-variables_secret.tf
+variables_secret.tfapplication-secret.yml
