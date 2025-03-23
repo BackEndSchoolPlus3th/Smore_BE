@@ -15,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +22,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -99,7 +96,7 @@ public class MemberService {
     public TokenDto refresh(HttpServletRequest request){
 
         String requestToken = extractRefreshTokenFromCookies(request);
-         Long memberId=tokenProvider.parseClaims(requestToken).get("memberId", Long.class);
+        Long memberId=tokenProvider.parseClaims(requestToken).get("memberId", Long.class);
 
         Authentication authentication = tokenProvider.getAuthentication(requestToken);
 
