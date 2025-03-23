@@ -71,6 +71,27 @@ services:
     volumes:
       - mongo-data:/data/db
 
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: smore_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "00001234"
+      MYSQL_DATABASE: "smore"
+      MYSQL_USER: "smore_user"
+      MYSQL_PASSWORD: "smore_pass"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - elastic
+
+
+
 networks:
   elastic:
     driver: bridge
@@ -78,3 +99,9 @@ networks:
 volumes:
   mongo-data:
     driver: local
+  mysql-data:
+    driver: local
+
+
+
+
