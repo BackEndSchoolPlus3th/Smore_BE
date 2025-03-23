@@ -113,7 +113,6 @@ public class StudyScheduleService {
         Study targetStudy = studyRepository.findById(study_id)
                 .orElseThrow(()-> new RuntimeException("해당 ID의 스터디를 찾을 수 없습니다." + study_id));
 
-
         Member targetMember = memberRepository.findById(userID)
                 .orElseThrow(() -> new RuntimeException("해당 ID의 회원을 찾을 수 없습니다." + userID));
 

@@ -5,7 +5,8 @@ server:
       charset: UTF-8
 spring:
   profiles:
-    active: dev
+#    active: dev
+    active: prod
     include: secret
   logging:
     level:
@@ -22,13 +23,7 @@ spring:
   thymeleaf:
     cache: false
 
-jwt:
-  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmct
 
-livekit:
-  websocketURL: wss://chat-app-y0a5829d.livekit.cloud
-  apiKey: APIURQtHFoLdJgb
-  apiSecret: jluVNjpRIrf5EVlVPlDkY2y5pEAQdzf9tAfV3RrftVIB
 
 
 aws:

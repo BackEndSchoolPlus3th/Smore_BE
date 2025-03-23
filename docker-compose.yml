@@ -56,20 +56,41 @@ services:
     networks:
       - elastic
 
-  mongodb:
-    image: mongo:latest
-    container_name: smore_mongodb
+#  mongodb:
+#    image: mongo:latest
+#    container_name: smore_mongodb
+#    restart: always
+#    command:
+#      - --auth
+#    ports:
+#      - "27017:27017"
+#    environment:
+#      MONGO_INITDB_DATABASE: smore_chat_db
+#      MONGO_INITDB_ROOT_USERNAME: "root"
+#      MONGO_INITDB_ROOT_PASSWORD: "00001234"
+#    volumes:
+#      - mongo-data:/data/db
+
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: smore_mysql
     restart: always
-    command:
-      - --auth
-    ports:
-      - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: smore_chat_db
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "00001234"
+      MYSQL_ROOT_PASSWORD: "00001234"
+      MYSQL_DATABASE: "smore"
+      MYSQL_USER: "smore_user"
+      MYSQL_PASSWORD: "smore_pass"
+    ports:
+      - "3306:3306"
     volumes:
-      - mongo-data:/data/db
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - elastic
+
+
 
 networks:
   elastic:
@@ -78,3 +99,9 @@ networks:
 volumes:
   mongo-data:
     driver: local
+  mysql-data:
+    driver: local
+
+
+
+
