@@ -8,22 +8,22 @@ spring:
     mongodb:
       uri: "${dev.spring.mongoDB.uri}"
     redis:
+
       host: "${dev.spring.redis.host}"
       port: "${dev.spring.redis.port}"
+
   docker:
     compose:
       enabled: false
   elasticsearch:
     restclient:
+
       uris: "${dev.spring.elasticsearch.uris}"
-      # 필요한 경우 타임아웃이나 인증 정보도 추가할 수 있습니다.
-      # connection-timeout: 5000
-      # read-timeout: 60000
+
+
     rest:
       uris: "${dev.spring.elasticsearch.uris}"
-      # 필요한 경우 타임아웃이나 인증 정보도 추가할 수 있습니다.
-      # connection-timeout: 5000
-      # read-timeout: 60000
+
 
   jpa:
     hibernate:
@@ -39,6 +39,7 @@ logging:
           jpa: DEBUG
 custom:
   elasticsearch:
+
     uri: "${dev.spring.elasticsearch.uris}"
 
 
@@ -49,3 +50,4 @@ livekit:
   websocketURL: "${dev.livekit.sebsocketURL}"
   apiKey: "${dev.livekit.apiKey}"
   apiSecret: "${dev.livekit.apiSecret}"
+
