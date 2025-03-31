@@ -1,20 +1,27 @@
+#version: '3.7'
+
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.3.3
     container_name: smore_elasticsearch
+    privileged: true
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=${ES_JAVA_OPTS}
     command: >
       bash -c '
-        bin/elasticsearch-plugin install analysis-nori;
+        if [ -d "plugins/analysis-nori" ]; then
+          bin/elasticsearch-plugin remove analysis-nori;
+        fi;
+        bin/elasticsearch-plugin install --batch analysis-nori;
         /usr/local/bin/docker-entrypoint.sh elasticsearch
       '
     ports:
       - "9200:9200"
     networks:
       - elastic
+
   kibana:
     image: docker.elastic.co/kibana/kibana:8.3.3
     container_name: smore_kibana
@@ -22,16 +29,22 @@ services:
       SERVER_NAME: kibana
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
     ports:
-      - 5601:5601
+      - "5601:5601"
     depends_on:
       - elasticsearch
     networks:
       - elastic
+
   logstash:
     image: docker.elastic.co/logstash/logstash:8.3.3
     container_name: smore_logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_LOGSTASH_USER}
+      - MYSQL_PASSWORD=${MYSQL_LOGSTASH_PASSWORD}
+      - MYSQL_DRIVER_LIBRARY=${MYSQL_DRIVER_LIBRARY}
+      - MYSQL_DRIVER_CLASS=${MYSQL_DRIVER_CLASS}
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
       - ./logstash/lib/mysql-connector-j-9.2.0.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar:ro
@@ -42,6 +55,53 @@ services:
       - elasticsearch
     networks:
       - elastic
+
+  mongodb:
+    image: mongo:latest
+    container_name: smore_mongodb
+    restart: always
+    command:
+      - --auth
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongo-data:/data/db
+
+
+
+  mysql:
+    image: mysql:8.0
+    container_name: smore_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - elastic
+
+
+
 networks:
   elastic:
     driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+  mysql-data:
+    driver: local
+
+
+
+

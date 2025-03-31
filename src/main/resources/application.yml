@@ -1,8 +1,12 @@
 server:
   port: 8090
+  servlet:
+    encoding:
+      charset: UTF-8
 spring:
   profiles:
-    active: dev
+#    active: dev
+    active: prod
     include: secret
   logging:
     level:
@@ -10,9 +14,21 @@ spring:
       org.hibernate.orm.jdbc.bind: TRACE
       org.hibernate.orm.jdbc.extract: TRACE
       org.springframework.transaction.interceptor: TRACE
+  security:
+    anonymous:
+      enabled: false
+
   jpa:
-    hibernate:
-      ddl-auto: update
     show-sql: true
   thymeleaf:
     cache: false
+
+
+
+
+aws:
+  s3:
+    region: ap-northeast-2
+    bucket-name:
+      public: smore-dev-bucket-public-1
+      private: smore-dev-bucket-private-1
