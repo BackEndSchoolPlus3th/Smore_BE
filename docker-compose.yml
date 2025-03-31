@@ -1,4 +1,4 @@
-version: '3.7'
+#version: '3.7'
 
 services:
   elasticsearch:
@@ -8,7 +8,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=${ES_JAVA_OPTS}
     command: >
       bash -c '
         if [ -d "plugins/analysis-nori" ]; then
@@ -40,11 +40,11 @@ services:
     container_name: smore_logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
-      - MYSQL_HOST=host.docker.internal
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=00001234
-      - MYSQL_DRIVER_LIBRARY=/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar
-      - MYSQL_DRIVER_CLASS=com.mysql.cj.jdbc.Driver
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_LOGSTASH_USER}
+      - MYSQL_PASSWORD=${MYSQL_LOGSTASH_PASSWORD}
+      - MYSQL_DRIVER_LIBRARY=${MYSQL_DRIVER_LIBRARY}
+      - MYSQL_DRIVER_CLASS=${MYSQL_DRIVER_CLASS}
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
       - ./logstash/lib/mysql-connector-j-9.2.0.jar:/usr/share/logstash/logstash-core/lib/jars/mysql-connector-j-9.2.0.jar:ro
@@ -65,9 +65,9 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: smore_chat_db
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "00001234"
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongo-data:/data/db
 
@@ -78,10 +78,10 @@ services:
     container_name: smore_mysql
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "00001234"
-      MYSQL_DATABASE: "smore"
-      MYSQL_USER: "smore_user"
-      MYSQL_PASSWORD: "smore_pass"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
