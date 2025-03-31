@@ -36,10 +36,13 @@ out/
 ### VS Code ###
 .vscode/
 
+# 민감정보
 application-secret.yml
+.env
 
-.terraform
+
 # Terraform 상태 파일
+.terraform
 *.tfstate
 *.tfstate.*
 
@@ -67,4 +70,4 @@ terraform.rc
 #
 .terraform.lock.hcl
 **/.terraform.lock.hcl/*
-variables_secret.tf
+variables_secret.tfapplication-secret.yml
