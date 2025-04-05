@@ -10,7 +10,6 @@ import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.net.ssl.SSLContext;
@@ -24,7 +23,8 @@ import java.util.stream.Collectors;
 @Component
 public class ElasticSearchUtil {
 
-    private String elasticsearchUri = "https://72e5-221-149-72-194.ngrok-free.app";
+//    private String elasticsearchUri = "https://72e5-221-149-72-194.ngrok-free.app";
+    private String elasticsearchUri = "http://localhost:9200";
 
     private ElasticsearchClient createClient() {
         RestClient restClient = RestClient.builder(HttpHost.create(elasticsearchUri))
