@@ -19,3 +19,6 @@
 :small_blue_diamond: webRTC 활용 화상채팅<br><br>
 :three: S3 서버를 활용한 자료관리<br>
 :small_blue_diamond: S3 업로드를 통한 스터디 자료 통합관리<br>
+
+## 아키텍처 설계
+![image](https://github.com/user-attachments/assets/b809f476-997f-4b96-8dd4-e38dadafb288)
