@@ -21,4 +21,5 @@
 :small_blue_diamond: S3 업로드를 통한 스터디 자료 통합관리<br>
 
 ## 아키텍처 설계
-![image](https://github.com/user-attachments/assets/b809f476-997f-4b96-8dd4-e38dadafb288)
+![image](https://github.com/user-attachments/assets/ed8ce338-c368-49b0-9b15-69157eacdfe2)
+
