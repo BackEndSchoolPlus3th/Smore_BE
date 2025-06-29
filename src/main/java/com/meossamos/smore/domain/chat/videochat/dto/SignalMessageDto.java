@@ -1,13 +1,13 @@
 package com.meossamos.smore.domain.chat.videochat.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SignalMessageDto {
-    private String type;         // join, offer, answer, ice 등
-    private String roomId;       // 대상 방
-    private String sender;       // 보낸 사용자 ID
-    private Object data;         // offer/answer/ice 데이터
+    private String type;
+    private String message;
 }
