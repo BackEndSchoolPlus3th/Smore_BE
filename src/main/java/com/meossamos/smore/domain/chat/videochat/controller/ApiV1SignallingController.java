@@ -21,7 +21,7 @@ public class ApiV1SignallingController {
             @DestinationVariable String roomId,
             @Payload Map<String, Object> message
             ) {
-            System.out.println("📨 Signal Received: " + message);
+            System.out.println("📨 Signal Received!: " + message);
             simpMessagingTemplate.convertAndSend("/topic/signal/" + roomId, message);
     }
 
