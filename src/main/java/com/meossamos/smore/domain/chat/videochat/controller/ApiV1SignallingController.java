@@ -1,6 +1,6 @@
 package com.meossamos.smore.domain.chat.videochat.controller;
 
-import com.meossamos.smore.domain.chat.videochat.dto.RoomSessionRegistry;
+import com.meossamos.smore.domain.chat.videochat.registry.RoomSessionRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,16 +25,15 @@ public class ApiV1SignallingController {
             @Header("simpSessionId") String sessionId,
             @Payload Map<String, Object> message
             ) {
-            System.out.println("📨 Signal Received!: "+sessionId + message);
-            String userId = String.valueOf(message.get("userId"));
-            roomSessionRegistry.addUserToRoom(roomId, userId);
+            System.out.println("📨 Signal Received from {}: {}: "+sessionId + message);
+
+            // 참가자 등록
+            roomSessionRegistry.addUserToRoom(roomId, sessionId);
 
             int userCount = roomSessionRegistry.getUserCount(roomId);
             log.info("현재 방 {} 참가자 수: {}", roomId, userCount);
 
-            // 메시지에 참가자 수 정보 추가
             message.put("userCount", userCount);
-
             simpMessagingTemplate.convertAndSend("/topic/signal/" + roomId, message);
     }
 
