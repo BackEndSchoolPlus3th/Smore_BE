@@ -26,8 +26,8 @@ public class ApiV1SignallingController {
             @Payload Map<String, Object> message
             ) {
             System.out.println("📨 Signal Received!: "+sessionId + message);
-
-            roomSessionRegistry.addUserToRoom(roomId, sessionId);
+            String userId = String.valueOf(message.get("userId"));
+            roomSessionRegistry.addUserToRoom(roomId, userId);
 
             int userCount = roomSessionRegistry.getUserCount(roomId);
             log.info("현재 방 {} 참가자 수: {}", roomId, userCount);
