@@ -14,7 +14,7 @@ public class WebSocketConfigForVideoChat implements WebSocketConfigurer {
     private final WebMediaHandler webMediaHandler;
 
     @Autowired
-    public WebSocketConfiguration(WebMediaHandler webMediaHandler) {
+    public WebSocketConfigForVideoChat(WebMediaHandler webMediaHandler) {
         this.webMediaHandler = webMediaHandler;
     }
 

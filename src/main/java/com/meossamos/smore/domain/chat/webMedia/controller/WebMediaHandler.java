@@ -1,7 +1,10 @@
 package com.meossamos.smore.domain.chat.webMedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meossamos.smore.domain.chat.webMedia.model.MessageType;
+import com.meossamos.smore.domain.chat.webMedia.model.StringMessageContainer;
 import com.meossamos.smore.domain.chat.webMedia.service.MessageSender;
+import com.meossamos.smore.domain.chat.webMedia.service.RoomAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -9,7 +12,6 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,19 +34,21 @@ public class WebMediaHandler  extends TextWebSocketHandler {
     }
 
     @Override
-    public void  afterConnectionEsatablished(WebSocketSession session) throws Exception{
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception{
         log.debug("Connection established : sessionId={}", session.getId());
+
+
     }
 
     @Override
-    protected void  handleTextMessage(WebSocketSession session, TextMessage message) throws  Exception{
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws  Exception{
         final String payload = message.getPayload();
 
         try {
             final StringMessageContainer messageContainer = objectMapper.readValue(payload, StringMessageContainer.class);
             RoomAgent agent = null;
 
-            if(TrayIcon.MessageType.JoinRequest.equals(messageContainer.getType())){
+            if(MessageType.JoinRequest.equals(messageContainer.getType())){
                 final  String roomId = messageContainer.getRoomId();
                 synchronized (lockObj){
                     if(agentMap.containsKey(roomId)){
