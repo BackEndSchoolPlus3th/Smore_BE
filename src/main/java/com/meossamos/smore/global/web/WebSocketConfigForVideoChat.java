@@ -20,7 +20,7 @@ public class WebSocketConfigForVideoChat implements WebSocketConfigurer {
 
     @Override
     public void  registerWebSocketHandlers(WebSocketHandlerRegistry registry){
-        registry.addHandler(webMediaHandler, "webmedia-ws")
+        registry.addHandler(webMediaHandler, "/webmedia-ws")
                 .setAllowedOrigins("*");
     }
 }

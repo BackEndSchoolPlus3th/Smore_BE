@@ -95,7 +95,7 @@ services:
     container_name: smore_srs
     restart: unless-stopped
     environment:
-      - CANDIDATE=172.29.72.193
+      - CANDIDATE=${CANDIDATE}
     ports:
       - "1985:1985"
       - "8000:8000/udp"

@@ -65,6 +65,10 @@ public class SecurityConfig {
                         .requestMatchers("/sse/connect").permitAll()
                         .requestMatchers("/api/current-user").permitAll()
                         .requestMatchers("/api/study/my-studies").permitAll()
+                        .requestMatchers("/webmedia-ws/**").permitAll()
+                        .requestMatchers("/video-chat/**").permitAll()
+                        .requestMatchers("/rtc/**").permitAll()
+                        .requestMatchers("/rrrrrr/**").permitAll()
 
 
                         .requestMatchers("/add").permitAll()
