@@ -8,21 +8,17 @@ spring:
     mongodb:
       uri: "${dev.spring.mongoDB.uri}"
     redis:
-
       host: "${dev.spring.redis.host}"
       port: "${dev.spring.redis.port}"
+    elasticsearch:
+      repositories:
+        enabled: true
 
   docker:
     compose:
       enabled: false
   elasticsearch:
-    restclient:
-
-      uris: "${dev.spring.elasticsearch.uris}"
-
-
-    rest:
-      uris: "${dev.spring.elasticsearch.uris}"
+      uris: http://localhost:9200
 
 
   jpa:
@@ -39,7 +35,6 @@ logging:
           jpa: DEBUG
 custom:
   elasticsearch:
-
     uri: "${dev.spring.elasticsearch.uris}"
 
 

@@ -24,10 +24,8 @@ public class ApiV1LiveKitController {
 
     @Value("${livekit.apiKey}")
     private String apikey;
-
     @Value("${livekit.apiSecret}")
     private String apiSecret;
-
 
     @PostMapping("/api/v1/token")
     public ResponseEntity<Map<String, String>> getToken(
@@ -38,10 +36,8 @@ public class ApiV1LiveKitController {
             System.out.println(authHeader);
             String jwttoken = authHeader.substring(7); // "Bearer " 이후의 부분을 추출
             // 토큰 복호화해서 유저정보 리턴
-//            System.out.println(token);
             Map<String, String> userInfo =liveKitService.getUserInfo(jwttoken);
             String studyTitle = userInfo.get("studyTitle");
-//            String userId = userInfo.get("userId");
             String userEmail = userInfo.get("userEmail");
 
 
@@ -55,7 +51,6 @@ public class ApiV1LiveKitController {
             return ResponseEntity.ok(Map.of(
                     "token", token.toJwt(),
                     "StudyTitle", studyTitle,
-//                    "UserId", userId,
                     "UserEmail", userEmail));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("errorMessage", "Authorization token is required"));
