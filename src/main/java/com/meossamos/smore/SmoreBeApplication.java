@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 @SpringBootApplication
 @EntityScan(basePackages = {"com.meossamos.smore.domain"})
+//@EnableElasticsearchRepositories(basePackages = {"com.meossamos.smore.domain.article.recruitmentArticle.repository"})
 public class SmoreBeApplication {
 
     public static void main(String[] args) {

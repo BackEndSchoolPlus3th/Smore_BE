@@ -90,6 +90,17 @@ services:
     networks:
       - elastic
 
+  srs:
+    image: ossrs/srs:5
+    container_name: smore_srs
+    restart: unless-stopped
+    environment:
+      - CANDIDATE=${CANDIDATE}
+    ports:
+      - "1985:1985"
+      - "8000:8000/udp"
+    networks:
+      - elastic
 
 
 networks:
