@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .requestMatchers("/webmedia-ws/**").permitAll()
                         .requestMatchers("/video-chat/**").permitAll()
                         .requestMatchers("/rtc/**").permitAll()
-                        .requestMatchers("/rrrrrr/**").permitAll()
+//                        .requestMatchers("/rrrrrr/**").permitAll()
 
 
                         .requestMatchers("/add").permitAll()
