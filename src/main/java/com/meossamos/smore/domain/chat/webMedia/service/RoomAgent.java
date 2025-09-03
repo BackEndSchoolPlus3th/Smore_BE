@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class RoomAgent {
-    private static final int MaxUsers = 2;
+    private static final int MaxUsers = 10;
     private static final String ApiUrl = "http://localhost:1985";
     private static final String StreamUrl = "webrtc://localhost";
 

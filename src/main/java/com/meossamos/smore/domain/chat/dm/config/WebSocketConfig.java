@@ -15,7 +15,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws")
                 .setAllowedOrigins("*") // 실제 운영환경에서는 도메인 제한 필요(보안)
                 .withSockJS();
+
     }
+
+    
 
     // 메세지 브로커 설정
     @Override
