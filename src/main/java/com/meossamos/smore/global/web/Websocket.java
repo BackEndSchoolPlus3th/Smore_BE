@@ -23,6 +23,10 @@ public class Websocket implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new TokenHandshakeInterceptor(tokenProvider))
                 .withSockJS();
+
+        registry.addEndpoint("/webmedia-ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
