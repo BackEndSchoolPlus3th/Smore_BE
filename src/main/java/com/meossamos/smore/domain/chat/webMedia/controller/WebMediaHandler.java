@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meossamos.smore.domain.chat.webMedia.model.MessageType;
 import com.meossamos.smore.domain.chat.webMedia.model.StringMessageContainer;
 import com.meossamos.smore.domain.chat.webMedia.service.MessageSender;
-import com.meossamos.smore.domain.chat.webMedia.service.RoomAgent;
+import com.meossamos.smore.domain.chat.webMedia.service.LegacyRoomAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -23,7 +23,7 @@ public class WebMediaHandler  extends TextWebSocketHandler {
 
     //동시성 문제
     private final Object lockObj;
-    private final Map<String, RoomAgent> agentMap;
+    private final Map<String, LegacyRoomAgent> agentMap;
 
     public WebMediaHandler(ObjectMapper objectMapper, MessageSender messagSender){
         this.objectMapper = objectMapper;
@@ -46,7 +46,7 @@ public class WebMediaHandler  extends TextWebSocketHandler {
 
         try {
             final StringMessageContainer messageContainer = objectMapper.readValue(payload, StringMessageContainer.class);
-            RoomAgent agent = null;
+            LegacyRoomAgent agent = null;
 
             if(MessageType.JoinRequest.equals(messageContainer.getType())){
                 final  String roomId = messageContainer.getRoomId();
@@ -54,7 +54,7 @@ public class WebMediaHandler  extends TextWebSocketHandler {
                     if(agentMap.containsKey(roomId)){
                         agent = agentMap.get(roomId);
                     } else {
-                        agent = new RoomAgent(objectMapper, messageSender, roomId);
+                        agent = new LegacyRoomAgent(objectMapper, messageSender, roomId);
                         agentMap.put(roomId, agent);
                     }
                 }
