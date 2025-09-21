@@ -46,3 +46,8 @@ livekit:
   apiKey: "${dev.livekit.apiKey}"
   apiSecret: "${dev.livekit.apiSecret}"
 
+
+webMedia:
+  apiUrl: http://localhost:1985
+  streamUrl: webrtc://localhost
+

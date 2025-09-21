@@ -36,23 +36,23 @@ public class VCController {
 
     @MessageMapping("/vc/{roomId}")
     public void handleMessage(
-            @DestinationVariable Long roomId,
+            @DestinationVariable String roomId,
             @Payload MessageDto<?> messageDto,
             Principal principal
             ){
 
-        vcService.handleMassage(roomId, principal.getName(), messageDto);
+        VCService.OutMessages out = vcService.handleMessage(roomId, principal.getName(), messageDto);
 
-        messagingTemplate.convertAndSend("/topic/vc/" + roomId, messageDto);
-        messagingTemplate.convertAndSendToUser(principal.getName(),
-                "/queue/vc",
-                Map.of("ok", true, "roomId", roomId));
+        if(out.ack() !=null){
+            messagingTemplate.convertAndSendToUser(principal.getName(),
+                    "/queue/vc",
+                    Map.of("ok", true, "roomId", roomId));
+        }
 
-
+        if(out.broadcasts() != null) {
+            messagingTemplate.convertAndSend("/topic/vc/" + roomId, messageDto);
+        }
         System.out.println("VCController got message -> roomId is "+roomId +" Message is "+ messageDto.toString());
     }
-
-
-
 
 }
