@@ -46,6 +46,7 @@ public class RoomAgent {
             state.emptyAt = null;
             state.lastActivatedAt = LocalDateTime.now();
             state.version.incrementAndGet();
+            System.out.println("RoomAgent Log => "+"RoomUser : " + roomUser.toString() + "Rooms : "+rooms.toString());
         }
 
         return added;

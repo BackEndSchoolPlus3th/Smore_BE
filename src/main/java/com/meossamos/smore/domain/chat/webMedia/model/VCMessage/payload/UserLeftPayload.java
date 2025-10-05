@@ -5,9 +5,8 @@ import lombok.*;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
+@Builder
 public class UserLeftPayload {
 }

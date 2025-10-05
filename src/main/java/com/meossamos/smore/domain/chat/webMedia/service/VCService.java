@@ -53,6 +53,7 @@ public class VCService {
         switch (messageDto.getType()) {
             case joinRequestPayload: {
                 boolean ok = roomAgent.handleJoin(messageDto);
+                System.out.println("VCService Log => handle join의 결과는 " + ok);
 
                 if (ok) {
                     var ackPayload = JoinResponsePayload.builder()
@@ -70,19 +71,18 @@ public class VCService {
                             .sentAt(LocalDateTime.now())
                             .build();
 
-                    var eventPayload = JoinEventPayload.builder()
-                            .build();
+
 
                     var joinEvent = MessageDto.builder()
                             .messageId(idGen.next())
                             .roomId(roomId)
                             .userId(name)
                             .type(MessageType.joinResponsePayload)
-                            .payload(eventPayload)
+                            .payload(null)
                             .sentAt(LocalDateTime.now())
                             .build();
 
-                    log.info("[SEND] roomId = {} msgId = {} type = {} ", roomId, ack.getMessageId(), ack.getType());
+//                    log.info("[SEND] roomId = {} msgId = {} type = {} ", roomId, ack.getMessageId(), ack.getType());
                     return OutMessages.both(ack, joinEvent);
                 }
                 return OutMessages.empty();

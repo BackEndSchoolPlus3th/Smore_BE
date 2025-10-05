@@ -14,7 +14,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
-import java.util.Map;
 
 @ToString
 @Controller
@@ -41,18 +40,28 @@ public class VCController {
             Principal principal
             ){
 
+        // IN 로그
+        log.info("[IN ] roomId ={} user ={} type ={} msgId ={}",
+                roomId, principal.getName(), messageDto.getType(), messageDto.getMessageId());
+
         VCService.OutMessages out = vcService.handleMessage(roomId, principal.getName(), messageDto);
 
+        // 개인 Ack 전송
         if(out.ack() !=null){
             messagingTemplate.convertAndSendToUser(principal.getName(),
-                    "/queue/vc",
-                    Map.of("ok", true, "roomId", roomId));
+                    "/queue/vc",out.ack());
+            log.info("[OUT] ACK dest=/user/{}/queue/vc type ={} msgId={}",
+                    principal.getName(), out.ack().getType(), out.ack().getMessageId());
+
         }
 
+        // 브로드캐스트 전송
         if(out.broadcasts() != null) {
-            messagingTemplate.convertAndSend("/topic/vc/" + roomId, messageDto);
+            messagingTemplate.convertAndSend("/topic/vc/" + roomId, out.broadcasts());
+            log.info("[OUT] BCAST dest =/topic/vc/{} type={} msgId={}",
+                    roomId, out.broadcasts().getType(), out.broadcasts().getMessageId());
+
         }
-        System.out.println("VCController got message -> roomId is "+roomId +" Message is "+ messageDto.toString());
     }
 
 }
