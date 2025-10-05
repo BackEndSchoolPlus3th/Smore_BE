@@ -11,7 +11,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -34,12 +35,12 @@ public class VCService {
     // VCController에 전달할 메세지 종류 정의
     public static record OutMessages(
        @Nullable MessageDto<?> ack,
-       @Nullable MessageDto<?> broadcasts
+       List<MessageDto<?>> broadcasts
     ){
-        public static OutMessages empty() { return new OutMessages(null,null);}
-        public static OutMessages justAck(MessageDto<?> ack) {return new OutMessages(ack,null);}
-        public static OutMessages justBroadcast(MessageDto<?> bc) {return new OutMessages(null, bc);}
-        public static OutMessages both(MessageDto<?> ack, MessageDto<?> bc){return  new OutMessages(ack, bc);}
+        public static OutMessages empty() { return new OutMessages(null,List.of());}
+        public static OutMessages justAck(MessageDto<?> ack) {return new OutMessages(ack,List.of());}
+        public static OutMessages justBroadcast(MessageDto<?> bc) {return new OutMessages(null, List.of(bc));}
+        public static OutMessages both(@Nullable MessageDto<?> ack, List<MessageDto<?>> bcs){return  new OutMessages(ack, (bcs==null?List.of():bcs));}
     }
 
     // 페이로드 꺼내는 헬퍼
@@ -48,12 +49,41 @@ public class VCService {
     }
 
 
+    private MessageDto<Void> buildJoinEvent(String roomId, String userId){
+        return MessageDto.<Void>builder()
+                .messageId(idGen.next())
+                .roomId(roomId)
+                .userId(userId)
+                .type(MessageType.joinEventPayload)
+                .payload(null)
+                .sentAt(LocalDateTime.now())
+                .build();
+    }
+
+    private MessageDto<PublishEventPayload> buildPublicEvent(String roomId, String userId, boolean published) {
+        var payload = PublishEventPayload.builder()
+                .published(published)
+                .build();
+
+        return MessageDto.<PublishEventPayload>builder()
+                .messageId(idGen.next())
+                .roomId(roomId)
+                .userId(userId)
+                .type(MessageType.publishEventPayload)
+                .payload(payload)
+                .sentAt(LocalDateTime.now())
+                .build();
+    }
+
+
+
+
     public OutMessages handleMessage(String roomId, String name, MessageDto<?> messageDto) {
 
         switch (messageDto.getType()) {
             case joinRequestPayload: {
                 boolean ok = roomAgent.handleJoin(messageDto);
-                System.out.println("VCService Log => handle join의 결과는 " + ok);
+                log.info("VCService Log => handle join의 결과는 " + ok);
 
                 if (ok) {
                     var ackPayload = JoinResponsePayload.builder()
@@ -62,7 +92,7 @@ public class VCService {
                             .userId(name)
                             .build();
 
-                    var ack = MessageDto.builder()
+                    var ack = MessageDto.<JoinResponsePayload>builder()
                             .messageId(idGen.next())
                             .type(MessageType.joinResponsePayload)
                             .userId(name)
@@ -71,19 +101,16 @@ public class VCService {
                             .sentAt(LocalDateTime.now())
                             .build();
 
-
-
-                    var joinEvent = MessageDto.builder()
+                    var joinEvent = MessageDto.<Void>builder()
                             .messageId(idGen.next())
                             .roomId(roomId)
                             .userId(name)
-                            .type(MessageType.joinResponsePayload)
+                            .type(MessageType.joinEventPayload)
                             .payload(null)
                             .sentAt(LocalDateTime.now())
                             .build();
 
-//                    log.info("[SEND] roomId = {} msgId = {} type = {} ", roomId, ack.getMessageId(), ack.getType());
-                    return OutMessages.both(ack, joinEvent);
+                    return OutMessages.both(ack, List.of(joinEvent));
                 }
                 return OutMessages.empty();
             }
@@ -103,7 +130,7 @@ public class VCService {
                             .sentAt(LocalDateTime.now())
                             .build();
 
-                    log.info("[SEND] roomId = {} msgId = {} type = {} ", roomId, leftEvent.getMessageId(), leftEvent.getType());
+//                    log.info("[SEND] roomId = {} msgId = {} type = {} ", roomId, leftEvent.getMessageId(), leftEvent.getType());
                     return OutMessages.justBroadcast(leftEvent);
                 }
                 return OutMessages.empty();
@@ -113,26 +140,20 @@ public class VCService {
                 PublishReportPayload pr = payloadOf(messageDto, PublishReportPayload.class);
                 boolean desired = pr.isPublished();
 
-                boolean ok = roomAgent.handlePublish(messageDto);
-                if (ok) {
-                    var eventPayload = PublishEventPayload.builder()
-                            .published(desired)
-                            .build();
+                List<MessageDto<?>> bcasts = new ArrayList<>();
 
-                    var publishEvent = MessageDto.<PublishEventPayload>builder()
-                            .messageId(idGen.next())
-                            .roomId(roomId)
-                            .userId(name)
-                            .type(MessageType.publishEventPayload)
-                            .payload(eventPayload)
-                            .sentAt(LocalDateTime.now())
-                            .build();
-
-                    return OutMessages.justBroadcast(publishEvent);
+                boolean joinedNow = roomAgent.ensureMember(roomId, name, LocalDateTime.now());
+                if (joinedNow) {
+                    bcasts.add(buildJoinEvent(roomId, name));
                 }
-                return OutMessages.empty();
-            }
 
+                boolean changed = roomAgent.setPublished(roomId, name, desired);
+                    if (changed) {
+                        bcasts.add(buildPublicEvent(roomId, name, desired));
+                    }
+                    return bcasts.isEmpty() ? OutMessages.empty()
+                            : OutMessages.both(null, bcasts);
+                }
 
             default: {
                 return OutMessages.empty();

@@ -41,8 +41,8 @@ public class VCController {
             ){
 
         // IN 로그
-        log.info("[IN ] roomId ={} user ={} type ={} msgId ={}",
-                roomId, principal.getName(), messageDto.getType(), messageDto.getMessageId());
+        log.info("[IN ] roomId ={} user ={} type ={} msgId ={} payload ={}",
+                roomId, principal.getName(), messageDto.getType(), messageDto.getMessageId(), messageDto.getPayload());
 
         VCService.OutMessages out = vcService.handleMessage(roomId, principal.getName(), messageDto);
 
@@ -56,10 +56,14 @@ public class VCController {
         }
 
         // 브로드캐스트 전송
-        if(out.broadcasts() != null) {
-            messagingTemplate.convertAndSend("/topic/vc/" + roomId, out.broadcasts());
-            log.info("[OUT] BCAST dest =/topic/vc/{} type={} msgId={}",
-                    roomId, out.broadcasts().getType(), out.broadcasts().getMessageId());
+        var bcs = out.broadcasts();
+        if(bcs != null) {
+            for(var bc : bcs){
+                messagingTemplate.convertAndSend("/topic/vc/" + roomId, bc);
+                log.info("[OUT] BCAST dest =/topic/vc/{} type={} msgId={}",
+                        roomId, bc.getType(), bc.getMessageId());
+
+            }
 
         }
     }
