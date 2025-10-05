@@ -49,5 +49,5 @@ livekit:
 
 webMedia:
   apiUrl: http://localhost:1985
-  streamUrl: webrtc://localhost
+  StreamUrl: webrtc://localhost
 
