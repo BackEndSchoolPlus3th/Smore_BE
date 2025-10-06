@@ -136,8 +136,11 @@ public class RoomAgent {
             if (state.users.isEmpty()){
                 state.emptyAt = LocalDateTime.now();
             }
+
+            log.info("RoomAgent Log => "+ "Rooms : "+rooms.toString());
             return state;
         });
+        log.info("RoomAgent Log => "+ "Rooms : "+rooms.toString());
         return removed[0];
     }
 

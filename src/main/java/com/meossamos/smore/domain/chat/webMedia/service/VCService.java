@@ -101,14 +101,7 @@ public class VCService {
                             .sentAt(LocalDateTime.now())
                             .build();
 
-                    var joinEvent = MessageDto.<Void>builder()
-                            .messageId(idGen.next())
-                            .roomId(roomId)
-                            .userId(name)
-                            .type(MessageType.joinEventPayload)
-                            .payload(null)
-                            .sentAt(LocalDateTime.now())
-                            .build();
+                    var joinEvent = buildJoinEvent(roomId, name);
 
                     return OutMessages.both(ack, List.of(joinEvent));
                 }
@@ -118,15 +111,14 @@ public class VCService {
             case leaveRequestPayload: {
                 boolean ok = roomAgent.handleLeave(messageDto);
                 if (ok) {
-                    var eventPayload = UserLeftPayload.builder()
-                            .build();
+
 
                     var leftEvent = MessageDto.builder()
                             .messageId(idGen.next())
                             .roomId(roomId)
                             .userId(name)
                             .type(MessageType.userLeftPayload)
-                            .payload(eventPayload)
+                            .payload(null)
                             .sentAt(LocalDateTime.now())
                             .build();
 
