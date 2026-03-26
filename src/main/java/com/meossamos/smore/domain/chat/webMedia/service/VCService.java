@@ -32,7 +32,7 @@ public class VCService {
     @Value("${webMedia.StreamUrl}")
     private String streamUrl;
 
-    // VCController에 전달할 메세지 종류 정의
+    // VCController에 전달할 메세지 종류 정의!
     public static record OutMessages(
        @Nullable MessageDto<?> ack,
        List<MessageDto<?>> broadcasts
@@ -45,6 +45,8 @@ public class VCService {
 
     // 페이로드 꺼내는 헬퍼
     private <T> T payloadOf(MessageDto<?> dto, Class<T> clazz) {
+        // 테스트 테스트!!!
+        // 테스트
         return objectMapper.convertValue(dto.getPayload(), clazz);
     }
 
