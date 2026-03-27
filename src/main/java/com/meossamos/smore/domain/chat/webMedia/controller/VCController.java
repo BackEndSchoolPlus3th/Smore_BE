@@ -48,9 +48,9 @@ public class VCController {
 
         // 개인 Ack 전송
         if(out.ack() !=null){
-            messagingTemplate.convertAndSendToUser(principal.getName(),
-                    "/queue/vc",out.ack());
-            log.info("[OUT] ACK dest=/user/{}/queue/vc type ={} msgId={}",
+            messagingTemplate.convertAndSend(
+                    "/topic/vc/" + roomId, out.ack());
+            log.info("[OUT] ack dest =/topic/vc/{} type={} msgId={}",
                     principal.getName(), out.ack().getType(), out.ack().getMessageId());
 
         }

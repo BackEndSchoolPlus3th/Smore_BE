@@ -45,8 +45,6 @@ public class VCService {
 
     // 페이로드 꺼내는 헬퍼
     private <T> T payloadOf(MessageDto<?> dto, Class<T> clazz) {
-        // 테스트 테스트!!!
-        // 테스트
         return objectMapper.convertValue(dto.getPayload(), clazz);
     }
 
@@ -63,6 +61,7 @@ public class VCService {
     }
 
     private MessageDto<PublishEventPayload> buildPublicEvent(String roomId, String userId, boolean published) {
+
         var payload = PublishEventPayload.builder()
                 .published(published)
                 .build();
@@ -81,7 +80,7 @@ public class VCService {
 
 
     public OutMessages handleMessage(String roomId, String name, MessageDto<?> messageDto) {
-
+        String clientMessageId = messageDto.getMessageId();
         switch (messageDto.getType()) {
             case joinRequestPayload: {
                 boolean ok = roomAgent.handleJoin(messageDto);
@@ -95,7 +94,7 @@ public class VCService {
                             .build();
 
                     var ack = MessageDto.<JoinResponsePayload>builder()
-                            .messageId(idGen.next())
+                            .messageId(clientMessageId)
                             .type(MessageType.joinResponsePayload)
                             .userId(name)
                             .payload(ackPayload)
@@ -103,8 +102,15 @@ public class VCService {
                             .sentAt(LocalDateTime.now())
                             .build();
 
-                    var joinEvent = buildJoinEvent(roomId, name);
-
+                    var joinEvent = MessageDto.<Void>builder()
+                            .messageId(clientMessageId + "_ev")
+                            .roomId(roomId)
+                            .userId(name)
+                            .type(MessageType.joinEventPayload)
+                            .sentAt(LocalDateTime.now())
+                            .build();
+                    log.info("VCService => 생성된 Ack ID: {}", ack.getMessageId());
+                    log.info("VCService => 생성된 Event ID: {}", joinEvent.getMessageId());
                     return OutMessages.both(ack, List.of(joinEvent));
                 }
                 return OutMessages.empty();
@@ -116,7 +122,7 @@ public class VCService {
 
 
                     var leftEvent = MessageDto.builder()
-                            .messageId(idGen.next())
+                            .messageId(clientMessageId)
                             .roomId(roomId)
                             .userId(name)
                             .type(MessageType.userLeftPayload)
