@@ -10,5 +10,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class PublishEventPayload {
+    private String userId;
     public boolean published;
 }

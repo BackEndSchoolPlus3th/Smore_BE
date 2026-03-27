@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class RoomAgent {
 
     private final Map<String, RoomState> rooms = new ConcurrentHashMap<>();
+    public record JoinResult(RoomUser user, RoomUser anotherUser) {}
 
     static final class  RoomState{
         final ConcurrentHashMap<String, RoomUser> users = new ConcurrentHashMap<>();
@@ -58,12 +59,12 @@ public class RoomAgent {
         return added;
     }
 
-    public boolean handleJoin(MessageDto<?>  messageDto) {
+    public JoinResult handleJoin(MessageDto<?>  messageDto) {
         String roomId = messageDto.getRoomId();
         String userId = messageDto.getUserId();
         LocalDateTime joinedAt = messageDto.getSentAt() != null ? messageDto.getSentAt() : LocalDateTime.now();
 
-        final RoomUser roomUser = RoomUser.builder()
+        final RoomUser myUser = RoomUser.builder()
                 .roomId(roomId)
                 .userId(userId)
                 .published(false)
@@ -71,15 +72,22 @@ public class RoomAgent {
                 .build();
 
         RoomState state = rooms.computeIfAbsent(roomId, id -> new RoomState());
-        boolean added = state.users.putIfAbsent(userId, roomUser) == null;
+        RoomUser existing = state.users.putIfAbsent(userId, myUser);
+        RoomUser finalMyUser = (existing == null) ? myUser : existing;
 
-        if(added){
+        if(existing == null){
             state.emptyAt = null;
             state.lastActivatedAt = LocalDateTime.now();
             state.version.incrementAndGet();
-            log.info("RoomAgent Log => "+"RoomUser : " + roomUser.toString() + "Rooms : "+rooms.toString());
+//            log.info("RoomAgent Log => "+"RoomUser : " + myUser.toString() + "Rooms : "+rooms.toString());
         }
-        return added;
+
+        RoomUser anotherUser = state.users.values().stream()
+                .filter(u -> !u.getUserId().equals(userId))
+                .findFirst()
+                .orElse(null);
+
+        return new JoinResult(finalMyUser, anotherUser);
     }
 
     public boolean setPublished(String roomId, String userId, boolean desired){
@@ -136,8 +144,11 @@ public class RoomAgent {
             if (state.users.isEmpty()){
                 state.emptyAt = LocalDateTime.now();
             }
+
+            log.info("RoomAgent Log => "+ "Rooms : "+rooms.toString());
             return state;
         });
+        log.info("RoomAgent Log => "+ "Rooms : "+rooms.toString());
         return removed[0];
     }
 
