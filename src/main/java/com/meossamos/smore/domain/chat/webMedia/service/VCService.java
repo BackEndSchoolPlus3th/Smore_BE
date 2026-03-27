@@ -1,6 +1,7 @@
 package com.meossamos.smore.domain.chat.webMedia.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.meossamos.smore.domain.chat.webMedia.model.RoomUser;
 import com.meossamos.smore.domain.chat.webMedia.model.VCMessage.MessageDto;
 import com.meossamos.smore.domain.chat.webMedia.model.VCMessage.payload.*;
 import com.mongodb.lang.Nullable;
@@ -83,37 +84,41 @@ public class VCService {
         String clientMessageId = messageDto.getMessageId();
         switch (messageDto.getType()) {
             case joinRequestPayload: {
-                boolean ok = roomAgent.handleJoin(messageDto);
-                log.info("VCService Log => handle join의 결과는 " + ok);
+                RoomAgent.JoinResult result = roomAgent.handleJoin(messageDto);
+                log.info("VCService Log => handle join의 결과는 " + result);
 
-                if (ok) {
-                    var ackPayload = JoinResponsePayload.builder()
-                            .apiUrl(apiUrl)
-                            .streamUrl(streamUrl)
-                            .userId(name)
-                            .build();
+                RoomUser myUser = result.user();
+                String verifiedUserId = myUser.getUserId();
+                RoomUser anotherUser = result.anotherUser();
 
-                    var ack = MessageDto.<JoinResponsePayload>builder()
-                            .messageId(clientMessageId)
-                            .type(MessageType.joinResponsePayload)
-                            .userId(name)
-                            .payload(ackPayload)
-                            .roomId(roomId)
-                            .sentAt(LocalDateTime.now())
-                            .build();
+                var ackPayload = JoinResponsePayload.builder()
+                        .apiUrl(apiUrl)
+                        .streamUrl(streamUrl)
+                        .roomId(roomId)
+                        .user(myUser)
+                        .anotherUser(anotherUser)
+                        .build();
 
-                    var joinEvent = MessageDto.<Void>builder()
-                            .messageId(clientMessageId + "_ev")
-                            .roomId(roomId)
-                            .userId(name)
-                            .type(MessageType.joinEventPayload)
-                            .sentAt(LocalDateTime.now())
-                            .build();
-                    log.info("VCService => 생성된 Ack ID: {}", ack.getMessageId());
-                    log.info("VCService => 생성된 Event ID: {}", joinEvent.getMessageId());
-                    return OutMessages.both(ack, List.of(joinEvent));
-                }
-                return OutMessages.empty();
+                var ack = MessageDto.<JoinResponsePayload>builder()
+                        .messageId(clientMessageId)
+                        .type(MessageType.joinResponsePayload)
+                        .userId(verifiedUserId)
+                        .payload(ackPayload)
+                        .roomId(roomId)
+                        .sentAt(LocalDateTime.now())
+                        .build();
+
+                var joinEvent = MessageDto.<Void>builder()
+                        .messageId(clientMessageId + "_ev")
+                        .roomId(roomId)
+                        .userId(verifiedUserId)
+                        .type(MessageType.joinEventPayload)
+                        .sentAt(LocalDateTime.now())
+                        .build();
+                log.info("VCService => 생성된 Ack ID: {}", ack.getMessageId());
+                log.info("VCService => 생성된 Event ID: {}", joinEvent.getMessageId());
+                return OutMessages.both(ack, List.of(joinEvent));
+
             }
 
             case leaveRequestPayload: {
